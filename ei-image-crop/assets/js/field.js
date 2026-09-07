@@ -148,6 +148,7 @@
 			source_id: sourceId,
 			current_id: existingId || '',
 			ratio: $field.data( 'ratio' ),
+			preview_size: $field.data( 'preview-size' ),
 		} )
 			.done( function ( response ) {
 				if ( ! response || ! response.success ) {
@@ -211,7 +212,7 @@
 				.append( $( '<img />' ).attr( 'src', crop.url ) )
 				.on( 'click', function () {
 					setState( $field, { id: crop.id, source: currentSourceId } );
-					setPreview( $field, crop.url );
+					setPreview( $field, crop.preview );
 					closeModal();
 				} );
 
@@ -257,6 +258,7 @@
 			field_key: fieldKey,
 			ratio: ratio,
 			box: box,
+			preview_size: $field.data( 'preview-size' ),
 		} )
 			.done( function ( response ) {
 				if ( ! response || ! response.success ) {
