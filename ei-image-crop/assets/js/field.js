@@ -283,7 +283,11 @@
 		cropper = new Cropper( imgEl, {
 			aspectRatio: aspectRatio,
 			viewMode: 1,
-			dragMode: 'move',
+			// 'move' lets dragging the canvas pan the underlying image
+			// around; 'none' keeps the image completely fixed and leaves
+			// only the crop box itself draggable/resizable via its own
+			// handles, which is what "the image should stay put" means.
+			dragMode: 'none',
 			autoCropArea: 1,
 			responsive: true,
 			background: false,
