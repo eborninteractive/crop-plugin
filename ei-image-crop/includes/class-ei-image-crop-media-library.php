@@ -16,7 +16,13 @@ class Ei_Image_Crop_Media_Library {
 		add_action( 'pre_get_posts', array( __CLASS__, 'filter_list_table' ) );
 		add_filter( 'ajax_query_attachments_args', array( __CLASS__, 'filter_grid_query' ) );
 		add_action( 'restrict_manage_posts', array( __CLASS__, 'render_list_toggle' ) );
+		// Covers the media modal opened from a post edit screen (which calls
+		// wp_enqueue_media() itself, firing this action).
 		add_action( 'wp_enqueue_media', array( __CLASS__, 'enqueue_grid_toggle' ) );
+		// The standalone Media Library grid (Media > Library) doesn't reliably
+		// fire wp_enqueue_media's action for this, so enqueue directly there too;
+		// wp_enqueue_script() no-ops harmlessly if it's already been added.
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_on_library_screen' ) );
 	}
 
 	/**
@@ -97,6 +103,21 @@ class Ei_Image_Crop_Media_Library {
 			esc_url( $url ),
 			esc_html( $label )
 		);
+	}
+
+	/**
+	 * @param string $hook_suffix
+	 */
+	public static function enqueue_on_library_screen( $hook_suffix ) {
+		if ( 'upload.php' !== $hook_suffix ) {
+			return;
+		}
+
+		// Make sure the underlying media views script this toggle patches is
+		// actually present on this screen before enqueuing it.
+		wp_enqueue_media();
+
+		self::enqueue_grid_toggle();
 	}
 
 	/**
