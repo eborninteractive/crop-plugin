@@ -25,7 +25,7 @@
 
 			$toggle.find( 'input' ).on( 'change', function () {
 				var checked = $( this ).is( ':checked' );
-				library.props.set( { ebShowCrops: checked ? 1 : '' } );
+				library.props.set( { eiShowCrops: checked ? 1 : '' } );
 			} );
 
 			this.toolbar.$el.append( $toggle );

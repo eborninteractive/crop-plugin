@@ -55,13 +55,13 @@ class Ei_Image_Crop_Media_Library {
 
 	/**
 	 * Hide crops from the media modal grid, unless the in-modal toggle sent
-	 * ebShowCrops through as part of the query props.
+	 * eiShowCrops through as part of the query props.
 	 *
 	 * @param array $query
 	 * @return array
 	 */
 	public static function filter_grid_query( $query ) {
-		if ( ! empty( $query['ebShowCrops'] ) ) {
+		if ( ! empty( $query['eiShowCrops'] ) ) {
 			return $query;
 		}
 
