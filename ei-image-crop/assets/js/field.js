@@ -132,7 +132,13 @@
 		return Math.abs( actual - target ) / target < 0.01;
 	}
 
-	function openCropper( $field, sourceId, existingId ) {
+	/**
+	 * @param {Object} [pickedAttachment] Raw wp.media attachment JSON for a
+	 *   fresh pick (undefined for "Adjust crop" on an already-set value) -
+	 *   used to preview an already-cropped pick immediately without a
+	 *   round trip, if it turns out to need no cropper at all.
+	 */
+	function openCropper( $field, sourceId, existingId, pickedAttachment ) {
 		var modal = buildModal();
 
 		currentField = $field;
@@ -166,11 +172,12 @@
 				}
 
 				var data = response.data;
+				var wasFreshPick = ! existingId;
 
 				// A fresh pick (existingId started out empty) of an image
 				// that's itself already a crop gets resolved server-side to
 				// its true original + that crop's own id, so adjusting it
-				// here marks its actual existing box on the real original
+				// later marks its actual existing box on the real original
 				// instead of treating the crop as a brand new source to
 				// crop again. Carry the resolved values forward for the
 				// rest of this session (reuse row, save, save-as-new).
@@ -179,6 +186,26 @@
 				currentSourceId    = sourceId;
 				currentExistingId  = existingId;
 				modal.find( '.ei-image-crop-save-new' ).prop( 'hidden', ! existingId );
+
+				// Picking an already-cropped image on purpose means using
+				// that exact crop, not being forced to make a new one right
+				// away - apply it as-is and leave the cropper unopened.
+				// "Adjust crop" (which starts with a non-empty existingId,
+				// so wasFreshPick is false) remains the explicit way to open
+				// the editor for it afterward.
+				if ( wasFreshPick && existingId ) {
+					var previewSize = $field.data( 'preview-size' );
+					var previewUrl = ( pickedAttachment && pickedAttachment.sizes && pickedAttachment.sizes[ previewSize ] )
+						? pickedAttachment.sizes[ previewSize ].url
+						: ( pickedAttachment ? pickedAttachment.url : data.edit.url );
+
+					setState( $field, { id: existingId, source: sourceId } );
+					setPreview( $field, previewUrl );
+					currentField = null;
+					currentSourceId = null;
+					currentExistingId = null;
+					return;
+				}
 
 				function showInteractiveCropper() {
 					renderReuseList( $field, data.existing || [] );
@@ -364,7 +391,7 @@
 
 		frame.on( 'select', function () {
 			var attachment = frame.state().get( 'selection' ).first().toJSON();
-			openCropper( $field, attachment.id, '' );
+			openCropper( $field, attachment.id, '', attachment );
 		} );
 
 		frame.open();
