@@ -2,14 +2,14 @@
 /**
  * Crop math and on-demand image generation.
  *
- * @package EB_Image_Crop
+ * @package Ei_Image_Crop
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class EB_Image_Crop_Generator {
+class Ei_Image_Crop_Generator {
 
 	/**
 	 * Parse a ratio string like "16:9" into array( 16, 9 ). Returns null for "free"/empty.
@@ -126,13 +126,13 @@ class EB_Image_Crop_Generator {
 		$path = wp_get_original_image_path( $attachment_id );
 
 		if ( ! $path || ! file_exists( $path ) ) {
-			return new WP_Error( 'eb_image_crop_no_source', __( 'Could not find the original image file.', 'eb-image-crop' ) );
+			return new WP_Error( 'ei_image_crop_no_source', __( 'Could not find the original image file.', 'ei-image-crop' ) );
 		}
 
 		$size = @getimagesize( $path );
 
 		if ( ! $size ) {
-			return new WP_Error( 'eb_image_crop_bad_source', __( 'Could not read the original image dimensions.', 'eb-image-crop' ) );
+			return new WP_Error( 'ei_image_crop_bad_source', __( 'Could not read the original image dimensions.', 'ei-image-crop' ) );
 		}
 
 		return array(
@@ -180,7 +180,7 @@ class EB_Image_Crop_Generator {
 				'fields'         => 'ids',
 				'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 					array(
-						'key'   => '_eb_crop_hash',
+						'key'   => '_ei_crop_hash',
 						'value' => $hash,
 					),
 				),
@@ -215,7 +215,7 @@ class EB_Image_Crop_Generator {
 		$parent_id = (int) $parent_id;
 
 		if ( ! wp_attachment_is_image( $parent_id ) ) {
-			return new WP_Error( 'eb_image_crop_bad_parent', __( 'Source is not a valid image attachment.', 'eb-image-crop' ) );
+			return new WP_Error( 'ei_image_crop_bad_parent', __( 'Source is not a valid image attachment.', 'ei-image-crop' ) );
 		}
 
 		$box = self::sanitize_box( $box );
@@ -257,7 +257,7 @@ class EB_Image_Crop_Generator {
 
 		$upload_dir = wp_upload_dir();
 		if ( ! empty( $upload_dir['error'] ) ) {
-			return new WP_Error( 'eb_image_crop_upload_dir', $upload_dir['error'] );
+			return new WP_Error( 'ei_image_crop_upload_dir', $upload_dir['error'] );
 		}
 
 		$parent_filename = pathinfo( $source['path'], PATHINFO_FILENAME );
@@ -294,7 +294,7 @@ class EB_Image_Crop_Generator {
 			$attachment_id = wp_insert_attachment(
 				array(
 					'post_mime_type' => $saved['mime-type'],
-					'post_title'     => sprintf( '%s – %s', $title, $ratio ? $ratio : __( 'free crop', 'eb-image-crop' ) ),
+					'post_title'     => sprintf( '%s – %s', $title, $ratio ? $ratio : __( 'free crop', 'ei-image-crop' ) ),
 					'post_content'   => '',
 					'post_status'    => 'inherit',
 				),
@@ -315,13 +315,13 @@ class EB_Image_Crop_Generator {
 		$metadata = wp_generate_attachment_metadata( $attachment_id, $saved['path'] );
 		wp_update_attachment_metadata( $attachment_id, $metadata );
 
-		update_post_meta( $attachment_id, '_eb_crop_parent', $parent_id );
-		update_post_meta( $attachment_id, '_eb_crop_ratio', $ratio ? $ratio : 'free' );
-		update_post_meta( $attachment_id, '_eb_crop_box', $box );
-		update_post_meta( $attachment_id, '_eb_crop_hash', $hash );
+		update_post_meta( $attachment_id, '_ei_crop_parent', $parent_id );
+		update_post_meta( $attachment_id, '_ei_crop_ratio', $ratio ? $ratio : 'free' );
+		update_post_meta( $attachment_id, '_ei_crop_box', $box );
+		update_post_meta( $attachment_id, '_ei_crop_hash', $hash );
 
 		if ( $field_key ) {
-			update_post_meta( $attachment_id, '_eb_crop_field_key', $field_key );
+			update_post_meta( $attachment_id, '_ei_crop_field_key', $field_key );
 		}
 
 		return $attachment_id;

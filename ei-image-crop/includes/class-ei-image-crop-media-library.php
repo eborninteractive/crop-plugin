@@ -3,14 +3,14 @@
  * Hides generated crop attachments from the Media Library by default, behind
  * a "Show crops" toggle, so the library doesn't drown in derivative images.
  *
- * @package EB_Image_Crop
+ * @package Ei_Image_Crop
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class EB_Image_Crop_Media_Library {
+class Ei_Image_Crop_Media_Library {
 
 	public static function init() {
 		add_action( 'pre_get_posts', array( __CLASS__, 'filter_list_table' ) );
@@ -24,14 +24,14 @@ class EB_Image_Crop_Media_Library {
 	 */
 	protected static function exclusion_clause() {
 		return array(
-			'key'     => '_eb_crop_parent',
+			'key'     => '_ei_crop_parent',
 			'compare' => 'NOT EXISTS',
 		);
 	}
 
 	/**
 	 * Hide crops from the classic Media Library list table, unless the
-	 * "Show crops" link has been clicked (adds ?eb_show_crops=1).
+	 * "Show crops" link has been clicked (adds ?ei_show_crops=1).
 	 *
 	 * @param WP_Query $query
 	 */
@@ -44,7 +44,7 @@ class EB_Image_Crop_Media_Library {
 			return;
 		}
 
-		if ( ! empty( $_GET['eb_show_crops'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! empty( $_GET['ei_show_crops'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			return;
 		}
 
@@ -82,18 +82,18 @@ class EB_Image_Crop_Media_Library {
 			return;
 		}
 
-		$showing = ! empty( $_GET['eb_show_crops'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$showing = ! empty( $_GET['ei_show_crops'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		$url = $showing
-			? remove_query_arg( 'eb_show_crops' )
-			: add_query_arg( 'eb_show_crops', '1' );
+			? remove_query_arg( 'ei_show_crops' )
+			: add_query_arg( 'ei_show_crops', '1' );
 
 		$label = $showing
-			? __( 'Hide generated crops', 'eb-image-crop' )
-			: __( 'Show generated crops', 'eb-image-crop' );
+			? __( 'Hide generated crops', 'ei-image-crop' )
+			: __( 'Show generated crops', 'ei-image-crop' );
 
 		printf(
-			'<a href="%1$s" class="button eb-image-crop-toggle-link">%2$s</a>',
+			'<a href="%1$s" class="button ei-image-crop-toggle-link">%2$s</a>',
 			esc_url( $url ),
 			esc_html( $label )
 		);
@@ -104,18 +104,18 @@ class EB_Image_Crop_Media_Library {
 	 */
 	public static function enqueue_grid_toggle() {
 		wp_enqueue_script(
-			'eb-image-crop-media-toggle',
-			EB_IMAGE_CROP_URL . 'assets/js/media-toggle.js',
+			'ei-image-crop-media-toggle',
+			EI_IMAGE_CROP_URL . 'assets/js/media-toggle.js',
 			array( 'media-views' ),
-			EB_IMAGE_CROP_VERSION,
+			EI_IMAGE_CROP_VERSION,
 			true
 		);
 
 		wp_localize_script(
-			'eb-image-crop-media-toggle',
-			'ebImageCropMedia',
+			'ei-image-crop-media-toggle',
+			'eiImageCropMedia',
 			array(
-				'label' => __( 'Show generated crops', 'eb-image-crop' ),
+				'label' => __( 'Show generated crops', 'ei-image-crop' ),
 			)
 		);
 	}

@@ -2,14 +2,14 @@
 /**
  * Keeps generated crops from turning into orphaned files.
  *
- * @package EB_Image_Crop
+ * @package Ei_Image_Crop
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class EB_Image_Crop_Cleanup {
+class Ei_Image_Crop_Cleanup {
 
 	public static function init() {
 		add_action( 'delete_attachment', array( __CLASS__, 'delete_child_crops' ) );
@@ -25,7 +25,7 @@ class EB_Image_Crop_Cleanup {
 	public static function delete_child_crops( $attachment_id ) {
 		// Crops are attachments themselves; skip if this deletion IS a crop
 		// (nothing further to cascade).
-		if ( get_post_meta( $attachment_id, '_eb_crop_parent', true ) ) {
+		if ( get_post_meta( $attachment_id, '_ei_crop_parent', true ) ) {
 			return;
 		}
 
@@ -37,7 +37,7 @@ class EB_Image_Crop_Cleanup {
 				'fields'         => 'ids',
 				'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 					array(
-						'key'   => '_eb_crop_parent',
+						'key'   => '_ei_crop_parent',
 						'value' => $attachment_id,
 					),
 				),

@@ -2,7 +2,7 @@
 /**
  * ACF field type: Image Crop.
  *
- * @package EB_Image_Crop
+ * @package Ei_Image_Crop
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -13,7 +13,7 @@ if ( ! class_exists( 'acf_field' ) ) {
 	return;
 }
 
-class EB_Image_Crop_Field extends acf_field {
+class Ei_Image_Crop_Field extends acf_field {
 
 	/**
 	 * Ratios offered in the field settings dropdown. Filterable.
@@ -23,8 +23,8 @@ class EB_Image_Crop_Field extends acf_field {
 	public $ratio_choices;
 
 	public function __construct() {
-		$this->name     = 'eb_image_crop';
-		$this->label    = __( 'Image Crop', 'eb-image-crop' );
+		$this->name     = 'ei_image_crop';
+		$this->label    = __( 'Image Crop', 'ei-image-crop' );
 		$this->category = 'content';
 		$this->defaults = array(
 			'aspect_ratio'  => '16:9',
@@ -35,15 +35,15 @@ class EB_Image_Crop_Field extends acf_field {
 		);
 
 		$this->ratio_choices = apply_filters(
-			'eb_image_crop/ratio_choices',
+			'ei_image_crop/ratio_choices',
 			array(
-				'free'  => __( 'Free (no fixed ratio)', 'eb-image-crop' ),
+				'free'  => __( 'Free (no fixed ratio)', 'ei-image-crop' ),
 				'1:1'   => '1:1',
 				'4:3'   => '4:3',
 				'3:2'   => '3:2',
 				'16:9'  => '16:9',
 				'21:9'  => '21:9',
-				'custom' => __( 'Custom…', 'eb-image-crop' ),
+				'custom' => __( 'Custom…', 'ei-image-crop' ),
 			)
 		);
 
@@ -59,8 +59,8 @@ class EB_Image_Crop_Field extends acf_field {
 		acf_render_field_setting(
 			$field,
 			array(
-				'label'        => __( 'Aspect ratio', 'eb-image-crop' ),
-				'instructions' => __( 'A fixed ratio locks the crop frame while scaling it; Free lets the frame itself be resized.', 'eb-image-crop' ),
+				'label'        => __( 'Aspect ratio', 'ei-image-crop' ),
+				'instructions' => __( 'A fixed ratio locks the crop frame while scaling it; Free lets the frame itself be resized.', 'ei-image-crop' ),
 				'type'         => 'select',
 				'name'         => 'aspect_ratio',
 				'choices'      => $this->ratio_choices,
@@ -70,8 +70,8 @@ class EB_Image_Crop_Field extends acf_field {
 		acf_render_field_setting(
 			$field,
 			array(
-				'label'        => __( 'Custom ratio', 'eb-image-crop' ),
-				'instructions' => __( 'Only used when Aspect ratio above is set to "Custom". Format: width:height, e.g. 5:2.', 'eb-image-crop' ),
+				'label'        => __( 'Custom ratio', 'ei-image-crop' ),
+				'instructions' => __( 'Only used when Aspect ratio above is set to "Custom". Format: width:height, e.g. 5:2.', 'ei-image-crop' ),
 				'type'         => 'text',
 				'name'         => 'custom_ratio',
 				'placeholder'  => '5:2',
@@ -86,8 +86,8 @@ class EB_Image_Crop_Field extends acf_field {
 		acf_render_field_setting(
 			$field,
 			array(
-				'label'        => __( 'Admin preview size', 'eb-image-crop' ),
-				'instructions' => __( 'Image size used to preview the crop in the field editor.', 'eb-image-crop' ),
+				'label'        => __( 'Admin preview size', 'ei-image-crop' ),
+				'instructions' => __( 'Image size used to preview the crop in the field editor.', 'ei-image-crop' ),
 				'type'         => 'select',
 				'name'         => 'preview_size',
 				'choices'      => $this->get_image_size_choices(),
@@ -97,13 +97,13 @@ class EB_Image_Crop_Field extends acf_field {
 		acf_render_field_setting(
 			$field,
 			array(
-				'label'   => __( 'Library', 'eb-image-crop' ),
+				'label'   => __( 'Library', 'ei-image-crop' ),
 				'type'    => 'radio',
 				'name'    => 'library',
 				'layout'  => 'horizontal',
 				'choices' => array(
-					'all'        => __( 'All', 'eb-image-crop' ),
-					'uploadedTo' => __( 'Uploaded to post', 'eb-image-crop' ),
+					'all'        => __( 'All', 'ei-image-crop' ),
+					'uploadedTo' => __( 'Uploaded to post', 'ei-image-crop' ),
 				),
 			)
 		);
@@ -111,14 +111,14 @@ class EB_Image_Crop_Field extends acf_field {
 		acf_render_field_setting(
 			$field,
 			array(
-				'label'   => __( 'Return format', 'eb-image-crop' ),
+				'label'   => __( 'Return format', 'ei-image-crop' ),
 				'type'    => 'radio',
 				'name'    => 'return_format',
 				'layout'  => 'horizontal',
 				'choices' => array(
-					'array' => __( 'Image array', 'eb-image-crop' ),
-					'url'   => __( 'Image URL', 'eb-image-crop' ),
-					'id'    => __( 'Image ID', 'eb-image-crop' ),
+					'array' => __( 'Image array', 'ei-image-crop' ),
+					'url'   => __( 'Image URL', 'ei-image-crop' ),
+					'id'    => __( 'Image ID', 'ei-image-crop' ),
 				),
 			)
 		);
@@ -135,7 +135,7 @@ class EB_Image_Crop_Field extends acf_field {
 			$choices[ $size ] = $size;
 		}
 
-		$choices['full'] = __( 'full', 'eb-image-crop' );
+		$choices['full'] = __( 'full', 'ei-image-crop' );
 
 		return $choices;
 	}
@@ -151,7 +151,7 @@ class EB_Image_Crop_Field extends acf_field {
 
 		if ( 'custom' === $ratio ) {
 			$custom = isset( $field['custom_ratio'] ) ? trim( $field['custom_ratio'] ) : '';
-			return EB_Image_Crop_Generator::parse_ratio( $custom ) ? $custom : 'free';
+			return Ei_Image_Crop_Generator::parse_ratio( $custom ) ? $custom : 'free';
 		}
 
 		return $ratio;
@@ -165,7 +165,7 @@ class EB_Image_Crop_Field extends acf_field {
 	public function render_field( $field ) {
 		$value       = (int) $field['value'];
 		$ratio       = self::resolve_ratio( $field );
-		$parent_id   = $value ? (int) get_post_meta( $value, '_eb_crop_parent', true ) : 0;
+		$parent_id   = $value ? (int) get_post_meta( $value, '_ei_crop_parent', true ) : 0;
 		$preview_id  = $value ? $value : 0;
 		$preview_url = $preview_id ? wp_get_attachment_image_url( $preview_id, $field['preview_size'] ) : '';
 
@@ -182,7 +182,7 @@ class EB_Image_Crop_Field extends acf_field {
 		);
 
 		$wrapper_atts = array(
-			'class'              => 'eb-image-crop-field',
+			'class'              => 'ei-image-crop-field',
 			'data-field-key'     => $field['key'],
 			'data-ratio'         => $ratio,
 			'data-preview-size'  => $field['preview_size'],
@@ -194,26 +194,26 @@ class EB_Image_Crop_Field extends acf_field {
 
 		acf_hidden_input(
 			array(
-				'class' => 'eb-image-crop-value',
+				'class' => 'ei-image-crop-value',
 				'name'  => $field['name'],
 				'value' => $state,
 			)
 		);
 
-		echo '<div class="eb-image-crop-preview">';
+		echo '<div class="ei-image-crop-preview">';
 		if ( $preview_url ) {
 			echo '<img src="' . esc_url( $preview_url ) . '" alt="" />';
 		} else {
-			echo '<div class="eb-image-crop-placeholder">' . esc_html__( 'No image selected', 'eb-image-crop' ) . '</div>';
+			echo '<div class="ei-image-crop-placeholder">' . esc_html__( 'No image selected', 'ei-image-crop' ) . '</div>';
 		}
 		echo '</div>';
 
-		echo '<div class="eb-image-crop-existing" hidden></div>';
+		echo '<div class="ei-image-crop-existing" hidden></div>';
 
-		echo '<div class="eb-image-crop-actions">';
-		echo '<button type="button" class="button eb-image-crop-select">' . esc_html__( 'Select image', 'eb-image-crop' ) . '</button> ';
-		echo '<button type="button" class="button eb-image-crop-edit"' . ( $parent_id ? '' : ' hidden' ) . '>' . esc_html__( 'Adjust crop', 'eb-image-crop' ) . '</button> ';
-		echo '<button type="button" class="button-link-delete eb-image-crop-remove"' . ( $parent_id ? '' : ' hidden' ) . '>' . esc_html__( 'Remove', 'eb-image-crop' ) . '</button>';
+		echo '<div class="ei-image-crop-actions">';
+		echo '<button type="button" class="button ei-image-crop-select">' . esc_html__( 'Select image', 'ei-image-crop' ) . '</button> ';
+		echo '<button type="button" class="button ei-image-crop-edit"' . ( $parent_id ? '' : ' hidden' ) . '>' . esc_html__( 'Adjust crop', 'ei-image-crop' ) . '</button> ';
+		echo '<button type="button" class="button-link-delete ei-image-crop-remove"' . ( $parent_id ? '' : ' hidden' ) . '>' . esc_html__( 'Remove', 'ei-image-crop' ) . '</button>';
 		echo '</div>';
 
 		echo '</div>';
@@ -223,34 +223,34 @@ class EB_Image_Crop_Field extends acf_field {
 	 * Enqueue admin assets. Called by ACF once per page load when the field type is present.
 	 */
 	public function input_admin_enqueue_scripts() {
-		$url = EB_IMAGE_CROP_URL;
-		$ver = EB_IMAGE_CROP_VERSION;
+		$url = EI_IMAGE_CROP_URL;
+		$ver = EI_IMAGE_CROP_VERSION;
 
-		wp_enqueue_style( 'eb-image-crop-cropperjs', $url . 'assets/vendor/cropperjs/cropper.min.css', array(), '1.6.2' );
-		wp_enqueue_script( 'eb-image-crop-cropperjs', $url . 'assets/vendor/cropperjs/cropper.min.js', array(), '1.6.2', true );
+		wp_enqueue_style( 'ei-image-crop-cropperjs', $url . 'assets/vendor/cropperjs/cropper.min.css', array(), '1.6.2' );
+		wp_enqueue_script( 'ei-image-crop-cropperjs', $url . 'assets/vendor/cropperjs/cropper.min.js', array(), '1.6.2', true );
 
-		wp_enqueue_style( 'eb-image-crop-field', $url . 'assets/css/field.css', array(), $ver );
+		wp_enqueue_style( 'ei-image-crop-field', $url . 'assets/css/field.css', array(), $ver );
 		wp_enqueue_script(
-			'eb-image-crop-field',
+			'ei-image-crop-field',
 			$url . 'assets/js/field.js',
-			array( 'jquery', 'eb-image-crop-cropperjs', 'media-editor', 'acf-input' ),
+			array( 'jquery', 'ei-image-crop-cropperjs', 'media-editor', 'acf-input' ),
 			$ver,
 			true
 		);
 
 		wp_localize_script(
-			'eb-image-crop-field',
-			'ebImageCrop',
+			'ei-image-crop-field',
+			'eiImageCrop',
 			array(
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-				'nonce'   => wp_create_nonce( 'eb_image_crop' ),
+				'nonce'   => wp_create_nonce( 'ei_image_crop' ),
 				'i18n'    => array(
-					'selectImage'  => __( 'Select an image', 'eb-image-crop' ),
-					'useImage'     => __( 'Use this image', 'eb-image-crop' ),
-					'save'         => __( 'Save crop', 'eb-image-crop' ),
-					'cancel'       => __( 'Cancel', 'eb-image-crop' ),
-					'reuseTitle'   => __( 'Existing crops of this image', 'eb-image-crop' ),
-					'error'        => __( 'Something went wrong while cropping the image.', 'eb-image-crop' ),
+					'selectImage'  => __( 'Select an image', 'ei-image-crop' ),
+					'useImage'     => __( 'Use this image', 'ei-image-crop' ),
+					'save'         => __( 'Save crop', 'ei-image-crop' ),
+					'cancel'       => __( 'Cancel', 'ei-image-crop' ),
+					'reuseTitle'   => __( 'Existing crops of this image', 'ei-image-crop' ),
+					'error'        => __( 'Something went wrong while cropping the image.', 'ei-image-crop' ),
 				),
 			)
 		);
@@ -318,16 +318,16 @@ class EB_Image_Crop_Field extends acf_field {
 		}
 
 		$ratio_label = self::resolve_ratio( $field );
-		$ratio       = EB_Image_Crop_Generator::parse_ratio( $ratio_label );
-		$edit_source = EB_Image_Crop_Generator::get_edit_source( $state['source'] );
+		$ratio       = Ei_Image_Crop_Generator::parse_ratio( $ratio_label );
+		$edit_source = Ei_Image_Crop_Generator::get_edit_source( $state['source'] );
 
 		if ( ! $edit_source ) {
 			return '';
 		}
 
-		$box = EB_Image_Crop_Generator::center_box( $edit_source['width'], $edit_source['height'], $ratio );
+		$box = Ei_Image_Crop_Generator::center_box( $edit_source['width'], $edit_source['height'], $ratio );
 
-		$generated = EB_Image_Crop_Generator::generate( $state['source'], $box, $ratio_label, $field['key'] );
+		$generated = Ei_Image_Crop_Generator::generate( $state['source'], $box, $ratio_label, $field['key'] );
 
 		if ( is_wp_error( $generated ) ) {
 			return '';
@@ -385,7 +385,7 @@ class EB_Image_Crop_Field extends acf_field {
 		$state = self::decode_state( $value );
 
 		if ( empty( $state['id'] ) && empty( $state['source'] ) ) {
-			return __( 'Please select an image.', 'eb-image-crop' );
+			return __( 'Please select an image.', 'ei-image-crop' );
 		}
 
 		return $valid;

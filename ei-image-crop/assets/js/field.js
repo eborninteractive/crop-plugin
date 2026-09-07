@@ -10,7 +10,7 @@
 	var $modal, cropper, currentField, currentSourceId, currentExistingId;
 
 	function t( key ) {
-		return ( window.ebImageCrop && ebImageCrop.i18n && ebImageCrop.i18n[ key ] ) || key;
+		return ( window.eiImageCrop && eiImageCrop.i18n && eiImageCrop.i18n[ key ] ) || key;
 	}
 
 	function parseAspectRatio( ratio ) {
@@ -30,7 +30,7 @@
 	}
 
 	function getState( $field ) {
-		var raw = $field.find( '.eb-image-crop-value' ).val();
+		var raw = $field.find( '.ei-image-crop-value' ).val();
 
 		try {
 			var parsed = JSON.parse( raw );
@@ -41,20 +41,20 @@
 	}
 
 	function setState( $field, state ) {
-		$field.find( '.eb-image-crop-value' ).val(
+		$field.find( '.ei-image-crop-value' ).val(
 			JSON.stringify( { id: state.id || '', source: state.source || '' } )
 		);
 	}
 
 	function setPreview( $field, url ) {
-		var $preview = $field.find( '.eb-image-crop-preview' );
+		var $preview = $field.find( '.ei-image-crop-preview' );
 
 		if ( url ) {
 			$preview.html( $( '<img />' ).attr( 'src', url ) );
-			$field.find( '.eb-image-crop-edit, .eb-image-crop-remove' ).prop( 'hidden', false );
+			$field.find( '.ei-image-crop-edit, .ei-image-crop-remove' ).prop( 'hidden', false );
 		} else {
-			$preview.html( '<div class="eb-image-crop-placeholder"></div>' );
-			$field.find( '.eb-image-crop-edit, .eb-image-crop-remove' ).prop( 'hidden', true );
+			$preview.html( '<div class="ei-image-crop-placeholder"></div>' );
+			$field.find( '.ei-image-crop-edit, .ei-image-crop-remove' ).prop( 'hidden', true );
 		}
 	}
 
@@ -64,21 +64,21 @@
 		}
 
 		$modal = $(
-			'<div class="eb-image-crop-modal" hidden>' +
-				'<div class="eb-image-crop-modal-inner">' +
-					'<div class="eb-image-crop-modal-main">' +
-						'<div class="eb-image-crop-canvas"><img class="eb-image-crop-img" alt="" /></div>' +
+			'<div class="ei-image-crop-modal" hidden>' +
+				'<div class="ei-image-crop-modal-inner">' +
+					'<div class="ei-image-crop-modal-main">' +
+						'<div class="ei-image-crop-canvas"><img class="ei-image-crop-img" alt="" /></div>' +
 					'</div>' +
-					'<div class="eb-image-crop-modal-side">' +
-						'<div class="eb-image-crop-live-preview"></div>' +
-						'<div class="eb-image-crop-reuse" hidden>' +
-							'<p class="eb-image-crop-reuse-title"></p>' +
-							'<div class="eb-image-crop-reuse-list"></div>' +
+					'<div class="ei-image-crop-modal-side">' +
+						'<div class="ei-image-crop-live-preview"></div>' +
+						'<div class="ei-image-crop-reuse" hidden>' +
+							'<p class="ei-image-crop-reuse-title"></p>' +
+							'<div class="ei-image-crop-reuse-list"></div>' +
 						'</div>' +
-						'<p class="eb-image-crop-error" hidden></p>' +
-						'<div class="eb-image-crop-modal-actions">' +
-							'<button type="button" class="button button-primary eb-image-crop-save"></button>' +
-							'<button type="button" class="button eb-image-crop-cancel"></button>' +
+						'<p class="ei-image-crop-error" hidden></p>' +
+						'<div class="ei-image-crop-modal-actions">' +
+							'<button type="button" class="button button-primary ei-image-crop-save"></button>' +
+							'<button type="button" class="button ei-image-crop-cancel"></button>' +
 						'</div>' +
 					'</div>' +
 				'</div>' +
@@ -87,19 +87,19 @@
 
 		$( 'body' ).append( $modal );
 
-		$modal.find( '.eb-image-crop-save' ).text( t( 'save' ) ).on( 'click', onSave );
-		$modal.find( '.eb-image-crop-cancel' ).text( t( 'cancel' ) ).on( 'click', closeModal );
-		$modal.find( '.eb-image-crop-reuse-title' ).text( t( 'reuseTitle' ) );
+		$modal.find( '.ei-image-crop-save' ).text( t( 'save' ) ).on( 'click', onSave );
+		$modal.find( '.ei-image-crop-cancel' ).text( t( 'cancel' ) ).on( 'click', closeModal );
+		$modal.find( '.ei-image-crop-reuse-title' ).text( t( 'reuseTitle' ) );
 
 		return $modal;
 	}
 
 	function showError( message ) {
-		$modal.find( '.eb-image-crop-error' ).text( message ).prop( 'hidden', false );
+		$modal.find( '.ei-image-crop-error' ).text( message ).prop( 'hidden', false );
 	}
 
 	function clearError() {
-		$modal.find( '.eb-image-crop-error' ).prop( 'hidden', true ).text( '' );
+		$modal.find( '.ei-image-crop-error' ).prop( 'hidden', true ).text( '' );
 	}
 
 	function closeModal() {
@@ -125,16 +125,16 @@
 		currentExistingId = existingId || '';
 
 		clearError();
-		modal.find( '.eb-image-crop-reuse' ).prop( 'hidden', true );
-		modal.find( '.eb-image-crop-reuse-list' ).empty();
+		modal.find( '.ei-image-crop-reuse' ).prop( 'hidden', true );
+		modal.find( '.ei-image-crop-reuse-list' ).empty();
 		modal.prop( 'hidden', false );
 
-		var $img = modal.find( '.eb-image-crop-img' );
+		var $img = modal.find( '.ei-image-crop-img' );
 		$img.attr( 'src', '' );
 
-		$.post( ebImageCrop.ajaxUrl, {
-			action: 'eb_image_crop_get_source',
-			nonce: ebImageCrop.nonce,
+		$.post( eiImageCrop.ajaxUrl, {
+			action: 'ei_image_crop_get_source',
+			nonce: eiImageCrop.nonce,
 			source_id: sourceId,
 			current_id: existingId || '',
 			ratio: $field.data( 'ratio' ),
@@ -174,7 +174,7 @@
 			autoCropArea: 1,
 			responsive: true,
 			background: false,
-			preview: '.eb-image-crop-live-preview',
+			preview: '.ei-image-crop-live-preview',
 			ready: function () {
 				var natural = { w: imgEl.naturalWidth, h: imgEl.naturalHeight };
 
@@ -193,10 +193,10 @@
 			return;
 		}
 
-		var $list = $modal.find( '.eb-image-crop-reuse-list' ).empty();
+		var $list = $modal.find( '.ei-image-crop-reuse-list' ).empty();
 
 		crops.forEach( function ( crop ) {
-			var $thumb = $( '<button type="button" class="eb-image-crop-reuse-item"></button>' )
+			var $thumb = $( '<button type="button" class="ei-image-crop-reuse-item"></button>' )
 				.attr( 'title', crop.title )
 				.append( $( '<img />' ).attr( 'src', crop.url ) )
 				.on( 'click', function () {
@@ -208,7 +208,7 @@
 			$list.append( $thumb );
 		} );
 
-		$modal.find( '.eb-image-crop-reuse' ).prop( 'hidden', false );
+		$modal.find( '.ei-image-crop-reuse' ).prop( 'hidden', false );
 	}
 
 	function onSave() {
@@ -232,11 +232,11 @@
 		var existingId = currentExistingId;
 
 		clearError();
-		$modal.find( '.eb-image-crop-save' ).prop( 'disabled', true );
+		$modal.find( '.ei-image-crop-save' ).prop( 'disabled', true );
 
-		$.post( ebImageCrop.ajaxUrl, {
-			action: 'eb_image_crop_save',
-			nonce: ebImageCrop.nonce,
+		$.post( eiImageCrop.ajaxUrl, {
+			action: 'ei_image_crop_save',
+			nonce: eiImageCrop.nonce,
 			source_id: sourceId,
 			existing_id: existingId,
 			field_key: fieldKey,
@@ -257,7 +257,7 @@
 				showError( t( 'error' ) );
 			} )
 			.always( function () {
-				$modal.find( '.eb-image-crop-save' ).prop( 'disabled', false );
+				$modal.find( '.ei-image-crop-save' ).prop( 'disabled', false );
 			} );
 	}
 
@@ -280,17 +280,17 @@
 	function initField( el ) {
 		var $field = $( el );
 
-		if ( $field.data( 'ebImageCropInitialized' ) ) {
+		if ( $field.data( 'eiImageCropInitialized' ) ) {
 			return;
 		}
-		$field.data( 'ebImageCropInitialized', true );
+		$field.data( 'eiImageCropInitialized', true );
 
-		$field.on( 'click', '.eb-image-crop-select', function ( e ) {
+		$field.on( 'click', '.ei-image-crop-select', function ( e ) {
 			e.preventDefault();
 			openMediaFrame( $field );
 		} );
 
-		$field.on( 'click', '.eb-image-crop-edit', function ( e ) {
+		$field.on( 'click', '.ei-image-crop-edit', function ( e ) {
 			e.preventDefault();
 			var state = getState( $field );
 			if ( state.source ) {
@@ -298,7 +298,7 @@
 			}
 		} );
 
-		$field.on( 'click', '.eb-image-crop-remove', function ( e ) {
+		$field.on( 'click', '.ei-image-crop-remove', function ( e ) {
 			e.preventDefault();
 			setState( $field, { id: '', source: '' } );
 			setPreview( $field, '' );
@@ -306,7 +306,7 @@
 	}
 
 	function initAll( $context ) {
-		$( '.eb-image-crop-field', $context ).each( function () {
+		$( '.ei-image-crop-field', $context ).each( function () {
 			initField( this );
 		} );
 	}

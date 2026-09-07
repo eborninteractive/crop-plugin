@@ -17,9 +17,9 @@
 
 			var library = this.collection;
 			var $toggle = $(
-				'<label class="eb-image-crop-toggle">' +
+				'<label class="ei-image-crop-toggle">' +
 					'<input type="checkbox" />' +
-					' ' + ( window.ebImageCropMedia ? ebImageCropMedia.label : 'Show generated crops' ) +
+					' ' + ( window.eiImageCropMedia ? eiImageCropMedia.label : 'Show generated crops' ) +
 				'</label>'
 			);
 

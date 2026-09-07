@@ -1,12 +1,12 @@
-.eb-image-crop-field {
+.ei-image-crop-field {
 	max-width: 640px;
 }
 
-.eb-image-crop-preview {
+.ei-image-crop-preview {
 	margin-bottom: 8px;
 }
 
-.eb-image-crop-preview img {
+.ei-image-crop-preview img {
 	max-width: 100%;
 	max-height: 260px;
 	display: block;
@@ -14,7 +14,7 @@
 	background: #f0f0f1;
 }
 
-.eb-image-crop-placeholder {
+.ei-image-crop-placeholder {
 	width: 100%;
 	height: 140px;
 	display: flex;
@@ -25,19 +25,19 @@
 	color: #787c82;
 }
 
-.eb-image-crop-placeholder::before {
+.ei-image-crop-placeholder::before {
 	content: "\f128";
 	font-family: dashicons;
 	font-size: 28px;
 }
 
-.eb-image-crop-actions .button {
+.ei-image-crop-actions .button {
 	margin-right: 4px;
 }
 
 /* Modal */
 
-.eb-image-crop-modal {
+.ei-image-crop-modal {
 	position: fixed;
 	inset: 0;
 	z-index: 160000;
@@ -51,11 +51,11 @@
  * `[hidden] { display: none }` rule, and author styles always win over the
  * user-agent stylesheet - so without this, toggling the `hidden` attribute
  * (open/close/cancel) has no visible effect at all. */
-.eb-image-crop-modal[hidden] {
+.ei-image-crop-modal[hidden] {
 	display: none;
 }
 
-.eb-image-crop-modal-inner {
+.ei-image-crop-modal-inner {
 	background: #fff;
 	width: min(1100px, 94vw);
 	height: min(720px, 90vh);
@@ -63,24 +63,24 @@
 	box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
 }
 
-.eb-image-crop-modal-main {
+.ei-image-crop-modal-main {
 	flex: 1 1 68%;
 	background: #1d2327;
 	position: relative;
 	overflow: hidden;
 }
 
-.eb-image-crop-canvas {
+.ei-image-crop-canvas {
 	position: absolute;
 	inset: 0;
 }
 
-.eb-image-crop-img {
+.ei-image-crop-img {
 	display: block;
 	max-width: 100%;
 }
 
-.eb-image-crop-modal-side {
+.ei-image-crop-modal-side {
 	flex: 0 0 32%;
 	max-width: 340px;
 	padding: 20px;
@@ -89,7 +89,7 @@
 	flex-direction: column;
 }
 
-.eb-image-crop-live-preview {
+.ei-image-crop-live-preview {
 	width: 100%;
 	height: 200px;
 	overflow: hidden;
@@ -98,22 +98,22 @@
 	margin-bottom: 16px;
 }
 
-.eb-image-crop-reuse {
+.ei-image-crop-reuse {
 	margin-bottom: 16px;
 }
 
-.eb-image-crop-reuse-title {
+.ei-image-crop-reuse-title {
 	font-weight: 600;
 	margin: 0 0 8px;
 }
 
-.eb-image-crop-reuse-list {
+.ei-image-crop-reuse-list {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 6px;
 }
 
-.eb-image-crop-reuse-item {
+.ei-image-crop-reuse-item {
 	padding: 0;
 	border: 2px solid transparent;
 	background: none;
@@ -123,37 +123,37 @@
 	overflow: hidden;
 }
 
-.eb-image-crop-reuse-item:hover,
-.eb-image-crop-reuse-item:focus {
+.ei-image-crop-reuse-item:hover,
+.ei-image-crop-reuse-item:focus {
 	border-color: #2271b1;
 }
 
-.eb-image-crop-reuse-item img {
+.ei-image-crop-reuse-item img {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
 }
 
-.eb-image-crop-error {
+.ei-image-crop-error {
 	color: #d63638;
 }
 
-.eb-image-crop-modal-actions {
+.ei-image-crop-modal-actions {
 	margin-top: auto;
 	padding-top: 16px;
 }
 
-.eb-image-crop-modal-actions .button {
+.ei-image-crop-modal-actions .button {
 	margin-right: 6px;
 }
 
 /* Media library toggle */
 
-.eb-image-crop-toggle-link {
+.ei-image-crop-toggle-link {
 	margin-left: 6px;
 }
 
-label.eb-image-crop-toggle {
+label.ei-image-crop-toggle {
 	display: inline-flex;
 	align-items: center;
 	gap: 4px;

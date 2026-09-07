@@ -1,4 +1,4 @@
-=== EB Image Crop ===
+=== Ei Image Crop ===
 Contributors: eborninteractive
 Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
@@ -12,7 +12,7 @@ An ACF field type for cropping images on demand, with reusable, editable crops t
 
 == Description ==
 
-EB Image Crop replaces the "select image + crop at upload" workflow of plugins like Advanced Custom Fields: Image Aspect Ratio Crop with a lazier, more reusable one:
+Ei Image Crop replaces the "select image + crop at upload" workflow of plugins like Advanced Custom Fields: Image Aspect Ratio Crop with a lazier, more reusable one:
 
 * **No cost at upload.** Nothing is cropped until a field using this crop is actually saved. If you never open the cropper, a center-center crop is generated automatically from the configured aspect ratio.
 * **Crops are real attachments.** Every generated crop lives in the Media Library like any other image, with its own registered image sizes, so it can be reused across posts and fields.
@@ -29,16 +29,16 @@ EB Image Crop replaces the "select image + crop at upload" workflow of plugins l
 
 Each crop is stored as its own attachment with this meta:
 
-* `_eb_crop_parent` – attachment ID of the source image.
-* `_eb_crop_ratio` – ratio label, e.g. `16:9` or `free`.
-* `_eb_crop_box` – normalized `x`/`y`/`w`/`h` (0–1) crop box, relative to the source image's own proportions. Using fractions instead of pixels means the crop survives `-scaled` copies of large uploads and image regeneration.
-* `_eb_crop_hash` – hash of parent + ratio + box, used to detect and reuse identical crops.
+* `_ei_crop_parent` – attachment ID of the source image.
+* `_ei_crop_ratio` – ratio label, e.g. `16:9` or `free`.
+* `_ei_crop_box` – normalized `x`/`y`/`w`/`h` (0–1) crop box, relative to the source image's own proportions. Using fractions instead of pixels means the crop survives `-scaled` copies of large uploads and image regeneration.
+* `_ei_crop_hash` – hash of parent + ratio + box, used to detect and reuse identical crops.
 
 The ACF field itself stores only the resulting crop's attachment ID, and `format_value()` returns the same array shape as ACF's native Image field, so existing templates built against `get_field()` output don't need to change.
 
 == Installation ==
 
-1. Upload the `eb-image-crop` folder to `/wp-content/plugins/`.
+1. Upload the `ei-image-crop` folder to `/wp-content/plugins/`.
 2. Activate the plugin. Advanced Custom Fields must already be active.
 3. Add a field of type "Image Crop" to any field group, and configure its aspect ratio, admin preview size, library and return format.
 
