@@ -62,6 +62,21 @@ class Ei_Image_Crop_Ajax {
 			wp_send_json_error( array( 'message' => __( 'Invalid source image.', 'ei-image-crop' ) ) );
 		}
 
+		// A fresh pick (no current_id yet) of an image that is itself
+		// already a crop - e.g. reused from the Media Library - should let
+		// you adjust it against its own true original with its existing box
+		// marked, not crop the crop. Resolve transparently to the real
+		// original, and treat the picked crop as the one being edited in
+		// place, so saving updates that same shared attachment rather than
+		// generating a derivative-of-a-derivative.
+		if ( ! $current_id ) {
+			$picked_parent = (int) get_post_meta( $source_id, '_ei_crop_parent', true );
+			if ( $picked_parent && wp_attachment_is_image( $picked_parent ) ) {
+				$current_id = $source_id;
+				$source_id  = $picked_parent;
+			}
+		}
+
 		$edit_source = Ei_Image_Crop_Generator::get_edit_source( $source_id );
 		if ( ! $edit_source ) {
 			wp_send_json_error( array( 'message' => __( 'Could not read the source image.', 'ei-image-crop' ) ) );
@@ -82,9 +97,17 @@ class Ei_Image_Crop_Ajax {
 
 		wp_send_json_success(
 			array(
-				'edit'     => $edit_source,
-				'box'      => $box,
-				'existing' => self::get_existing_crops( $source_id, $ratio_label, $preview_size ),
+				'edit'        => $edit_source,
+				'box'         => $box,
+				'existing'    => self::get_existing_crops( $source_id, $ratio_label, $preview_size ),
+				// Echo these back since a fresh pick of an already-cropped
+				// image gets resolved above to its true original + that
+				// crop's own id - the client started the request not
+				// knowing that yet, so it needs the resolved values to
+				// carry on with (which attachment "save" should overwrite,
+				// which source the reuse row and later saves are against).
+				'source_id'   => $source_id,
+				'existing_id' => $current_id ? $current_id : '',
 			)
 		);
 	}

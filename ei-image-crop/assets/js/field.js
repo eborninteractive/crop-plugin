@@ -167,6 +167,19 @@
 
 				var data = response.data;
 
+				// A fresh pick (existingId started out empty) of an image
+				// that's itself already a crop gets resolved server-side to
+				// its true original + that crop's own id, so adjusting it
+				// here marks its actual existing box on the real original
+				// instead of treating the crop as a brand new source to
+				// crop again. Carry the resolved values forward for the
+				// rest of this session (reuse row, save, save-as-new).
+				sourceId   = data.source_id;
+				existingId = data.existing_id || '';
+				currentSourceId    = sourceId;
+				currentExistingId  = existingId;
+				modal.find( '.ei-image-crop-save-new' ).prop( 'hidden', ! existingId );
+
 				function showInteractiveCropper() {
 					renderReuseList( $field, data.existing || [] );
 					modal.prop( 'hidden', false );
@@ -182,10 +195,11 @@
 				var targetRatio = parseAspectRatio( ratioLabel );
 				var actualRatio = data.edit.width / data.edit.height;
 
-				// A brand new selection (not an explicit "Adjust crop") whose
-				// own proportions already closely match a fixed target ratio
-				// has nothing meaningful to crop - use it right away instead
-				// of forcing the modal open. "Adjust crop" is still there
+				// A brand new selection (not an explicit "Adjust crop", and
+				// not resolved above to an existing crop either) whose own
+				// proportions already closely match a fixed target ratio has
+				// nothing meaningful to crop - use it right away instead of
+				// forcing the modal open. "Adjust crop" is still there
 				// afterward for anyone who wants to fine-tune it anyway.
 				if ( ! existingId && ! isNaN( targetRatio ) && ratioAlreadyMatches( actualRatio, targetRatio ) ) {
 					autoSave( $field, sourceId, ratioLabel, data.box, showInteractiveCropper );
@@ -246,6 +260,7 @@
 			autoCropArea: 1,
 			responsive: true,
 			background: false,
+			zoomOnWheel: false,
 			preview: '.ei-image-crop-live-preview',
 			ready: function () {
 				var natural = { w: imgEl.naturalWidth, h: imgEl.naturalHeight };

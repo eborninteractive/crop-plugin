@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.8
+Stable tag: 1.0.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,10 @@ Yes — set "Aspect ratio" to "Free" in the field settings. The crop frame can t
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.0.9 =
+* Disabled Cropper.js's scroll-wheel zoom, which made the crop area flicker/jitter - the image now stays fixed, only the crop frame moves.
+* Picking an already-cropped image from the Media Library now resolves to its true original with the existing crop box marked, instead of treating the crop as a brand new source to crop again. Adjusting it updates that same shared attachment (with "Save as new crop" still available as before).
 
 = 1.0.8 =
 * Changed the "show crops" toggle to show ONLY crops when checked, instead of everything - a plain "show all" mostly just repeated what was already visible, since regular uploads vastly outnumber crops.
