@@ -5,7 +5,7 @@
 ( function ( $ ) {
 	'use strict';
 
-	var MAX_ATTEMPTS = 15;
+	var MAX_ATTEMPTS = 30;
 	var RETRY_DELAY = 200;
 
 	function label() {
@@ -112,12 +112,15 @@
 	function patchExistingFrame( attempt ) {
 		attempt = attempt || 0;
 
-		if ( ! window.wp || ! wp.media || ! wp.media.frame ) {
-			return;
-		}
-
+		// wp.media.frame itself not existing yet is just another "not ready
+		// yet" state, same as toolbar.secondary not being there - it must
+		// keep retrying here too, not bail out for good. An early return
+		// with no retry scheduled is exactly how this silently gave up
+		// forever on the very first check if the frame happened to not be
+		// assigned yet at that exact moment.
+		var frame = window.wp && wp.media && wp.media.frame;
 		var forceFallback = attempt >= MAX_ATTEMPTS;
-		var done = addToggle( wp.media.frame.browserView, forceFallback );
+		var done = frame && addToggle( frame.browserView, forceFallback );
 
 		if ( ! done && attempt < MAX_ATTEMPTS ) {
 			setTimeout( function () {
