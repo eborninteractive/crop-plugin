@@ -1,0 +1,154 @@
+.eb-image-crop-field {
+	max-width: 640px;
+}
+
+.eb-image-crop-preview {
+	margin-bottom: 8px;
+}
+
+.eb-image-crop-preview img {
+	max-width: 100%;
+	max-height: 260px;
+	display: block;
+	border: 1px solid #dcdcde;
+	background: #f0f0f1;
+}
+
+.eb-image-crop-placeholder {
+	width: 100%;
+	height: 140px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 1px dashed #c3c4c7;
+	background: #f6f7f7;
+	color: #787c82;
+}
+
+.eb-image-crop-placeholder::before {
+	content: "\f128";
+	font-family: dashicons;
+	font-size: 28px;
+}
+
+.eb-image-crop-actions .button {
+	margin-right: 4px;
+}
+
+/* Modal */
+
+.eb-image-crop-modal {
+	position: fixed;
+	inset: 0;
+	z-index: 160000;
+	background: rgba(0, 0, 0, 0.7);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.eb-image-crop-modal-inner {
+	background: #fff;
+	width: min(1100px, 94vw);
+	height: min(720px, 90vh);
+	display: flex;
+	box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+}
+
+.eb-image-crop-modal-main {
+	flex: 1 1 68%;
+	background: #1d2327;
+	position: relative;
+	overflow: hidden;
+}
+
+.eb-image-crop-canvas {
+	position: absolute;
+	inset: 0;
+}
+
+.eb-image-crop-img {
+	display: block;
+	max-width: 100%;
+}
+
+.eb-image-crop-modal-side {
+	flex: 0 0 32%;
+	max-width: 340px;
+	padding: 20px;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+}
+
+.eb-image-crop-live-preview {
+	width: 100%;
+	height: 200px;
+	overflow: hidden;
+	background: #f0f0f1;
+	border: 1px solid #dcdcde;
+	margin-bottom: 16px;
+}
+
+.eb-image-crop-reuse {
+	margin-bottom: 16px;
+}
+
+.eb-image-crop-reuse-title {
+	font-weight: 600;
+	margin: 0 0 8px;
+}
+
+.eb-image-crop-reuse-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.eb-image-crop-reuse-item {
+	padding: 0;
+	border: 2px solid transparent;
+	background: none;
+	cursor: pointer;
+	width: 56px;
+	height: 56px;
+	overflow: hidden;
+}
+
+.eb-image-crop-reuse-item:hover,
+.eb-image-crop-reuse-item:focus {
+	border-color: #2271b1;
+}
+
+.eb-image-crop-reuse-item img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.eb-image-crop-error {
+	color: #d63638;
+}
+
+.eb-image-crop-modal-actions {
+	margin-top: auto;
+	padding-top: 16px;
+}
+
+.eb-image-crop-modal-actions .button {
+	margin-right: 6px;
+}
+
+/* Media library toggle */
+
+.eb-image-crop-toggle-link {
+	margin-left: 6px;
+}
+
+label.eb-image-crop-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	margin-left: 12px;
+	font-size: 13px;
+}
