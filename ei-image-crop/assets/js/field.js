@@ -78,6 +78,7 @@
 						'<p class="ei-image-crop-error" hidden></p>' +
 						'<div class="ei-image-crop-modal-actions">' +
 							'<button type="button" class="button button-primary ei-image-crop-save"></button>' +
+							'<button type="button" class="button ei-image-crop-save-new" hidden></button>' +
 							'<button type="button" class="button ei-image-crop-cancel"></button>' +
 						'</div>' +
 					'</div>' +
@@ -87,7 +88,12 @@
 
 		$( 'body' ).append( $modal );
 
-		$modal.find( '.ei-image-crop-save' ).text( t( 'save' ) ).on( 'click', onSave );
+		$modal.find( '.ei-image-crop-save' ).text( t( 'save' ) ).on( 'click', function () {
+			performSave( false );
+		} );
+		$modal.find( '.ei-image-crop-save-new' ).text( t( 'saveNew' ) ).on( 'click', function () {
+			performSave( true );
+		} );
 		$modal.find( '.ei-image-crop-cancel' ).text( t( 'cancel' ) ).on( 'click', closeModal );
 		$modal.find( '.ei-image-crop-reuse-title' ).text( t( 'reuseTitle' ) );
 
@@ -127,6 +133,10 @@
 		clearError();
 		modal.find( '.ei-image-crop-reuse' ).prop( 'hidden', true );
 		modal.find( '.ei-image-crop-reuse-list' ).empty();
+		// Only offer "save as new" when there's an existing crop that a plain
+		// Save would otherwise overwrite in place; a brand new selection has
+		// nothing to preserve, so the two buttons would do the same thing.
+		modal.find( '.ei-image-crop-save-new' ).prop( 'hidden', ! existingId );
 		modal.prop( 'hidden', false );
 
 		var $img = modal.find( '.ei-image-crop-img' );
@@ -211,7 +221,12 @@
 		$modal.find( '.ei-image-crop-reuse' ).prop( 'hidden', false );
 	}
 
-	function onSave() {
+	/**
+	 * @param {boolean} forceNew When true, always create a new crop
+	 *   attachment instead of overwriting the one currently being edited -
+	 *   for keeping an alternate composition around instead of replacing it.
+	 */
+	function performSave( forceNew ) {
 		if ( ! cropper || ! currentField ) {
 			return;
 		}
@@ -229,10 +244,10 @@
 		var fieldKey = $field.data( 'field-key' );
 		var ratio = $field.data( 'ratio' );
 		var sourceId = currentSourceId;
-		var existingId = currentExistingId;
+		var existingId = forceNew ? '' : currentExistingId;
 
 		clearError();
-		$modal.find( '.ei-image-crop-save' ).prop( 'disabled', true );
+		$modal.find( '.ei-image-crop-save, .ei-image-crop-save-new' ).prop( 'disabled', true );
 
 		$.post( eiImageCrop.ajaxUrl, {
 			action: 'ei_image_crop_save',
@@ -257,7 +272,7 @@
 				showError( t( 'error' ) );
 			} )
 			.always( function () {
-				$modal.find( '.ei-image-crop-save' ).prop( 'disabled', false );
+				$modal.find( '.ei-image-crop-save, .ei-image-crop-save-new' ).prop( 'disabled', false );
 			} );
 	}
 

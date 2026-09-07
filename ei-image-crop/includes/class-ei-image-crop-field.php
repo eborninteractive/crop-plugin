@@ -248,6 +248,7 @@ class Ei_Image_Crop_Field extends acf_field {
 					'selectImage'  => __( 'Select an image', 'ei-image-crop' ),
 					'useImage'     => __( 'Use this image', 'ei-image-crop' ),
 					'save'         => __( 'Save crop', 'ei-image-crop' ),
+					'saveNew'      => __( 'Save as new crop', 'ei-image-crop' ),
 					'cancel'       => __( 'Cancel', 'ei-image-crop' ),
 					'reuseTitle'   => __( 'Existing crops of this image', 'ei-image-crop' ),
 					'error'        => __( 'Something went wrong while cropping the image.', 'ei-image-crop' ),
