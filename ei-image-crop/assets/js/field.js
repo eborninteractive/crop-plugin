@@ -385,6 +385,34 @@
 			} );
 	}
 
+	/**
+	 * Scopes the media grid's "Only show generated crops" listing to crops
+	 * matching this field's own ratio, while its picker is open - so
+	 * everything shown there is actually usable as-is, without still
+	 * needing a new crop to fit. A "free" field has no fixed shape to match
+	 * against, so any existing crop already counts as usable; no scoping
+	 * is applied there. Mirrors the eiShowCrops cookie's approach (see
+	 * class-ei-image-crop-media-library.php) since a custom prop on the
+	 * picker's query model can't reach that filter either.
+	 */
+	function setCropRatioCookie( ratio ) {
+		if ( ratio && 'free' !== ratio ) {
+			// Short-lived on purpose: this only needs to survive for as
+			// long as the picker itself is realistically open. It's cleared
+			// on frame close anyway, but a short expiry limits the damage
+			// if that somehow doesn't fire (e.g. the tab closes mid-pick) -
+			// a stale cookie would otherwise keep scoping the standalone
+			// Media Library by whatever ratio was last picked against.
+			document.cookie = 'ei_crop_ratio=' + encodeURIComponent( ratio ) + '; path=/; max-age=300';
+		} else {
+			clearCropRatioCookie();
+		}
+	}
+
+	function clearCropRatioCookie() {
+		document.cookie = 'ei_crop_ratio=; path=/; max-age=0';
+	}
+
 	function openMediaFrame( $field ) {
 		var frame = wp.media( {
 			title: t( 'selectImage' ),
@@ -398,6 +426,9 @@
 			openCropper( $field, attachment.id, '', attachment );
 		} );
 
+		frame.on( 'close', clearCropRatioCookie );
+
+		setCropRatioCookie( $field.data( 'ratio' ) );
 		frame.open();
 	}
 

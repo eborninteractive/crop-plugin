@@ -74,7 +74,12 @@ class Ei_Image_Crop_Media_Library {
 	/**
 	 * Filters the media modal grid the same way filter_list_table() filters
 	 * the classic list table: hide crops by default, or show ONLY crops
-	 * once the toggle is checked.
+	 * once the toggle is checked. When that grid is our own field's picker
+	 * (as opposed to the standalone Media Library), it further scopes the
+	 * "only crops" view to crops matching that field's own ratio, via the
+	 * ei_crop_ratio cookie field.js sets while its picker is open - so
+	 * everything listed there is actually usable as-is, without a "reused"
+	 * crop turning out to need a new one anyway once picked.
 	 *
 	 * The toggle's state can't be read from $query here: WordPress's
 	 * wp_ajax_query_attachments() whitelists which keys survive from the
@@ -91,8 +96,16 @@ class Ei_Image_Crop_Media_Library {
 	public static function filter_grid_query( $query ) {
 		$showing_only_crops = ! empty( $_COOKIE['ei_show_crops'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		$meta_query          = isset( $query['meta_query'] ) ? (array) $query['meta_query'] : array();
-		$meta_query[]        = $showing_only_crops ? self::inclusion_clause() : self::exclusion_clause();
+		$meta_query   = isset( $query['meta_query'] ) ? (array) $query['meta_query'] : array();
+		$meta_query[] = $showing_only_crops ? self::inclusion_clause() : self::exclusion_clause();
+
+		if ( $showing_only_crops && ! empty( $_COOKIE['ei_crop_ratio'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$meta_query[] = array(
+				'key'   => '_ei_crop_ratio',
+				'value' => sanitize_text_field( wp_unslash( $_COOKIE['ei_crop_ratio'] ) ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			);
+		}
+
 		$query['meta_query'] = $meta_query;
 
 		return $query;

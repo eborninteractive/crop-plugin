@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.11
+Stable tag: 1.0.12
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,9 @@ Yes — set "Aspect ratio" to "Free" in the field settings. The crop frame can t
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.0.12 =
+* When picking an image with "Only show generated crops" checked in a field's own picker, the listing now scopes to crops matching that field's ratio, so everything shown is actually usable as-is without still needing a new crop. Free-ratio fields see all crops, since none of them need a specific shape.
 
 = 1.0.11 =
 * Changed the cropper's dragMode from 'move' to 'none' - dragging on the canvas no longer pans the underlying image, only the crop box itself moves/resizes via its own handles.
