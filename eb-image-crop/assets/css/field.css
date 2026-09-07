@@ -47,6 +47,14 @@
 	justify-content: center;
 }
 
+/* `display: flex` above has the same specificity as the browser's built-in
+ * `[hidden] { display: none }` rule, and author styles always win over the
+ * user-agent stylesheet - so without this, toggling the `hidden` attribute
+ * (open/close/cancel) has no visible effect at all. */
+.eb-image-crop-modal[hidden] {
+	display: none;
+}
+
 .eb-image-crop-modal-inner {
 	background: #fff;
 	width: min(1100px, 94vw);
