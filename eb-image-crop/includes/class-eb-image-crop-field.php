@@ -272,6 +272,15 @@ class EB_Image_Crop_Field extends acf_field {
 			);
 		}
 
+		// WordPress slash-escapes every value in $_POST (see wp_magic_quotes()),
+		// and that raw, still-slashed value is what reaches a field's
+		// update_value()/validate_value(). Our JSON blob is full of quotes, so
+		// without unslashing here json_decode() silently fails on it and the
+		// field would save as empty on every real post save.
+		if ( is_string( $value ) ) {
+			$value = wp_unslash( $value );
+		}
+
 		if ( is_string( $value ) && '' !== $value && '{' === $value[0] ) {
 			$decoded = json_decode( $value, true );
 			if ( is_array( $decoded ) ) {
