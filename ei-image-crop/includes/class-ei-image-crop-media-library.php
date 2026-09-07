@@ -36,8 +36,22 @@ class Ei_Image_Crop_Media_Library {
 	}
 
 	/**
-	 * Hide crops from the classic Media Library list table, unless the
-	 * "Show crops" link has been clicked (adds ?ei_show_crops=1).
+	 * @return array
+	 */
+	protected static function inclusion_clause() {
+		return array(
+			'key'     => '_ei_crop_parent',
+			'compare' => 'EXISTS',
+		);
+	}
+
+	/**
+	 * Filters the classic Media Library list table: by default, hides crops
+	 * so the library isn't drowned in derivative images; with the "Only
+	 * show generated crops" link clicked (adds ?ei_show_crops=1), flips to
+	 * showing ONLY crops - a plain "show everything" would mostly just
+	 * repeat what's already visible without the toggle, since regular
+	 * uploads vastly outnumber crops.
 	 *
 	 * @param WP_Query $query
 	 */
@@ -50,18 +64,17 @@ class Ei_Image_Crop_Media_Library {
 			return;
 		}
 
-		if ( ! empty( $_GET['ei_show_crops'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			return;
-		}
+		$showing_only_crops = ! empty( $_GET['ei_show_crops'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		$meta_query   = (array) $query->get( 'meta_query' );
-		$meta_query[] = self::exclusion_clause();
+		$meta_query[] = $showing_only_crops ? self::inclusion_clause() : self::exclusion_clause();
 		$query->set( 'meta_query', $meta_query );
 	}
 
 	/**
-	 * Hide crops from the media modal grid, unless the in-modal toggle has
-	 * been checked.
+	 * Filters the media modal grid the same way filter_list_table() filters
+	 * the classic list table: hide crops by default, or show ONLY crops
+	 * once the toggle is checked.
 	 *
 	 * The toggle's state can't be read from $query here: WordPress's
 	 * wp_ajax_query_attachments() whitelists which keys survive from the
@@ -76,12 +89,10 @@ class Ei_Image_Crop_Media_Library {
 	 * @return array
 	 */
 	public static function filter_grid_query( $query ) {
-		if ( ! empty( $_COOKIE['ei_show_crops'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			return $query;
-		}
+		$showing_only_crops = ! empty( $_COOKIE['ei_show_crops'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		$meta_query          = isset( $query['meta_query'] ) ? (array) $query['meta_query'] : array();
-		$meta_query[]        = self::exclusion_clause();
+		$meta_query[]        = $showing_only_crops ? self::inclusion_clause() : self::exclusion_clause();
 		$query['meta_query'] = $meta_query;
 
 		return $query;
@@ -104,8 +115,8 @@ class Ei_Image_Crop_Media_Library {
 			: add_query_arg( 'ei_show_crops', '1' );
 
 		$label = $showing
-			? __( 'Hide generated crops', 'ei-image-crop' )
-			: __( 'Show generated crops', 'ei-image-crop' );
+			? __( 'Show all media', 'ei-image-crop' )
+			: __( 'Only show generated crops', 'ei-image-crop' );
 
 		printf(
 			'<a href="%1$s" class="button ei-image-crop-toggle-link">%2$s</a>',
@@ -158,7 +169,7 @@ class Ei_Image_Crop_Media_Library {
 			'ei-image-crop-media-toggle',
 			'eiImageCropMedia',
 			array(
-				'label' => __( 'Show generated crops', 'ei-image-crop' ),
+				'label' => __( 'Only show generated crops', 'ei-image-crop' ),
 			)
 		);
 	}

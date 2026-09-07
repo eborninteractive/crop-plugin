@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.7
+Stable tag: 1.0.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,9 @@ Yes — set "Aspect ratio" to "Free" in the field settings. The crop frame can t
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.0.8 =
+* Changed the "show crops" toggle to show ONLY crops when checked, instead of everything - a plain "show all" mostly just repeated what was already visible, since regular uploads vastly outnumber crops.
 
 = 1.0.7 =
 * Fixed the real, confirmed root cause of the grid toggle never revealing crops: WordPress's wp_ajax_query_attachments() whitelists which query keys survive into the ajax_query_attachments_args filter, silently stripping our custom eiShowCrops prop before our code ever saw it - meaning the exclusion was unconditionally applied regardless of the checkbox. Switched to a cookie, which isn't subject to that whitelist.

@@ -1,6 +1,9 @@
 /**
- * Adds a "Show generated crops" checkbox to the media modal grid toolbar,
- * mirroring the classic list table's toggle link.
+ * Adds an "Only show generated crops" checkbox to the media modal grid
+ * toolbar, mirroring the classic list table's toggle link. Unchecked (the
+ * default) hides crops; checked flips to showing ONLY crops, rather than
+ * everything - regular uploads would otherwise vastly outnumber crops and
+ * make the toggle barely change what's visible.
  */
 ( function ( $ ) {
 	'use strict';
@@ -14,7 +17,7 @@
 	var RETRY_DELAY = 200;
 
 	function label() {
-		return window.eiImageCropMedia ? eiImageCropMedia.label : 'Show generated crops';
+		return window.eiImageCropMedia ? eiImageCropMedia.label : 'Only show generated crops';
 	}
 
 	// WordPress's wp_ajax_query_attachments() whitelists which query keys it
