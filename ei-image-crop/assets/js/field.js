@@ -123,6 +123,15 @@
 		currentExistingId = null;
 	}
 
+	/**
+	 * @param {number} actual Source image's own width/height ratio.
+	 * @param {number} target Field's configured aspect ratio.
+	 * @return {boolean} True when close enough that cropping would be a no-op.
+	 */
+	function ratioAlreadyMatches( actual, target ) {
+		return Math.abs( actual - target ) / target < 0.01;
+	}
+
 	function openCropper( $field, sourceId, existingId ) {
 		var modal = buildModal();
 
@@ -137,7 +146,6 @@
 		// Save would otherwise overwrite in place; a brand new selection has
 		// nothing to preserve, so the two buttons would do the same thing.
 		modal.find( '.ei-image-crop-save-new' ).prop( 'hidden', ! existingId );
-		modal.prop( 'hidden', false );
 
 		var $img = modal.find( '.ei-image-crop-img' );
 		$img.attr( 'src', '' );
@@ -153,22 +161,75 @@
 			.done( function ( response ) {
 				if ( ! response || ! response.success ) {
 					showError( ( response && response.data && response.data.message ) || t( 'error' ) );
+					modal.prop( 'hidden', false );
 					return;
 				}
 
 				var data = response.data;
 
-				renderReuseList( $field, data.existing || [] );
+				function showInteractiveCropper() {
+					renderReuseList( $field, data.existing || [] );
+					modal.prop( 'hidden', false );
 
-				$img.one( 'load', function () {
-					initCropper( $field, this, data.box );
-				} );
+					$img.one( 'load', function () {
+						initCropper( $field, this, data.box );
+					} );
 
-				$img.attr( 'src', data.edit.url );
+					$img.attr( 'src', data.edit.url );
+				}
+
+				var ratioLabel = $field.data( 'ratio' );
+				var targetRatio = parseAspectRatio( ratioLabel );
+				var actualRatio = data.edit.width / data.edit.height;
+
+				// A brand new selection (not an explicit "Adjust crop") whose
+				// own proportions already closely match a fixed target ratio
+				// has nothing meaningful to crop - use it right away instead
+				// of forcing the modal open. "Adjust crop" is still there
+				// afterward for anyone who wants to fine-tune it anyway.
+				if ( ! existingId && ! isNaN( targetRatio ) && ratioAlreadyMatches( actualRatio, targetRatio ) ) {
+					autoSave( $field, sourceId, ratioLabel, data.box, showInteractiveCropper );
+					return;
+				}
+
+				showInteractiveCropper();
 			} )
 			.fail( function () {
 				showError( t( 'error' ) );
+				modal.prop( 'hidden', false );
 			} );
+	}
+
+	/**
+	 * Silently saves the server-computed default box without opening the
+	 * cropper UI, for the "already the right shape" fast path. Falls back to
+	 * the interactive cropper if the save unexpectedly fails, so the field
+	 * never gets stuck with a picked image and no way to finish setting it.
+	 */
+	function autoSave( $field, sourceId, ratio, box, onFallback ) {
+		$.post( eiImageCrop.ajaxUrl, {
+			action: 'ei_image_crop_save',
+			nonce: eiImageCrop.nonce,
+			source_id: sourceId,
+			existing_id: '',
+			field_key: $field.data( 'field-key' ),
+			ratio: ratio,
+			box: box,
+			preview_size: $field.data( 'preview-size' ),
+		} )
+			.done( function ( response ) {
+				if ( ! response || ! response.success ) {
+					onFallback();
+					return;
+				}
+
+				setState( $field, { id: response.data.id, source: sourceId } );
+				setPreview( $field, response.data.url );
+				currentField = null;
+				currentSourceId = null;
+				currentExistingId = null;
+			} )
+			.fail( onFallback );
 	}
 
 	function initCropper( $field, imgEl, box ) {
