@@ -60,14 +60,23 @@ class Ei_Image_Crop_Media_Library {
 	}
 
 	/**
-	 * Hide crops from the media modal grid, unless the in-modal toggle sent
-	 * eiShowCrops through as part of the query props.
+	 * Hide crops from the media modal grid, unless the in-modal toggle has
+	 * been checked.
+	 *
+	 * The toggle's state can't be read from $query here: WordPress's
+	 * wp_ajax_query_attachments() whitelists which keys survive from the
+	 * request into this filter (s, order, orderby, posts_per_page, paged,
+	 * post_mime_type, post_parent, author, post__in, post__not_in, year,
+	 * monthnum, plus taxonomy query vars) via array_intersect_key() -
+	 * anything else, including a custom prop the toggle sets on the
+	 * client-side query model, is silently stripped before this filter ever
+	 * runs. A cookie doesn't go through that whitelist, so it's used instead.
 	 *
 	 * @param array $query
 	 * @return array
 	 */
 	public static function filter_grid_query( $query ) {
-		if ( ! empty( $query['eiShowCrops'] ) ) {
+		if ( ! empty( $_COOKIE['ei_show_crops'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			return $query;
 		}
 

@@ -17,6 +17,27 @@
 		return window.eiImageCropMedia ? eiImageCropMedia.label : 'Show generated crops';
 	}
 
+	// WordPress's wp_ajax_query_attachments() whitelists which query keys it
+	// passes through to the ajax_query_attachments_args filter (s, order,
+	// orderby, posts_per_page, paged, post_mime_type, post_parent, author,
+	// post__in, post__not_in, year, monthnum, plus taxonomy query vars) via
+	// array_intersect_key() - anything else, including a custom prop like
+	// eiShowCrops, is silently stripped before that filter ever runs. So the
+	// checkbox's state can never reach PHP through library.props at all; a
+	// cookie (sent with every request regardless of that whitelist) is used
+	// instead. props.set() is still called purely to trigger WordPress's own
+	// refetch-on-change listener - its value just isn't what PHP reads.
+	var COOKIE_NAME = 'ei_show_crops';
+
+	function getShowCropsCookie() {
+		var match = document.cookie.match( new RegExp( '(?:^|; )' + COOKIE_NAME + '=([^;]*)' ) );
+		return !! match && '1' === match[ 1 ];
+	}
+
+	function setShowCropsCookie( checked ) {
+		document.cookie = COOKIE_NAME + '=' + ( checked ? '1' : '0' ) + '; path=/; max-age=' + ( 60 * 60 * 24 );
+	}
+
 	/**
 	 * Injects the checkbox into an already-built AttachmentsBrowser view and
 	 * wires it up.
@@ -70,13 +91,18 @@
 		var library = browserView.collection;
 		var $toggle = $(
 			'<label class="ei-image-crop-toggle" style="' + VISIBLE_STYLE + '">' +
-				'<input type="checkbox" />' +
+				'<input type="checkbox"' + ( getShowCropsCookie() ? ' checked' : '' ) + ' />' +
 				' ' + label() +
 			'</label>'
 		);
 
 		$toggle.find( 'input' ).on( 'change', function () {
 			var checked = $( this ).is( ':checked' );
+			setShowCropsCookie( checked );
+			// The actual value here is irrelevant server-side (see the
+			// comment above COOKIE_NAME) - this call's only real purpose is
+			// to trigger WordPress's own listener that refetches the
+			// collection whenever its query props change.
 			library.props.set( { eiShowCrops: checked ? 1 : '' } );
 		} );
 
