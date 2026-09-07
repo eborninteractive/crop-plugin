@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,9 @@ Yes — set "Aspect ratio" to "Free" in the field settings. The crop frame can t
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.0.2 =
+* Fixed the grid toggle for real this time: it now hooks wp.media.frame.browserView directly (confirmed against a live session) instead of guessing at internal WordPress media view structure.
 
 = 1.0.1 =
 * Fixed the "show generated crops" toggle not appearing in the standalone Media Library grid.

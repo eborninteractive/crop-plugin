@@ -38,17 +38,17 @@
 			library.props.set( { eiShowCrops: checked ? 1 : '' } );
 		} );
 
-		// Appending straight to the toolbar root (rather than into one of its
-		// floated filter/search sections) puts the checkbox at the mercy of
-		// whatever's left in the row - it can end up wrapping onto its own
-		// line or squeezed somewhere unexpected. The secondary section (date
-		// filter, media type dropdown) is the one place across both the
-		// standalone Library grid and the media-picker modal that's reliably
-		// there and makes sense to group this with; fall back to the toolbar
-		// root itself so the checkbox still ends up somewhere rather than
-		// vanishing entirely if a future core layout drops that section.
-		var $secondary = browserView.toolbar.$el.find( '.media-toolbar-secondary' );
-		( $secondary.length ? $secondary : browserView.toolbar.$el ).append( $toggle );
+		// toolbar.secondary is the actual rendered sub-view holding the date
+		// filter / media type dropdown (confirmed via wp.media.frame.browserView
+		// in a live session - it has its own real $el), which groups the
+		// checkbox with the other filters instead of leaving its position to
+		// chance. Fall back to the toolbar's own $el if a future core version
+		// doesn't have that sub-view, so the checkbox still shows up somewhere.
+		var $target = ( browserView.toolbar.secondary && browserView.toolbar.secondary.$el && browserView.toolbar.secondary.$el.length )
+			? browserView.toolbar.secondary.$el
+			: browserView.toolbar.$el;
+
+		$target.append( $toggle );
 	}
 
 	/**
@@ -83,29 +83,25 @@
 	 * often before this script gets a chance to run. Patching the class at
 	 * that point is too late: reassigning wp.media.view.AttachmentsBrowser
 	 * doesn't retroactively change a view instance already built from the
-	 * original class. wp.media.frame is WordPress's own reference to that
-	 * already-built frame, so reach into its current content view directly.
+	 * original class. wp.media.frame.browserView is WordPress's own direct
+	 * reference to that already-built view, so reach into it directly.
 	 */
 	function patchExistingFrame() {
-		if ( ! window.wp || ! wp.media || ! wp.media.frame || ! wp.media.frame.content ) {
+		if ( ! window.wp || ! wp.media || ! wp.media.frame ) {
 			return;
 		}
 
-		var content = wp.media.frame.content.get();
-
-		if ( content ) {
-			addToggle( content );
-		}
+		addToggle( wp.media.frame.browserView );
 	}
 
 	$( function () {
 		patchClassForFutureViews();
 		patchExistingFrame();
 
-		// wp.media.frame can be assigned, or its content view (re)rendered,
-		// slightly after DOMContentLoaded in some WordPress versions. A
-		// couple of delayed re-checks catch that without depending on this
-		// script's exact position relative to core's own bootstrap script.
+		// wp.media.frame.browserView can be (re)assigned slightly after
+		// DOMContentLoaded in some WordPress versions. A couple of delayed
+		// re-checks catch that without depending on this script's exact
+		// position relative to core's own bootstrap script.
 		setTimeout( patchExistingFrame, 300 );
 		setTimeout( patchExistingFrame, 1000 );
 	} );
