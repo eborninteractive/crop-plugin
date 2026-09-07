@@ -144,7 +144,12 @@ class Ei_Image_Crop_Ajax {
 		$crops = array();
 
 		foreach ( $ids as $id ) {
-			$thumb = wp_get_attachment_image_url( $id, 'thumbnail' );
+			// A named size like 'thumbnail' is a hard, forced-square crop by
+			// default in WordPress - showing that here would misrepresent
+			// the crop's real aspect ratio. An array size instead bounds the
+			// image proportionally, so the thumbnail actually looks like
+			// the crop it represents.
+			$thumb = wp_get_attachment_image_url( $id, array( 120, 120 ) );
 			if ( ! $thumb ) {
 				continue;
 			}

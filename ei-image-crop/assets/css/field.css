@@ -118,9 +118,10 @@
 	border: 2px solid transparent;
 	background: none;
 	cursor: pointer;
-	width: 56px;
 	height: 56px;
+	max-width: 96px;
 	overflow: hidden;
+	display: block;
 }
 
 .ei-image-crop-reuse-item:hover,
@@ -128,10 +129,14 @@
 	border-color: #2271b1;
 }
 
+/* No forced square crop here - the <img> keeps the crop's real aspect
+ * ratio (see Ei_Image_Crop_Ajax::get_existing_crops()), it's just bounded
+ * to the item's height so mismatched ratios still line up in the row. */
 .ei-image-crop-reuse-item img {
-	width: 100%;
+	display: block;
 	height: 100%;
-	object-fit: cover;
+	width: auto;
+	max-width: 100%;
 }
 
 .ei-image-crop-error {
