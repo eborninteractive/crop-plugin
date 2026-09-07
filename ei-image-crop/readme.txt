@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,12 @@ Yes — set "Aspect ratio" to "Free" in the field settings. The crop frame can t
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.0.1 =
+* Fixed the "show generated crops" toggle not appearing in the standalone Media Library grid.
+* Fixed field preview looking smaller right after saving a crop than after a page reload.
+* Skip the crop modal when a freshly picked image already matches the field's fixed aspect ratio.
+* Various fixes carried over from initial testing (crop modal not closing, crop value not persisting, reuse thumbnails showing as square).
 
 = 1.0.0 =
 * Initial release: field type, lazy on-demand cropping, reuse, in-place re-cropping, and Media Library filtering.
