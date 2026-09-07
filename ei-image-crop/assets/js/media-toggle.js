@@ -5,6 +5,11 @@
 ( function ( $ ) {
 	'use strict';
 
+	if ( typeof $ !== 'function' ) {
+		console.error( '[Ei Image Crop] media-toggle.js loaded but jQuery was not available at that point.' );
+		return;
+	}
+
 	var MAX_ATTEMPTS = 30;
 	var RETRY_DELAY = 200;
 
@@ -122,15 +127,27 @@
 		var forceFallback = attempt >= MAX_ATTEMPTS;
 		var done = frame && addToggle( frame.browserView, forceFallback );
 
-		if ( ! done && attempt < MAX_ATTEMPTS ) {
+		if ( done ) {
+			console.log( '[Ei Image Crop] toggle inserted on attempt ' + attempt + ( frame.browserView.toolbar.secondary ? '' : ' (fallback spot)' ) );
+			return;
+		}
+
+		if ( attempt < MAX_ATTEMPTS ) {
 			setTimeout( function () {
 				patchExistingFrame( attempt + 1 );
 			}, RETRY_DELAY );
+		} else {
+			console.warn( '[Ei Image Crop] gave up after ' + attempt + ' attempts - wp.media.frame present: ' + !! frame );
 		}
 	}
 
 	$( function () {
-		patchClassForFutureViews();
-		patchExistingFrame( 0 );
+		try {
+			console.log( '[Ei Image Crop] media-toggle.js running, jQuery available: ' + ( typeof $ === 'function' ) );
+			patchClassForFutureViews();
+			patchExistingFrame( 0 );
+		} catch ( e ) {
+			console.error( '[Ei Image Crop] media-toggle.js threw an error:', e );
+		}
 	} );
-} )( jQuery );
+} )( window.jQuery );

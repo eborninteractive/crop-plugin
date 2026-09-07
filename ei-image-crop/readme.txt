@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.4
+Stable tag: 1.0.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,9 @@ Yes — set "Aspect ratio" to "Free" in the field settings. The crop frame can t
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.0.5 =
+* Added diagnostic console logging (prefixed "[Ei Image Crop]") and error handling to media-toggle.js, to pin down why the grid toggle still wasn't appearing despite the underlying logic testing correctly in isolation.
 
 = 1.0.4 =
 * Fixed the grid toggle silently giving up forever: the retry loop bailed out with no retry scheduled if wp.media.frame itself wasn't assigned yet at the very first check, instead of treating that the same as any other "not ready yet" state.
