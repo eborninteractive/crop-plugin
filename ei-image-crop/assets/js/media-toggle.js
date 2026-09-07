@@ -54,9 +54,22 @@
 			return false;
 		}
 
+		// WordPress visually hides every bare <label> in this toolbar
+		// section by default (its own filter labels are for screen readers
+		// only, since the <select>'s value is the visible cue) using its
+		// screen-reader-text technique - 1x1px, clipped, absolutely
+		// positioned, all !important. field.css carries the same overrides,
+		// but an inline style here is unconditionally guaranteed to win
+		// regardless of stylesheet load order, so the checkbox is never
+		// silently invisible even if that CSS somehow isn't loaded.
+		var VISIBLE_STYLE = 'position:static!important;width:auto!important;height:auto!important;' +
+			'overflow:visible!important;clip:auto!important;clip-path:none!important;' +
+			'white-space:nowrap!important;margin:0 0 0 12px!important;display:inline-flex!important;' +
+			'align-items:center;gap:4px;font-size:13px;';
+
 		var library = browserView.collection;
 		var $toggle = $(
-			'<label class="ei-image-crop-toggle">' +
+			'<label class="ei-image-crop-toggle" style="' + VISIBLE_STYLE + '">' +
 				'<input type="checkbox" />' +
 				' ' + label() +
 			'</label>'

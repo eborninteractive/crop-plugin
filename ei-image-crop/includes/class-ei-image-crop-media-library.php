@@ -124,6 +124,19 @@ class Ei_Image_Crop_Media_Library {
 	 * Small script adding an equivalent toggle checkbox to the media modal grid.
 	 */
 	public static function enqueue_grid_toggle() {
+		// Needed for the toggle to actually be visible: WordPress visually
+		// hides bare <label> elements in this toolbar section by default
+		// (see field.css), and this stylesheet is normally only loaded via
+		// ACF's own field-input enqueue action - which doesn't necessarily
+		// fire on the standalone Media Library page. wp_enqueue_style() is
+		// a harmless no-op if it's already been enqueued another way.
+		wp_enqueue_style(
+			'ei-image-crop-field',
+			EI_IMAGE_CROP_URL . 'assets/css/field.css',
+			array(),
+			EI_IMAGE_CROP_VERSION
+		);
+
 		wp_enqueue_script(
 			'ei-image-crop-media-toggle',
 			EI_IMAGE_CROP_URL . 'assets/js/media-toggle.js',

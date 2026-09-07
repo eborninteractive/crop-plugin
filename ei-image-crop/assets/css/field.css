@@ -158,10 +158,25 @@
 	margin-left: 6px;
 }
 
+/* WordPress visually hides every bare <label> inside the media grid
+ * toolbar's filter section by default (its own filter labels are there
+ * for screen readers only - the <select>'s own value is the visible
+ * cue), using its screen-reader-text technique: 1x1px, clipped,
+ * absolutely positioned, and !important throughout so it survives
+ * being reused in different contexts. Our label isn't one of those
+ * decorative pairings - the checkbox has no other visible label - so
+ * every property needs an explicit, !important override to escape it. */
 label.ei-image-crop-toggle {
-	display: inline-flex;
+	position: static !important;
+	width: auto !important;
+	height: auto !important;
+	overflow: visible !important;
+	clip: auto !important;
+	clip-path: none !important;
+	white-space: nowrap !important;
+	display: inline-flex !important;
 	align-items: center;
 	gap: 4px;
-	margin-left: 12px;
+	margin: 0 0 0 12px !important;
 	font-size: 13px;
 }
