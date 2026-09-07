@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.12
+Stable tag: 1.0.13
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,9 @@ Yes — set "Aspect ratio" to "Free" in the field settings. The crop frame can t
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.0.13 =
+* Crops no longer generate the site's full registered set of intermediate sizes (thumbnail/medium/large/etc.) - only the cropped file itself is saved. Anything that requests a specific named size on a crop now falls back to that one file, same as WordPress does natively when a size doesn't exist.
 
 = 1.0.12 =
 * When picking an image with "Only show generated crops" checked in a field's own picker, the listing now scopes to crops matching that field's ratio, so everything shown is actually usable as-is without still needing a new crop. Free-ratio fields see all crops, since none of them need a specific shape.

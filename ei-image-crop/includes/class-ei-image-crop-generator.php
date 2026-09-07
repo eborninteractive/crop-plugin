@@ -312,7 +312,19 @@ class Ei_Image_Crop_Generator {
 		}
 
 		require_once ABSPATH . 'wp-admin/includes/image.php';
+
+		// A crop only ever needs to exist at the one size it was actually
+		// cropped to - generating the site's whole registered set of
+		// thumbnail/medium/large/etc. copies on top of that is wasted disk
+		// space and processing for every single crop. Suppressing it here
+		// still leaves wp_generate_attachment_metadata() computing the
+		// crop's own width/height/file as normal; anything that later asks
+		// for a specific named size on this attachment just falls back to
+		// the full/only file WordPress already does that natively.
+		add_filter( 'intermediate_image_sizes_advanced', '__return_empty_array' );
 		$metadata = wp_generate_attachment_metadata( $attachment_id, $saved['path'] );
+		remove_filter( 'intermediate_image_sizes_advanced', '__return_empty_array' );
+
 		wp_update_attachment_metadata( $attachment_id, $metadata );
 
 		update_post_meta( $attachment_id, '_ei_crop_parent', $parent_id );
