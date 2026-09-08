@@ -3,7 +3,7 @@
  * Plugin Name:       Ei Image Crop
  * Plugin URI:        https://github.com/eborninteractive/crop-plugin
  * Description:       ACF field type for cropping images on demand (not at upload), with reusable, editable crops that live as regular Media Library attachments.
- * Version:           1.3.5
+ * Version:           1.3.6
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Eborn Interactive
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'EI_IMAGE_CROP_VERSION', '1.3.5' );
+define( 'EI_IMAGE_CROP_VERSION', '1.3.6' );
 define( 'EI_IMAGE_CROP_FILE', __FILE__ );
 define( 'EI_IMAGE_CROP_PATH', plugin_dir_path( __FILE__ ) );
 define( 'EI_IMAGE_CROP_URL', plugin_dir_url( __FILE__ ) );

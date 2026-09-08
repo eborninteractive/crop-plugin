@@ -383,7 +383,7 @@
 	margin-top: auto;
 	padding-top: 16px;
 	display: flex;
-	justify-content: flex-end;
+	justify-content: flex-start;
 }
 
 /* Deliberately not .button-primary (WP's default blue) - black by default,
@@ -395,6 +395,7 @@
 	background: #1d2327 !important;
 	border-color: #1d2327 !important;
 	color: #fff !important;
+	border-radius: 5px !important;
 }
 
 .ei-image-crop-save:hover,

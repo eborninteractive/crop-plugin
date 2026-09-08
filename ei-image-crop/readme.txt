@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.3.5
+Stable tag: 1.3.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,10 @@ Yes — set "Aspect ratio" to "Free" in the field settings. The crop frame can t
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.3.6 =
+* Applied user-supplied field.css tweaks: rounded corners on the "Crop image" button, and left-aligned the modal's action row instead of right-aligned.
+* Dropped the aspect-ratio label ("2000:1000") from both the live preview caption and the floating dimension tag on the crop box - they now just show the actual pixel size, e.g. "860 × 430".
 
 = 1.3.5 =
 * Removed the reuse thumbnail delete button's × from its markup - it's meant to be added as a ::before rule in field.css instead, for full control over its own sizing/position. field.css itself wasn't touched in this release since it's currently being edited by hand directly.

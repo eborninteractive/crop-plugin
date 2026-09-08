@@ -458,11 +458,11 @@
 	}
 
 	/**
-	 * Keeps the "16:9 · 1600 × 900" caption under the live preview in sync
-	 * with the crop box - the field's own configured ratio label plus the
-	 * resulting crop's actual pixel size, not the source image's.
+	 * Keeps the "860 × 430" caption under the live preview in sync with the
+	 * crop box - just the resulting crop's actual pixel size, not the
+	 * source image's.
 	 */
-	function updatePreviewCaption( $field ) {
+	function updatePreviewCaption() {
 		if ( ! cropper ) {
 			return;
 		}
@@ -470,21 +470,19 @@
 		var data = cropper.getData();
 		var w = Math.round( data.width );
 		var h = Math.round( data.height );
-		var ratioLabel = $field.data( 'ratio' );
-		var text = ( ratioLabel && 'free' !== ratioLabel ) ? ratioLabel + ' · ' + w + ' × ' + h : w + ' × ' + h;
 
-		$modal.find( '.ei-image-crop-live-preview-caption' ).text( text );
+		$modal.find( '.ei-image-crop-live-preview-caption' ).text( w + ' × ' + h );
 	}
 
 	/**
-	 * Small "16:9 · 1600 × 900" tag floating just above the crop box itself,
+	 * Small "860 × 430" tag floating just above the crop box itself,
 	 * mirroring the same info as the live preview's caption but where you're
 	 * actually looking while dragging. Positioned with cropper.getCropBoxData(),
 	 * which already reports on-screen pixels relative to Cropper's own
 	 * .cropper-container - the element this tag lives inside - so no extra
 	 * coordinate conversion is needed.
 	 */
-	function updateBoxLabel( $field, $label ) {
+	function updateBoxLabel( $label ) {
 		if ( ! cropper ) {
 			return;
 		}
@@ -493,13 +491,11 @@
 		var box = cropper.getCropBoxData();
 		var w = Math.round( data.width );
 		var h = Math.round( data.height );
-		var ratioLabel = $field.data( 'ratio' );
-		var text = ( ratioLabel && 'free' !== ratioLabel ) ? w + ' × ' + h + ' · ' + ratioLabel : w + ' × ' + h;
 
 		// Centered above the box horizontally (the negative translate in
 		// field.css does both that and sitting above rather than on top of
 		// the box's own top edge), not left-aligned to it.
-		$label.text( text ).css( {
+		$label.text( w + ' × ' + h ).css( {
 			left: ( box.left + box.width / 2 ) + 'px',
 			top: box.top + 'px',
 		} );
@@ -545,8 +541,8 @@
 					height: box.h * natural.h,
 				} );
 				suppressCropEvents = false;
-				updatePreviewCaption( $field );
-				updateBoxLabel( $field, $boxLabel );
+				updatePreviewCaption();
+				updateBoxLabel( $boxLabel );
 			},
 		} );
 
@@ -556,8 +552,8 @@
 		// an actual manual adjustment, which should drop the "viewing an
 		// existing crop" selection back to a fresh "Crop image" state.
 		imgEl.addEventListener( 'crop', function () {
-			updatePreviewCaption( $field );
-			updateBoxLabel( $field, $boxLabel );
+			updatePreviewCaption();
+			updateBoxLabel( $boxLabel );
 
 			if ( suppressCropEvents || ! selectedReuseCrop ) {
 				return;
