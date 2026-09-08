@@ -10,7 +10,7 @@
 	var $modal, cropper, currentField, currentSourceId, currentExistingId;
 	// Set while a reuse thumbnail's own box is being shown for a look before
 	// committing to it; cleared as soon as the user adjusts the crop box
-	// themselves, or the modal closes. Drives the save button's "Use Crop"
+	// themselves, or the modal closes. Drives the save button's "Use image"
 	// vs. "Crop image" state.
 	var selectedReuseCrop = null;
 	// Guards the crop box's own 'crop' event handler against the setData()
@@ -107,7 +107,7 @@
 	/**
 	 * The single save button does one of two things depending on whether a
 	 * reuse thumbnail is currently selected (and hasn't been deselected by
-	 * an adjustment since): apply that exact crop as-is ("Use Crop"), or
+	 * an adjustment since): apply that exact crop as-is ("Use image"), or
 	 * crop the image fresh from the current box ("Crop image").
 	 */
 	function onSaveButtonClick() {
@@ -130,7 +130,7 @@
 	/**
 	 * Marks a reuse thumbnail selected: shows its own crop box (and, via
 	 * Cropper's own preview feature, the live preview) without committing to
-	 * it yet, and switches the save button to "Use Crop". Any further manual
+	 * it yet, and switches the save button to "Use image". Any further manual
 	 * adjustment of the crop box (see the 'crop' event handler in
 	 * initCropper()) clears this back out again.
 	 */
@@ -160,7 +160,7 @@
 	/**
 	 * Applies the selected reuse thumbnail as-is (no new crop generated) and
 	 * closes the modal - what clicking a thumbnail used to do immediately;
-	 * now it's a deliberate second step via the "Use Crop" button, so
+	 * now it's a deliberate second step via the "Use image" button, so
 	 * clicking a thumbnail can show a look at it first without committing.
 	 */
 	function useSelectedCrop() {
@@ -477,7 +477,7 @@
 	 * whatever crop the field currently holds, even when adjusting one via
 	 * "Adjust crop"; that in-place-overwrite behavior isn't reachable from
 	 * this single button on purpose, since silently mutating a crop that
-	 * may be shared elsewhere is surprising. "Use Crop" (see
+	 * may be shared elsewhere is surprising. "Use image" (see
 	 * useSelectedCrop()) is the only way this modal applies an existing
 	 * attachment as-is.
 	 */

@@ -248,7 +248,7 @@ class Ei_Image_Crop_Field extends acf_field {
 					'selectImage'   => __( 'Select an image', 'ei-image-crop' ),
 					'useImage'      => __( 'Use this image', 'ei-image-crop' ),
 					'save'          => __( 'Crop image', 'ei-image-crop' ),
-					'useCrop'       => __( 'Use Crop', 'ei-image-crop' ),
+					'useCrop'       => __( 'Use image', 'ei-image-crop' ),
 					'close'         => __( 'Close', 'ei-image-crop' ),
 					'deleteCrop'    => __( 'Delete this crop', 'ei-image-crop' ),
 					'confirmDelete' => __( 'Delete this crop? This cannot be undone.', 'ei-image-crop' ),

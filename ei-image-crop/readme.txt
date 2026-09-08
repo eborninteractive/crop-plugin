@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,11 @@ Yes — set "Aspect ratio" to "Free" in the field settings. The crop frame can t
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.1.1 =
+* Renamed "Use Crop" to "Use image".
+* Fixed the "Use image" button not actually turning green - WP core's own .button-primary styling was winning the tie against our color override.
+* Pushed the live preview down so it no longer overlaps the modal's close (×) button.
 
 = 1.1.0 =
 * Reworked the crop modal's controls:
