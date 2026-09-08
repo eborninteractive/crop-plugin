@@ -489,7 +489,7 @@
 					modal.find( '.ei-image-crop-modal-subtitle' ).text(
 						data.filename + ' · ' + data.full_width + ' × ' + data.full_height + ' px'
 					);
-					renderReuseList( $field, data.existing || [] );
+					renderReuseList( $field, data.existing || [], existingId );
 					modal.prop( 'hidden', false );
 
 					$img.one( 'load', function () {
@@ -745,12 +745,25 @@
 		} );
 	}
 
-	function renderReuseList( $field, crops ) {
+	/**
+	 * @param {jQuery} $field
+	 * @param {Array}  crops
+	 * @param {string} [selectedId] The field's currently-set crop, if any -
+	 *   e.g. reopened via "Adjust crop". When it's among these existing
+	 *   crops, it starts out marked selected here (see
+	 *   selectReuseThumbnail()), Save button already reading "Use image",
+	 *   since the crop box initCropper() places (from that same crop's own
+	 *   stored box - see get_source()) already matches it exactly and
+	 *   nothing new needs generating unless it's adjusted further.
+	 */
+	function renderReuseList( $field, crops, selectedId ) {
 		if ( ! crops.length ) {
 			return;
 		}
 
 		var $list = $modal.find( '.ei-image-crop-reuse-list' ).empty();
+		var $selectedThumb = null;
+		var selectedCrop = null;
 
 		crops.forEach( function ( crop ) {
 			var $thumb = $( '<div class="ei-image-crop-reuse-item"></div>' )
@@ -772,10 +785,26 @@
 
 			$thumb.append( $delete );
 			$list.append( $thumb );
+
+			if ( selectedId && String( crop.id ) === String( selectedId ) ) {
+				$selectedThumb = $thumb;
+				selectedCrop = crop;
+			}
 		} );
 
 		$modal.find( '.ei-image-crop-reuse' ).prop( 'hidden', false );
 		updateReuseCount();
+
+		// Only the selection state/label here, not cropper.setData() (as a
+		// manual click via selectReuseThumbnail() would do) - the cropper
+		// itself doesn't exist yet at this point (it's built asynchronously
+		// once the edit image loads, see openCropper()), and its initial
+		// box already comes from this exact crop's own stored box anyway.
+		if ( selectedCrop ) {
+			selectedReuseCrop = selectedCrop;
+			setSaveButtonState( true );
+			$selectedThumb.addClass( 'is-selected' );
+		}
 	}
 
 	function updateReuseCount() {

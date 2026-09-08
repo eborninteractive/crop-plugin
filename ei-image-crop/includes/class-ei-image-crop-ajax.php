@@ -111,13 +111,6 @@ class Ei_Image_Crop_Ajax {
 		}
 
 		if ( ! $box ) {
-			// The exact-target-size-vs-largest-fit decision inside
-			// center_box() needs the true original's absolute pixel size
-			// (whether the real file can actually fit the target box), not
-			// $edit_source's - which can be a smaller "-scaled" copy - even
-			// though the normalized fractions it returns apply the same
-			// either way (same aspect ratio, just a different absolute
-			// scale).
 			$box = Ei_Image_Crop_Generator::center_box( $true_width, $true_height, $ratio );
 		}
 

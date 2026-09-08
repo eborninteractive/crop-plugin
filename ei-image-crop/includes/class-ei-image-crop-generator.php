@@ -39,15 +39,12 @@ class Ei_Image_Crop_Generator {
 
 	/**
 	 * Calculate the default centered box inside the source dimensions,
-	 * normalized to 0-1. A ratio derived from a registered WP image size
-	 * (see Ei_Image_Crop_Field::resolve_ratio()) is always its own literal
-	 * target width:height, not just a proportion - so when the source is
-	 * at least that big in both dimensions, the default box is exactly
-	 * that many pixels, centered, rather than the largest box that
-	 * happens to share the ratio. Only falls back to "largest matching
-	 * ratio" when the source is too small to fit the literal target,
-	 * which is also exactly the case the undersized/upscale warning in
-	 * the cropper UI is watching for.
+	 * normalized to 0-1. Always the largest box of the target ratio that
+	 * fits the source - i.e. flush with the source's edges on whichever
+	 * axis is the tighter fit, centered on the other - regardless of how
+	 * the source's own absolute pixel size compares to the ratio's literal
+	 * target dimensions, so the initial selection always starts out
+	 * maximized rather than at the exact target size.
 	 *
 	 * @param int        $orig_w
 	 * @param int        $orig_h
@@ -66,20 +63,15 @@ class Ei_Image_Crop_Generator {
 
 		list( $ratio_w, $ratio_h ) = $ratio;
 
-		if ( $orig_w >= $ratio_w && $orig_h >= $ratio_h ) {
-			$box_w = $ratio_w;
-			$box_h = $ratio_h;
-		} else {
-			$target_ratio = $ratio_w / $ratio_h;
-			$orig_ratio   = $orig_w / $orig_h;
+		$target_ratio = $ratio_w / $ratio_h;
+		$orig_ratio   = $orig_w / $orig_h;
 
-			if ( $orig_ratio > $target_ratio ) {
-				$box_h = $orig_h;
-				$box_w = $orig_h * $target_ratio;
-			} else {
-				$box_w = $orig_w;
-				$box_h = $orig_w / $target_ratio;
-			}
+		if ( $orig_ratio > $target_ratio ) {
+			$box_h = $orig_h;
+			$box_w = $orig_h * $target_ratio;
+		} else {
+			$box_w = $orig_w;
+			$box_h = $orig_w / $target_ratio;
 		}
 
 		$x = ( $orig_w - $box_w ) / 2;

@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.7.1
+Stable tag: 1.7.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,10 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.7.2 =
+* The initial crop selection now always starts out maximized - flush with the source image's edges on whichever axis is the tighter fit for the target ratio, centered on the other - instead of at the ratio's exact literal pixel size when the source was big enough to fit that.
+* Opening "Adjust crop" on an image that already matches one of its own existing crops now starts with that crop marked selected in "Existing crops" and the Save button already reading "Use image", instead of looking like an unrelated fresh crop.
 
 = 1.7.1 =
 * Replaced the "Only show generated crops" checkbox (list view) / toggle link (grid view) with two tabs, "Original images" and "Crops", in both the classic Media Library list table and the JS-injected grid toolbar - including inside the field's own "Select image" picker, which shares the same toolbar code.
