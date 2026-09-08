@@ -404,7 +404,9 @@
 	height: 72px;
 	max-width: 96px;
 	overflow: visible;
-	display: block;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .ei-image-crop-reuse-item:hover,
@@ -421,14 +423,17 @@
 }
 
 /* No forced square crop here - the <img> keeps the crop's real aspect
- * ratio (see Ei_Image_Crop_Ajax::get_existing_crops()), it's just bounded
- * to the item's height so mismatched ratios still line up in the row. */
+ * ratio (see Ei_Image_Crop_Ajax::get_existing_crops()). height:100% paired
+ * with max-width:100% used to clamp width down for a wide (e.g. 2:1) crop
+ * without shrinking height to match, distorting/stretching it - max-height
+ * + width/height:auto scales the whole image down proportionally instead,
+ * whichever dimension is the tighter fit. */
 .ei-image-crop-reuse-item img {
 	display: block;
-	height: 100%;
 	width: auto;
+	height: auto;
 	max-width: 100%;
-	overflow: hidden;
+	max-height: 100%;
 	border-radius: 4px;
 }
 

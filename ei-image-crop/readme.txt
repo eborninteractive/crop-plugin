@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.7.2
+Stable tag: 1.7.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.7.3 =
+* Fixed existing-crop thumbnails in "Existing crops" looking stretched/distorted - height:100% paired with max-width:100% clamped a wide crop's width down without shrinking its height to match, squashing it. Now scales down proportionally instead.
 
 = 1.7.2 =
 * The initial crop selection now always starts out maximized - flush with the source image's edges on whichever axis is the tighter fit for the target ratio, centered on the other - instead of at the ratio's exact literal pixel size when the source was big enough to fit that.
