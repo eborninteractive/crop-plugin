@@ -38,6 +38,9 @@ msgstr "Kunde inte läsa källbilden."
 msgid "Crop image"
 msgstr "Beskär bild"
 
+msgid "Crops"
+msgstr "Beskärningar"
+
 msgid "Delete"
 msgstr "Radera"
 
@@ -83,8 +86,8 @@ msgstr "Bibliotek"
 msgid "One of the image sizes registered on this site (Settings > Media, or added by a theme/plugin via add_image_size()). A size registered without hard cropping is treated as a free-form crop."
 msgstr "Ett av de bildformat som är registrerade på sajten (Inställningar > Media, eller tillagda av ett tema/plugin via add_image_size()). Ett format som registrerats utan hård beskärning behandlas som fri beskärning."
 
-msgid "Only show generated crops"
-msgstr "Visa endast genererade beskärningar"
+msgid "Original images"
+msgstr "Originalbilder"
 
 msgid "Please select an image."
 msgstr "Välj en bild."
@@ -106,9 +109,6 @@ msgstr "Välj en bild"
 
 msgid "Select image"
 msgstr "Välj bild"
-
-msgid "Show all media"
-msgstr "Visa alla mediefiler"
 
 msgid "Something went wrong while cropping the image."
 msgstr "Något gick fel vid beskärning av bilden."

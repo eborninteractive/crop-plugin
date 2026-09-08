@@ -112,7 +112,10 @@ class Ei_Image_Crop_Media_Library {
 	}
 
 	/**
-	 * Toggle link shown above the classic Media Library list table.
+	 * Two tabs ("Original images" / "Crops") shown above the classic Media
+	 * Library list table - always exactly one or the other, never both at
+	 * once, since regular uploads vastly outnumber crops and a combined
+	 * view would barely differ from "Original images" alone.
 	 *
 	 * @param string $post_type
 	 */
@@ -121,20 +124,20 @@ class Ei_Image_Crop_Media_Library {
 			return;
 		}
 
-		$showing = ! empty( $_GET['ei_show_crops'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-
-		$url = $showing
-			? remove_query_arg( 'ei_show_crops' )
-			: add_query_arg( 'ei_show_crops', '1' );
-
-		$label = $showing
-			? __( 'Show all media', 'ei-image-crop' )
-			: __( 'Only show generated crops', 'ei-image-crop' );
+		$showing_crops = ! empty( $_GET['ei_show_crops'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$base_url      = remove_query_arg( 'ei_show_crops' );
 
 		printf(
-			'<a href="%1$s" class="button ei-image-crop-toggle-link">%2$s</a>',
-			esc_url( $url ),
-			esc_html( $label )
+			'<span class="ei-image-crop-toggle">' .
+				'<a href="%1$s" class="ei-image-crop-tab%2$s">%3$s</a>' .
+				'<a href="%4$s" class="ei-image-crop-tab%5$s">%6$s</a>' .
+			'</span>',
+			esc_url( $base_url ),
+			$showing_crops ? '' : ' is-active',
+			esc_html__( 'Original images', 'ei-image-crop' ),
+			esc_url( add_query_arg( 'ei_show_crops', '1', $base_url ) ),
+			$showing_crops ? ' is-active' : '',
+			esc_html__( 'Crops', 'ei-image-crop' )
 		);
 	}
 
@@ -182,7 +185,8 @@ class Ei_Image_Crop_Media_Library {
 			'ei-image-crop-media-toggle',
 			'eiImageCropMedia',
 			array(
-				'label' => __( 'Only show generated crops', 'ei-image-crop' ),
+				'originalsLabel' => __( 'Original images', 'ei-image-crop' ),
+				'cropsLabel'     => __( 'Crops', 'ei-image-crop' ),
 			)
 		);
 	}

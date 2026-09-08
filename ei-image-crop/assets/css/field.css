@@ -610,31 +610,42 @@
 	border-color: #b32d2e !important;
 }
 
-/* Media library toggle */
+/* Media library "Original images" / "Crops" tabs - the list table's own
+ * <a> pair and the grid toolbar's <button> pair (see media-toggle.js)
+ * share these same classes so both look the same. */
 
-.ei-image-crop-toggle-link {
-	margin-left: 6px;
+.ei-image-crop-toggle {
+	margin-left: 12px;
 }
 
-/* WordPress visually hides every bare <label> inside the media grid
- * toolbar's filter section by default (its own filter labels are there
- * for screen readers only - the <select>'s own value is the visible
- * cue), using its screen-reader-text technique: 1x1px, clipped,
- * absolutely positioned, and !important throughout so it survives
- * being reused in different contexts. Our label isn't one of those
- * decorative pairings - the checkbox has no other visible label - so
- * every property needs an explicit, !important override to escape it. */
-label.ei-image-crop-toggle {
-	position: static !important;
-	width: auto !important;
-	height: auto !important;
-	overflow: visible !important;
-	clip: auto !important;
-	clip-path: none !important;
-	white-space: nowrap !important;
-	display: inline-flex !important;
-	align-items: center;
-	gap: 4px;
-	margin: 0 0 0 12px !important;
+.ei-image-crop-tab {
+	display: inline-block;
+	margin: 0;
+	padding: 4px 10px;
+	border: none;
+	border-radius: 4px;
+	background: none;
+	color: #2271b1;
 	font-size: 13px;
+	line-height: 1.4;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.ei-image-crop-tab:hover,
+.ei-image-crop-tab:focus {
+	background: #f0f0f1;
+	color: #2271b1;
+}
+
+.ei-image-crop-tab.is-active {
+	background: #2271b1;
+	color: #fff;
+	font-weight: 600;
+}
+
+.ei-image-crop-tab.is-active:hover,
+.ei-image-crop-tab.is-active:focus {
+	background: #2271b1;
+	color: #fff;
 }

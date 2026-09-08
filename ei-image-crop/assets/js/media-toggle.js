@@ -1,9 +1,8 @@
 /**
- * Adds an "Only show generated crops" checkbox to the media modal grid
- * toolbar, mirroring the classic list table's toggle link. Unchecked (the
- * default) hides crops; checked flips to showing ONLY crops, rather than
- * everything - regular uploads would otherwise vastly outnumber crops and
- * make the toggle barely change what's visible.
+ * Adds "Original images" / "Crops" tabs to the media modal grid toolbar,
+ * mirroring the classic list table's tabs - always exactly one or the
+ * other, never both at once, since regular uploads vastly outnumber crops
+ * and a combined view would barely differ from "Original images" alone.
  */
 ( function ( $ ) {
 	'use strict';
@@ -16,8 +15,12 @@
 	var MAX_ATTEMPTS = 30;
 	var RETRY_DELAY = 200;
 
-	function label() {
-		return window.eiImageCropMedia ? eiImageCropMedia.label : 'Only show generated crops';
+	function originalsLabel() {
+		return window.eiImageCropMedia ? eiImageCropMedia.originalsLabel : 'Original images';
+	}
+
+	function cropsLabel() {
+		return window.eiImageCropMedia ? eiImageCropMedia.cropsLabel : 'Crops';
 	}
 
 	// WordPress's wp_ajax_query_attachments() whitelists which query keys it
@@ -42,15 +45,15 @@
 	}
 
 	/**
-	 * Injects the checkbox into an already-built AttachmentsBrowser view and
-	 * wires it up.
+	 * Injects the two tabs into an already-built AttachmentsBrowser view and
+	 * wires them up.
 	 *
 	 * @param {Object}  browserView   A wp.media.view.AttachmentsBrowser instance.
 	 * @param {boolean} forceFallback If true, insert onto the toolbar's own
 	 *   $el even when the secondary sub-view isn't ready yet, instead of
-	 *   waiting - used once retries are exhausted so the checkbox ends up
+	 *   waiting - used once retries are exhausted so the tabs end up
 	 *   *somewhere* rather than never appearing at all.
-	 * @return {boolean} True once the checkbox is in the DOM (in the right
+	 * @return {boolean} True once the tabs are in the DOM (in the right
 	 *   spot, or the fallback spot when forced); false if not ready yet.
 	 */
 	function addToggle( browserView, forceFallback ) {
@@ -78,35 +81,31 @@
 			return false;
 		}
 
-		// WordPress visually hides every bare <label> in this toolbar
-		// section by default (its own filter labels are for screen readers
-		// only, since the <select>'s value is the visible cue) using its
-		// screen-reader-text technique - 1x1px, clipped, absolutely
-		// positioned, all !important. field.css carries the same overrides,
-		// but an inline style here is unconditionally guaranteed to win
-		// regardless of stylesheet load order, so the checkbox is never
-		// silently invisible even if that CSS somehow isn't loaded.
-		var VISIBLE_STYLE = 'position:static!important;width:auto!important;height:auto!important;' +
-			'overflow:visible!important;clip:auto!important;clip-path:none!important;' +
-			'white-space:nowrap!important;margin:0 0 0 12px!important;display:inline-flex!important;' +
-			'align-items:center;gap:4px;font-size:13px;';
+		// Plain inline layout only - unlike the checkbox+<label> this used
+		// to be, WordPress's screen-reader-text hiding of bare <label>
+		// elements in this toolbar section doesn't apply to a <span> of
+		// <button>s, so no !important visibility overrides are needed here.
+		var LAYOUT_STYLE = 'display:inline-flex;align-items:center;gap:4px;margin:0 0 0 12px;';
 
 		var library = browserView.collection;
+		var showingCrops = getShowCropsCookie();
 		var $toggle = $(
-			'<label class="ei-image-crop-toggle" style="' + VISIBLE_STYLE + '">' +
-				'<input type="checkbox"' + ( getShowCropsCookie() ? ' checked' : '' ) + ' />' +
-				' ' + label() +
-			'</label>'
+			'<span class="ei-image-crop-toggle" style="' + LAYOUT_STYLE + '">' +
+				'<button type="button" class="ei-image-crop-tab' + ( showingCrops ? '' : ' is-active' ) + '" data-crops="0">' + originalsLabel() + '</button>' +
+				'<button type="button" class="ei-image-crop-tab' + ( showingCrops ? ' is-active' : '' ) + '" data-crops="1">' + cropsLabel() + '</button>' +
+			'</span>'
 		);
 
-		$toggle.find( 'input' ).on( 'change', function () {
-			var checked = $( this ).is( ':checked' );
-			setShowCropsCookie( checked );
+		$toggle.find( '.ei-image-crop-tab' ).on( 'click', function () {
+			var wantsCrops = '1' === $( this ).data( 'crops' ).toString();
+			setShowCropsCookie( wantsCrops );
+			$toggle.find( '.ei-image-crop-tab' ).removeClass( 'is-active' );
+			$( this ).addClass( 'is-active' );
 			// The actual value here is irrelevant server-side (see the
 			// comment above COOKIE_NAME) - this call's only real purpose is
 			// to trigger WordPress's own listener that refetches the
 			// collection whenever its query props change.
-			library.props.set( { eiShowCrops: checked ? 1 : '' } );
+			library.props.set( { eiShowCrops: wantsCrops ? 1 : '' } );
 		} );
 
 		( $secondaryEl || browserView.toolbar.$el ).append( $toggle );

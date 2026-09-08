@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.7.0
+Stable tag: 1.7.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,7 +19,7 @@ Ei Image Crop replaces the "select image + crop at upload" workflow of plugins l
 * **Reuse instead of duplicate.** Cropping the same source image to the same ratio and box reuses the existing crop attachment instead of creating a new one. The field also shows existing crops of the current source image for one-click reuse.
 * **Adjustable afterwards.** Re-opening a crop and adjusting it overwrites the same attachment ID, so every place that crop is referenced updates automatically.
 * **Familiar cropping UI.** Built on Cropper.js: the original image is shown with a crop frame that scales while keeping a locked aspect ratio, or resizes freely when the field has no fixed ratio, plus a live preview of the result.
-* **Tidy Media Library.** Generated crops are hidden from the Media Library grid and list view by default, behind a "Show generated crops" toggle.
+* **Tidy Media Library.** Generated crops are hidden from the Media Library grid and list view by default, behind "Original images" / "Crops" tabs.
 
 = Requirements =
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.7.1 =
+* Replaced the "Only show generated crops" checkbox (list view) / toggle link (grid view) with two tabs, "Original images" and "Crops", in both the classic Media Library list table and the JS-injected grid toolbar - including inside the field's own "Select image" picker, which shares the same toolbar code.
 
 = 1.7.0 =
 * The pencil icon now opens the attachment details popup in an iframe over the current page, instead of following its link - clicking it no longer navigates the tab away to the Media Library (leaving you there once the popup closes), you stay exactly where you were. Middle-click/ctrl-click still opens a real new tab, same as any other link.

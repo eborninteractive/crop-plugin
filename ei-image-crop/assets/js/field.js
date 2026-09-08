@@ -893,7 +893,7 @@
 	}
 
 	/**
-	 * Scopes the media grid's "Only show generated crops" listing to crops
+	 * Scopes the media grid's "Crops" tab listing to crops
 	 * matching this field's own ratio, while its picker is open - so
 	 * everything shown there is actually usable as-is, without still
 	 * needing a new crop to fit. A "free" field has no fixed shape to match
