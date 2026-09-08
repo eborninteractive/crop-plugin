@@ -24,6 +24,7 @@
 	display: block;
 	border: 1px solid #dcdcde;
 	background: #f0f0f1;
+	cursor: pointer;
 }
 
 .ei-image-crop-overlay {

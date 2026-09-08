@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,9 @@ Yes — set "Aspect ratio" to "Free" in the field settings. The crop frame can t
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.2.1 =
+* The pencil icon now opens the image's own WordPress edit screen (in a new tab), for editing its caption/alt text/description - it was mistakenly wired up to reopen the image picker instead. Clicking the preview image itself is now how you pick a different image, same as ACF's own native Image field.
 
 = 1.2.0 =
 * Removed the dashed "drop a file here" placeholder shown before an image is selected - dragging and dropping was never actually supported, so it only invited people to try.

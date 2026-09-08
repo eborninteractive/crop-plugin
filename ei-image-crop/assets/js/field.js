@@ -61,17 +61,27 @@
 		);
 	}
 
-	function setPreview( $field, url ) {
+	/**
+	 * @param {jQuery} $field
+	 * @param {string} url Preview image URL, or '' to clear the preview.
+	 * @param {number|string} [id] Current attachment id, only needed to link
+	 *   the "edit details" icon to its own WP attachment edit screen.
+	 */
+	function setPreview( $field, url, id ) {
 		var $preview = $field.find( '.ei-image-crop-preview' );
 		var $actions = $field.find( '.ei-image-crop-actions' );
 
 		if ( url ) {
+			// The image itself doubles as the "pick a different image"
+			// control (same convention as ACF's own native Image field) -
+			// the pencil icon is for something else entirely (see below).
 			$preview.empty()
-				.append( $( '<img />' ).attr( 'src', url ) )
+				.append( $( '<img class="ei-image-crop-select" />' ).attr( 'src', url ) )
 				.append(
 					$( '<div class="ei-image-crop-overlay" />' ).append(
-						$( '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-select"><span class="dashicons dashicons-edit"></span></button>' )
-							.attr( 'title', t( 'changeImage' ) ),
+						$( '<a target="_blank" rel="noopener" class="ei-image-crop-icon-btn ei-image-crop-open-attachment"><span class="dashicons dashicons-edit"></span></a>' )
+							.attr( 'href', eiImageCrop.editUrlBase + id )
+							.attr( 'title', t( 'editDetails' ) ),
 						$( '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-edit">' + CROP_ICON_SVG + '</button>' )
 							.attr( 'title', t( 'adjustCrop' ) ),
 						$( '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-remove"><span class="dashicons dashicons-no-alt"></span></button>' )
@@ -187,7 +197,7 @@
 		}
 
 		setState( currentField, { id: selectedReuseCrop.id, source: currentSourceId } );
-		setPreview( currentField, selectedReuseCrop.preview );
+		setPreview( currentField, selectedReuseCrop.preview, selectedReuseCrop.id );
 		closeModal();
 	}
 
@@ -289,7 +299,7 @@
 						: ( pickedAttachment ? pickedAttachment.url : data.edit.url );
 
 					setState( $field, { id: existingId, source: sourceId } );
-					setPreview( $field, previewUrl );
+					setPreview( $field, previewUrl, existingId );
 					currentField = null;
 					currentSourceId = null;
 					currentExistingId = null;
@@ -354,7 +364,7 @@
 				}
 
 				setState( $field, { id: response.data.id, source: sourceId } );
-				setPreview( $field, response.data.url );
+				setPreview( $field, response.data.url, response.data.id );
 				currentField = null;
 				currentSourceId = null;
 				currentExistingId = null;
@@ -538,7 +548,7 @@
 				}
 
 				setState( $field, { id: response.data.id, source: sourceId } );
-				setPreview( $field, response.data.url );
+				setPreview( $field, response.data.url, response.data.id );
 				closeModal();
 			} )
 			.fail( function () {

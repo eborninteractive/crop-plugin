@@ -206,9 +206,12 @@ class Ei_Image_Crop_Field extends acf_field {
 		// isn't actually supported and it only invites people to try.
 		echo '<div class="ei-image-crop-preview"' . ( $has_image ? '' : ' hidden' ) . '>';
 		if ( $has_image ) {
-			echo '<img src="' . esc_url( $preview_url ) . '" alt="" />';
+			// The image itself doubles as the "pick a different image"
+			// control (same convention as ACF's own native Image field) -
+			// the pencil icon is for something else entirely (see below).
+			echo '<img src="' . esc_url( $preview_url ) . '" alt="" class="ei-image-crop-select" />';
 			echo '<div class="ei-image-crop-overlay">';
-			echo '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-select" title="' . esc_attr__( 'Change image', 'ei-image-crop' ) . '"><span class="dashicons dashicons-edit"></span></button>';
+			echo '<a href="' . esc_url( admin_url( 'post.php?action=edit&post=' . $value ) ) . '" target="_blank" rel="noopener" class="ei-image-crop-icon-btn ei-image-crop-open-attachment" title="' . esc_attr__( 'Edit image details (caption, alt text, etc.)', 'ei-image-crop' ) . '"><span class="dashicons dashicons-edit"></span></a>';
 			echo '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-edit" title="' . esc_attr__( 'Adjust crop', 'ei-image-crop' ) . '">' . self::crop_icon() . '</button>';
 			echo '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-remove" title="' . esc_attr__( 'Remove image', 'ei-image-crop' ) . '"><span class="dashicons dashicons-no-alt"></span></button>';
 			echo '</div>';
@@ -259,12 +262,13 @@ class Ei_Image_Crop_Field extends acf_field {
 			'ei-image-crop-field',
 			'eiImageCrop',
 			array(
-				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-				'nonce'   => wp_create_nonce( 'ei_image_crop' ),
+				'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
+				'nonce'       => wp_create_nonce( 'ei_image_crop' ),
+				'editUrlBase' => admin_url( 'post.php?action=edit&post=' ),
 				'i18n'    => array(
 					'selectImage'   => __( 'Select an image', 'ei-image-crop' ),
 					'useImage'      => __( 'Use this image', 'ei-image-crop' ),
-					'changeImage'   => __( 'Change image', 'ei-image-crop' ),
+					'editDetails'   => __( 'Edit image details (caption, alt text, etc.)', 'ei-image-crop' ),
 					'adjustCrop'    => __( 'Adjust crop', 'ei-image-crop' ),
 					'removeImage'   => __( 'Remove image', 'ei-image-crop' ),
 					'save'          => __( 'Crop image', 'ei-image-crop' ),
