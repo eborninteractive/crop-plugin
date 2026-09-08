@@ -211,7 +211,7 @@ class Ei_Image_Crop_Field extends acf_field {
 			// the pencil icon is for something else entirely (see below).
 			echo '<img src="' . esc_url( $preview_url ) . '" alt="" class="ei-image-crop-select" />';
 			echo '<div class="ei-image-crop-overlay">';
-			echo '<a href="' . esc_url( admin_url( 'post.php?action=edit&post=' . $value ) ) . '" target="_blank" rel="noopener" class="ei-image-crop-icon-btn ei-image-crop-open-attachment" title="' . esc_attr__( 'Edit image details (caption, alt text, etc.)', 'ei-image-crop' ) . '"><span class="dashicons dashicons-edit"></span></a>';
+			echo '<a href="' . esc_url( admin_url( 'post.php?action=edit&post=' . $value ) ) . '" target="_blank" rel="noopener" class="ei-image-crop-icon-btn ei-image-crop-open-attachment" title="' . esc_attr__( 'Edit image details (caption, alt text, etc.)', 'ei-image-crop' ) . '">' . self::pencil_icon() . '</a>';
 			echo '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-edit" title="' . esc_attr__( 'Adjust crop', 'ei-image-crop' ) . '">' . self::crop_icon() . '</button>';
 			echo '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-remove" title="' . esc_attr__( 'Remove image', 'ei-image-crop' ) . '">&times;</button>';
 			echo '</div>';
@@ -229,13 +229,23 @@ class Ei_Image_Crop_Field extends acf_field {
 
 	/**
 	 * Inline SVG crop icon - dashicons has no crop glyph, so the "Adjust
-	 * crop" button uses this instead, matching how dashicons-edit/no-alt are
-	 * rendered for the other two icon buttons.
+	 * crop" button uses this instead.
 	 *
 	 * @return string
 	 */
 	public static function crop_icon() {
 		return '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M17 15h2V7c0-1.1-.9-2-2-2H9v2h8v8zM7 17V1H5v4H1v2h4v10c0 1.1.9 2 2 2h10v4h2v-4h4v-2H7z"/></svg>';
+	}
+
+	/**
+	 * Inline SVG pencil icon - dashicons-edit renders with a baseline stroke
+	 * under the pencil that read as a stray underline at this size, so this
+	 * plain pencil (no line) is used for "edit image details" instead.
+	 *
+	 * @return string
+	 */
+	public static function pencil_icon() {
+		return '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>';
 	}
 
 	/**

@@ -90,6 +90,10 @@
 	// instead - kept identical to Ei_Image_Crop_Field::crop_icon() so a
 	// freshly-saved preview (built here) looks the same as the server-rendered one.
 	var CROP_ICON_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M17 15h2V7c0-1.1-.9-2-2-2H9v2h8v8zM7 17V1H5v4H1v2h4v10c0 1.1.9 2 2 2h10v4h2v-4h4v-2H7z"/></svg>';
+	// Plain pencil, no baseline stroke - kept identical to
+	// Ei_Image_Crop_Field::pencil_icon() (dashicons-edit's baseline read as
+	// a stray underline at this size).
+	var PENCIL_ICON_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>';
 
 	function parseAspectRatio( ratio ) {
 		if ( ! ratio || 'free' === ratio ) {
@@ -142,7 +146,7 @@
 				.append( $( '<img class="ei-image-crop-select" />' ).attr( 'src', url ) )
 				.append(
 					$( '<div class="ei-image-crop-overlay" />' ).append(
-						$( '<a target="_blank" rel="noopener" class="ei-image-crop-icon-btn ei-image-crop-open-attachment"><span class="dashicons dashicons-edit"></span></a>' )
+						$( '<a target="_blank" rel="noopener" class="ei-image-crop-icon-btn ei-image-crop-open-attachment">' + PENCIL_ICON_SVG + '</a>' )
 							.attr( 'href', eiImageCrop.editUrlBase + id )
 							.attr( 'title', t( 'editDetails' ) ),
 						$( '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-edit">' + CROP_ICON_SVG + '</button>' )

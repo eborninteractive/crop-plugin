@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,9 @@ Yes — set "Aspect ratio" to "Free" in the field settings. The crop frame can t
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.2.3 =
+* Replaced the "edit image details" pencil icon (dashicons-edit) with a plain custom pencil - dashicons-edit's baseline stroke read as a stray underline at this size.
 
 = 1.2.2 =
 * Inverted the round icon buttons (field preview overlay, crop popup close, reuse thumbnail delete) to dark plates with white icons.
