@@ -510,6 +510,35 @@
 	border-color: #008a20 !important;
 }
 
+/* Shown while performSave()'s AJAX request is in flight - the label stays
+ * put, a small spinner joins it via ::after so there's no layout jump when
+ * it appears/disappears. */
+.ei-image-crop-save.is-loading {
+	background: #fff !important;
+	border-color: var(--wp-admin-theme-color) !important;
+	color: var(--wp-admin-theme-color) !important;
+	cursor: wait;
+}
+
+.ei-image-crop-save.is-loading::after {
+	content: "";
+	display: inline-block;
+	width: 12px;
+	height: 12px;
+	margin-left: 8px;
+	vertical-align: middle;
+	border: 2px solid currentColor;
+	border-top-color: transparent;
+	border-radius: 50%;
+	animation: ei-image-crop-spin 0.6s linear infinite;
+}
+
+@keyframes ei-image-crop-spin {
+	to {
+		transform: rotate( 360deg );
+	}
+}
+
 /* Attachment details popup - shows upload.php?item={id} (the Media
  * Library's own attachment details view) in an iframe over the current
  * page, so the pencil icon never navigates the tab away to the Media

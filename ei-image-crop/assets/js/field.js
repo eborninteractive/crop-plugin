@@ -890,7 +890,7 @@
 		var sourceId = currentSourceId;
 
 		clearError();
-		$modal.find( '.ei-image-crop-save' ).prop( 'disabled', true );
+		$modal.find( '.ei-image-crop-save' ).prop( 'disabled', true ).addClass( 'is-loading' );
 
 		$.post( eiImageCrop.ajaxUrl, {
 			action: 'ei_image_crop_save',
@@ -916,7 +916,7 @@
 				showError( t( 'error' ) );
 			} )
 			.always( function () {
-				$modal.find( '.ei-image-crop-save' ).prop( 'disabled', false );
+				$modal.find( '.ei-image-crop-save' ).prop( 'disabled', false ).removeClass( 'is-loading' );
 			} );
 	}
 
