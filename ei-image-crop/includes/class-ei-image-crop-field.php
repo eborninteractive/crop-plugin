@@ -281,7 +281,7 @@ class Ei_Image_Crop_Field extends acf_field {
 					'close'                => __( 'Close', 'ei-image-crop' ),
 					'deleteCrop'           => __( 'Delete image', 'ei-image-crop' ),
 					'confirmDeleteTitle'   => __( 'Delete image?', 'ei-image-crop' ),
-					'confirmDeleteMessage' => __( 'This cannot be undone.', 'ei-image-crop' ),
+					'confirmDeleteMessage' => __( 'Keep in mind that the image is permanently deleted, and if this exact crop is used anywhere else on the site, it will need to be replaced.', 'ei-image-crop' ),
 					'delete'               => __( 'Delete', 'ei-image-crop' ),
 					'cancel'               => __( 'Cancel', 'ei-image-crop' ),
 					'previewTitle'         => __( 'Preview', 'ei-image-crop' ),

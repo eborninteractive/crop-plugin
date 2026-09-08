@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.7.5
+Stable tag: 1.7.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.7.6 =
+* The delete-crop confirmation now spells out what's actually at stake - the image is gone for good, and if that exact crop is used elsewhere on the site, it'll need replacing - instead of just "This cannot be undone."
 
 = 1.7.5 =
 * CSS tweaks to the "Existing crops" row: tighter vertical gap between wrapped rows, delete button flush to the thumbnail's corner instead of overhanging it.

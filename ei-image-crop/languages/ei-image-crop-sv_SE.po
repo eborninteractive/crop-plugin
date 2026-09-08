@@ -80,6 +80,9 @@ msgstr "Bildstorlek som används för att förhandsgranska beskärningen i fält
 msgid "Invalid source image."
 msgstr "Ogiltig källbild."
 
+msgid "Keep in mind that the image is permanently deleted, and if this exact crop is used anywhere else on the site, it will need to be replaced."
+msgstr "Tänk på att bilden försvinner permanent och om du använder just denna beskärning av bilden någon annanstans på hemsidan måste den ersättas."
+
 msgid "Library"
 msgstr "Bibliotek"
 
@@ -118,9 +121,6 @@ msgstr "Källan är inte en giltig bifogad bildfil."
 
 msgid "That is not a crop this plugin can delete."
 msgstr "Det är inte en beskärning som det här tillägget kan radera."
-
-msgid "This cannot be undone."
-msgstr "Detta kan inte ångras."
 
 msgid "Uploaded to post"
 msgstr "Uppladdad till inlägget"
