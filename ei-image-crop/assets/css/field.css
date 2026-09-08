@@ -218,6 +218,16 @@
 	z-index: 1;
 }
 
+/* Crop box outline - thicker than Cropper's own default (1px). */
+.cropper-view-box {
+	display: block;
+	height: 100%;
+	outline: 3px solid #39f;
+	outline-color: rgba(51, 153, 255, 0.75);
+	overflow: hidden;
+	width: 100%;
+}
+
 /* Crop box handles: bold corner brackets instead of Cropper's default tiny
  * dots, and only at the four corners - the four edge-midpoint handles are
  * hidden entirely. Both stylesheets load in the same order every time
@@ -243,31 +253,31 @@
 }
 
 .cropper-point.point-nw {
-	top: -2px !important;
-	left: -2px !important;
-	border-top: 3px solid #000 !important;
-	border-left: 3px solid #000 !important;
+	top: -9px !important;
+	left: -9px !important;
+	border-top: 3px solid #fff !important;
+	border-left: 3px solid #fff !important;
 }
 
 .cropper-point.point-ne {
-	top: -2px !important;
-	right: -2px !important;
-	border-top: 3px solid #000 !important;
-	border-right: 3px solid #000 !important;
+	top: -9px !important;
+	right: -9px !important;
+	border-top: 3px solid #fff !important;
+	border-right: 3px solid #fff !important;
 }
 
 .cropper-point.point-sw {
-	bottom: -2px !important;
-	left: -2px !important;
-	border-bottom: 3px solid #000 !important;
-	border-left: 3px solid #000 !important;
+	bottom: -9px !important;
+	left: -9px !important;
+	border-bottom: 3px solid #fff !important;
+	border-left: 3px solid #fff !important;
 }
 
 .cropper-point.point-se {
-	bottom: -2px !important;
-	right: -2px !important;
-	border-bottom: 3px solid #000 !important;
-	border-right: 3px solid #000 !important;
+	bottom: -9px !important;
+	right: -9px !important;
+	border-bottom: 3px solid #fff !important;
+	border-right: 3px solid #fff !important;
 }
 
 .ei-image-crop-live-preview {
