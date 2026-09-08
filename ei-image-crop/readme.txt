@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.6.5
+Stable tag: 1.6.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.6.6 =
+* Added !important to .cropper-view-box's outline override - something on at least one live site (likely a CSS concatenation/optimization plugin reordering enqueued stylesheets) was letting cropper.min.css's own 1px outline win despite field.css being enqueued after it.
 
 = 1.6.5 =
 * Fixed the live preview disappearing entirely - Cropper.js's own preview feature needs the container to have an explicit width/height to compute its scale/position from; 1.6.4 removed those, which collapsed it to a 0x0 box. Restored them (kept the rounded corners from 1.6.4).

@@ -229,8 +229,13 @@
 .cropper-view-box {
 	display: block;
 	height: 100%;
-	outline: 3px solid #39f;
-	outline-color: rgba(51, 153, 255, 0.75);
+	/* !important: something on at least one live site (likely a CSS
+	 * concatenation/optimization plugin reordering enqueued stylesheets)
+	 * is letting cropper.min.css's own 1px outline win over this despite
+	 * field.css being enqueued after it, which normally would've been
+	 * enough on its own. */
+	outline: 3px solid #39f !important;
+	outline-color: rgba(51, 153, 255, 0.75) !important;
 	overflow: hidden;
 	width: 100%;
 }
