@@ -175,10 +175,35 @@
 .ei-image-crop-modal-side {
 	flex: 0 0 32%;
 	max-width: 340px;
-	padding: 20px;
+	padding: 24px;
 	overflow-y: auto;
 	display: flex;
 	flex-direction: column;
+}
+
+.ei-image-crop-preview-title {
+	font-weight: 600;
+	margin: 0 0 10px;
+}
+
+/* Floating "1600 × 900 · 16:9" tag that tracks the crop box itself while
+ * dragging - lives inside Cropper's own .cropper-container (see
+ * updateBoxLabel() in field.js), whose top-left is the same coordinate
+ * space cropper.getCropBoxData() reports in, so left/top need no extra
+ * conversion. The negative translateY sits it just above the box
+ * regardless of the tag's own rendered height. */
+.ei-image-crop-box-label {
+	position: absolute;
+	transform: translateY(calc(-100% - 6px));
+	background: rgba(29, 35, 39, 0.9);
+	color: #fff;
+	font-size: 12px;
+	line-height: 1;
+	padding: 5px 8px;
+	border-radius: 3px;
+	white-space: nowrap;
+	pointer-events: none;
+	z-index: 1;
 }
 
 .ei-image-crop-live-preview {
@@ -190,7 +215,7 @@
 }
 
 .ei-image-crop-live-preview-caption {
-	margin: 6px 0 16px;
+	margin: 6px 0 20px;
 	color: #646970;
 	font-size: 12px;
 	text-align: center;
@@ -200,9 +225,23 @@
 	margin-bottom: 16px;
 }
 
+.ei-image-crop-reuse-heading {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 8px;
+	margin: 0 0 8px;
+}
+
+.ei-image-crop-reuse-count {
+	color: #646970;
+	font-size: 12px;
+	white-space: nowrap;
+}
+
 .ei-image-crop-reuse-title {
 	font-weight: 600;
-	margin: 0 0 8px;
+	margin: 0;
 }
 
 .ei-image-crop-reuse-list {
@@ -278,10 +317,8 @@
 .ei-image-crop-modal-actions {
 	margin-top: auto;
 	padding-top: 16px;
-}
-
-.ei-image-crop-modal-actions .button {
-	margin-right: 6px;
+	display: flex;
+	justify-content: flex-end;
 }
 
 /* Deliberately not .button-primary (WP's default blue) - black by default,

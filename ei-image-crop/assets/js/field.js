@@ -183,10 +183,14 @@
 							'<div class="ei-image-crop-canvas"><img class="ei-image-crop-img" alt="" /></div>' +
 						'</div>' +
 						'<div class="ei-image-crop-modal-side">' +
+							'<p class="ei-image-crop-preview-title"></p>' +
 							'<div class="ei-image-crop-live-preview"></div>' +
 							'<p class="ei-image-crop-live-preview-caption"></p>' +
 							'<div class="ei-image-crop-reuse" hidden>' +
-								'<p class="ei-image-crop-reuse-title"></p>' +
+								'<div class="ei-image-crop-reuse-heading">' +
+									'<p class="ei-image-crop-reuse-title"></p>' +
+									'<span class="ei-image-crop-reuse-count"></span>' +
+								'</div>' +
 								'<div class="ei-image-crop-reuse-list"></div>' +
 							'</div>' +
 							'<p class="ei-image-crop-error" hidden></p>' +
@@ -202,6 +206,7 @@
 		$( 'body' ).append( $modal );
 
 		$modal.find( '.ei-image-crop-modal-title' ).text( t( 'modalTitle' ) );
+		$modal.find( '.ei-image-crop-preview-title' ).text( t( 'previewTitle' ) );
 		$modal.find( '.ei-image-crop-save' ).text( t( 'save' ) ).on( 'click', onSaveButtonClick );
 		$modal.find( '.ei-image-crop-close' ).on( 'click', closeModal );
 		$modal.find( '.ei-image-crop-reuse-title' ).text( t( 'reuseTitle' ) );
@@ -471,10 +476,41 @@
 		$modal.find( '.ei-image-crop-live-preview-caption' ).text( text );
 	}
 
+	/**
+	 * Small "16:9 · 1600 × 900" tag floating just above the crop box itself,
+	 * mirroring the same info as the live preview's caption but where you're
+	 * actually looking while dragging. Positioned with cropper.getCropBoxData(),
+	 * which already reports on-screen pixels relative to Cropper's own
+	 * .cropper-container - the element this tag lives inside - so no extra
+	 * coordinate conversion is needed.
+	 */
+	function updateBoxLabel( $field, $label ) {
+		if ( ! cropper ) {
+			return;
+		}
+
+		var data = cropper.getData();
+		var box = cropper.getCropBoxData();
+		var w = Math.round( data.width );
+		var h = Math.round( data.height );
+		var ratioLabel = $field.data( 'ratio' );
+		var text = ( ratioLabel && 'free' !== ratioLabel ) ? w + ' × ' + h + ' · ' + ratioLabel : w + ' × ' + h;
+
+		// Sits just above the box (see the negative translateY in field.css)
+		// rather than at its top edge, so it never overlaps the selection.
+		$label.text( text ).css( {
+			left: box.left + 'px',
+			top: box.top + 'px',
+		} );
+	}
+
 	function initCropper( $field, imgEl, box ) {
 		if ( cropper ) {
 			cropper.destroy();
 		}
+
+		$modal.find( '.ei-image-crop-box-label' ).remove();
+		var $boxLabel = $( '<div class="ei-image-crop-box-label"></div>' );
 
 		var aspectRatio = parseAspectRatio( $field.data( 'ratio' ) );
 
@@ -494,6 +530,12 @@
 			ready: function () {
 				var natural = { w: imgEl.naturalWidth, h: imgEl.naturalHeight };
 
+				// .cropper-container only exists once Cropper has finished its
+				// own setup, which is exactly what "ready" signals - appending
+				// here (rather than right after `new Cropper()`) guarantees
+				// it's actually there to append into.
+				$( imgEl ).closest( '.ei-image-crop-canvas' ).find( '.cropper-container' ).append( $boxLabel );
+
 				suppressCropEvents = true;
 				cropper.setData( {
 					x: box.x * natural.w,
@@ -503,6 +545,7 @@
 				} );
 				suppressCropEvents = false;
 				updatePreviewCaption( $field );
+				updateBoxLabel( $field, $boxLabel );
 			},
 		} );
 
@@ -513,6 +556,7 @@
 		// existing crop" selection back to a fresh "Crop image" state.
 		imgEl.addEventListener( 'crop', function () {
 			updatePreviewCaption( $field );
+			updateBoxLabel( $field, $boxLabel );
 
 			if ( suppressCropEvents || ! selectedReuseCrop ) {
 				return;
@@ -553,6 +597,12 @@
 		} );
 
 		$modal.find( '.ei-image-crop-reuse' ).prop( 'hidden', false );
+		updateReuseCount();
+	}
+
+	function updateReuseCount() {
+		var n = $modal.find( '.ei-image-crop-reuse-item' ).length;
+		$modal.find( '.ei-image-crop-reuse-count' ).text( t( 'savedCount' ).replace( '%d', n ) );
 	}
 
 	/**
@@ -591,6 +641,7 @@
 					}
 
 					$thumb.remove();
+					updateReuseCount();
 
 					if ( ! $modal.find( '.ei-image-crop-reuse-item' ).length ) {
 						$modal.find( '.ei-image-crop-reuse' ).prop( 'hidden', true );

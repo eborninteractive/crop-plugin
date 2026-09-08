@@ -101,6 +101,12 @@ msgstr "Används bara när Bildförhållande ovan är satt till \"Eget\". Format
 msgid "Please select an image."
 msgstr "Välj en bild."
 
+msgid "Preview"
+msgstr "Förhandsvisning"
+
+msgid "%d saved"
+msgstr "%d sparade"
+
 msgid "Remove image"
 msgstr "Ta bort bild"
 

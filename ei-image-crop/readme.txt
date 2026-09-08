@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,13 @@ Yes — set "Aspect ratio" to "Free" in the field settings. The crop frame can t
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.3.1 =
+* Closed the remaining gaps against the design mockup:
+  * Added a floating "1600 × 900 · 16:9" tag that tracks the crop box itself while dragging, not just the static caption under the live preview.
+  * Added a "Preview" heading above the live preview, and a "<n> saved" count next to "Existing crops of this image", both matching the mockup's section headings.
+  * Right-aligned the "Crop image" button.
+* Added the two new strings above to the Swedish translation.
 
 = 1.3.0 =
 * Reworked the crop popup's layout based on a design mockup:
