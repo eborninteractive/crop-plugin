@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.6.4
+Stable tag: 1.6.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,10 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.6.5 =
+* Fixed the live preview disappearing entirely - Cropper.js's own preview feature needs the container to have an explicit width/height to compute its scale/position from; 1.6.4 removed those, which collapsed it to a 0x0 box. Restored them (kept the rounded corners from 1.6.4).
+* Switched the popup's close button to a ::before pseudo-element for its ×, matching the same approach and fine-tuning as the reuse-delete button.
 
 = 1.6.4 =
 * Applied user-supplied field.css tweaks: the live preview now sizes to its content instead of a fixed 100%/200px box, both it and its reuse-thumbnail images gained rounded corners.

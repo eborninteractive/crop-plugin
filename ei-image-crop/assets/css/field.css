@@ -159,8 +159,11 @@
 	color: #1d2327;
 }
 
-.ei-image-crop-close::after {
+.ei-image-crop-close::before {
 	content: "×";
+	vertical-align: top;
+	display: inline-block;
+	margin-top: -1px;
 }
 
 .ei-image-crop-modal-body {
@@ -305,6 +308,15 @@
 }
 
 .ei-image-crop-live-preview {
+	/* Cropper.js's own preview feature (see the `preview` option in
+	 * initCropper() in field.js) works by absolutely positioning a scaled
+	 * clone of the source image inside this container and computing the
+	 * scale/offset from the CONTAINER's own current size - without an
+	 * explicit width/height here it collapses to 0x0 (nothing in it
+	 * contributes to normal-flow sizing) and the preview simply never
+	 * appears at all, regardless of anything else in this rule. */
+	width: 100%;
+	height: 200px;
 	overflow: hidden;
 	background: #f0f0f1;
 	border: 1px solid #dcdcde;
