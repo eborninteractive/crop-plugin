@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.2.3
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,14 @@ Yes — set "Aspect ratio" to "Free" in the field settings. The crop frame can t
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.3.0 =
+* Reworked the crop popup's layout based on a design mockup:
+  * Added a header bar with a title, the source image's filename and true pixel dimensions, and the close button.
+  * The live preview now shows a caption with the current ratio and resulting pixel size.
+  * Existing-crop thumbnails no longer show their title as visible text (just the thumbnail); the selected one now gets a light blue border/background instead of green.
+  * The "Crop image" button is black by default (no longer WP's default blue), turning green only once a reuse thumbnail is selected ("Use image").
+* Added a Swedish (sv_SE) translation - every string in the plugin now displays in Swedish on a Swedish-locale WordPress install.
 
 = 1.2.3 =
 * Replaced the "edit image details" pencil icon (dashicons-edit) with a plain custom pencil - dashicons-edit's baseline stroke read as a stray underline at this size.

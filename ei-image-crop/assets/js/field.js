@@ -171,19 +171,28 @@
 		$modal = $(
 			'<div class="ei-image-crop-modal" hidden>' +
 				'<div class="ei-image-crop-modal-inner">' +
-					'<button type="button" class="ei-image-crop-close" aria-label="' + t( 'close' ) + '">&times;</button>' +
-					'<div class="ei-image-crop-modal-main">' +
-						'<div class="ei-image-crop-canvas"><img class="ei-image-crop-img" alt="" /></div>' +
-					'</div>' +
-					'<div class="ei-image-crop-modal-side">' +
-						'<div class="ei-image-crop-live-preview"></div>' +
-						'<div class="ei-image-crop-reuse" hidden>' +
-							'<p class="ei-image-crop-reuse-title"></p>' +
-							'<div class="ei-image-crop-reuse-list"></div>' +
+					'<div class="ei-image-crop-modal-header">' +
+						'<div class="ei-image-crop-modal-heading">' +
+							'<strong class="ei-image-crop-modal-title"></strong>' +
+							'<span class="ei-image-crop-modal-subtitle"></span>' +
 						'</div>' +
-						'<p class="ei-image-crop-error" hidden></p>' +
-						'<div class="ei-image-crop-modal-actions">' +
-							'<button type="button" class="button button-primary ei-image-crop-save"></button>' +
+						'<button type="button" class="ei-image-crop-close" aria-label="' + t( 'close' ) + '">&times;</button>' +
+					'</div>' +
+					'<div class="ei-image-crop-modal-body">' +
+						'<div class="ei-image-crop-modal-main">' +
+							'<div class="ei-image-crop-canvas"><img class="ei-image-crop-img" alt="" /></div>' +
+						'</div>' +
+						'<div class="ei-image-crop-modal-side">' +
+							'<div class="ei-image-crop-live-preview"></div>' +
+							'<p class="ei-image-crop-live-preview-caption"></p>' +
+							'<div class="ei-image-crop-reuse" hidden>' +
+								'<p class="ei-image-crop-reuse-title"></p>' +
+								'<div class="ei-image-crop-reuse-list"></div>' +
+							'</div>' +
+							'<p class="ei-image-crop-error" hidden></p>' +
+							'<div class="ei-image-crop-modal-actions">' +
+								'<button type="button" class="button ei-image-crop-save"></button>' +
+							'</div>' +
 						'</div>' +
 					'</div>' +
 				'</div>' +
@@ -192,6 +201,7 @@
 
 		$( 'body' ).append( $modal );
 
+		$modal.find( '.ei-image-crop-modal-title' ).text( t( 'modalTitle' ) );
 		$modal.find( '.ei-image-crop-save' ).text( t( 'save' ) ).on( 'click', onSaveButtonClick );
 		$modal.find( '.ei-image-crop-close' ).on( 'click', closeModal );
 		$modal.find( '.ei-image-crop-reuse-title' ).text( t( 'reuseTitle' ) );
@@ -374,6 +384,9 @@
 				}
 
 				function showInteractiveCropper() {
+					modal.find( '.ei-image-crop-modal-subtitle' ).text(
+						data.filename + ' · ' + data.full_width + ' × ' + data.full_height + ' px'
+					);
 					renderReuseList( $field, data.existing || [] );
 					modal.prop( 'hidden', false );
 
@@ -439,6 +452,25 @@
 			.fail( onFallback );
 	}
 
+	/**
+	 * Keeps the "16:9 · 1600 × 900" caption under the live preview in sync
+	 * with the crop box - the field's own configured ratio label plus the
+	 * resulting crop's actual pixel size, not the source image's.
+	 */
+	function updatePreviewCaption( $field ) {
+		if ( ! cropper ) {
+			return;
+		}
+
+		var data = cropper.getData();
+		var w = Math.round( data.width );
+		var h = Math.round( data.height );
+		var ratioLabel = $field.data( 'ratio' );
+		var text = ( ratioLabel && 'free' !== ratioLabel ) ? ratioLabel + ' · ' + w + ' × ' + h : w + ' × ' + h;
+
+		$modal.find( '.ei-image-crop-live-preview-caption' ).text( text );
+	}
+
 	function initCropper( $field, imgEl, box ) {
 		if ( cropper ) {
 			cropper.destroy();
@@ -470,6 +502,7 @@
 					height: box.h * natural.h,
 				} );
 				suppressCropEvents = false;
+				updatePreviewCaption( $field );
 			},
 		} );
 
@@ -479,6 +512,8 @@
 		// an actual manual adjustment, which should drop the "viewing an
 		// existing crop" selection back to a fresh "Crop image" state.
 		imgEl.addEventListener( 'crop', function () {
+			updatePreviewCaption( $field );
+
 			if ( suppressCropEvents || ! selectedReuseCrop ) {
 				return;
 			}

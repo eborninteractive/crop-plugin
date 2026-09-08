@@ -1,0 +1,148 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Ei Image Crop\n"
+"Report-Msgid-Bugs-To: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sv_SE\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "A fixed ratio locks the crop frame while scaling it; Free lets the frame itself be resized."
+msgstr "Ett fast bildförhållande låser croppramen medan den skalas; Fri gör att ramen själv kan ändra storlek."
+
+msgid "Adjust crop"
+msgstr "Justera beskärning"
+
+msgid "Admin preview size"
+msgstr "Förhandsvisningsstorlek i admin"
+
+msgid "All"
+msgstr "Alla"
+
+msgid "Aspect ratio"
+msgstr "Bildförhållande"
+
+msgid "Cancel"
+msgstr "Avbryt"
+
+msgid "Close"
+msgstr "Stäng"
+
+msgid "Could not delete that crop."
+msgstr "Kunde inte radera den beskärningen."
+
+msgid "Could not find the original image file."
+msgstr "Kunde inte hitta originalbildfilen."
+
+msgid "Could not read the original image dimensions."
+msgstr "Kunde inte läsa originalbildens dimensioner."
+
+msgid "Could not read the source image."
+msgstr "Kunde inte läsa källbilden."
+
+msgid "Crop image"
+msgstr "Beskär bild"
+
+msgid "Custom ratio"
+msgstr "Eget bildförhållande"
+
+msgid "Custom…"
+msgstr "Eget…"
+
+msgid "Delete"
+msgstr "Radera"
+
+msgid "Delete image"
+msgstr "Radera bild"
+
+msgid "Delete image?"
+msgstr "Radera bild?"
+
+msgid "Edit image details (caption, alt text, etc.)"
+msgstr "Redigera bilddetaljer (bildtext, alt-text, m.m.)"
+
+msgid "Ei Image Crop requires Advanced Custom Fields (or ACF PRO) to be installed and active."
+msgstr "Ei Image Crop kräver att Advanced Custom Fields (eller ACF PRO) är installerat och aktiverat."
+
+msgid "Existing crops of this image"
+msgstr "Befintliga beskärningar av denna bild"
+
+msgid "Free (no fixed ratio)"
+msgstr "Fri (inget fast förhållande)"
+
+msgid "Image Crop"
+msgstr "Bildbeskärning"
+
+msgid "Image ID"
+msgstr "Bild-ID"
+
+msgid "Image URL"
+msgstr "Bild-URL"
+
+msgid "Image array"
+msgstr "Bilddata (array)"
+
+msgid "Image size used to preview the crop in the field editor."
+msgstr "Bildstorlek som används för att förhandsgranska beskärningen i fältredigeraren."
+
+msgid "Invalid source image."
+msgstr "Ogiltig källbild."
+
+msgid "Library"
+msgstr "Bibliotek"
+
+msgid "Only show generated crops"
+msgstr "Visa endast genererade beskärningar"
+
+msgid "Only used when Aspect ratio above is set to \"Custom\". Format: width:height, e.g. 5:2."
+msgstr "Används bara när Bildförhållande ovan är satt till \"Eget\". Format: bredd:höjd, t.ex. 5:2."
+
+msgid "Please select an image."
+msgstr "Välj en bild."
+
+msgid "Remove image"
+msgstr "Ta bort bild"
+
+msgid "Return format"
+msgstr "Returformat"
+
+msgid "Select an image"
+msgstr "Välj en bild"
+
+msgid "Select image"
+msgstr "Välj bild"
+
+msgid "Show all media"
+msgstr "Visa alla mediefiler"
+
+msgid "Something went wrong while cropping the image."
+msgstr "Något gick fel vid beskärning av bilden."
+
+msgid "Source is not a valid image attachment."
+msgstr "Källan är inte en giltig bifogad bildfil."
+
+msgid "That is not a crop this plugin can delete."
+msgstr "Det är inte en beskärning som det här tillägget kan radera."
+
+msgid "This cannot be undone."
+msgstr "Detta kan inte ångras."
+
+msgid "Uploaded to post"
+msgstr "Uppladdad till inlägget"
+
+msgid "Use image"
+msgstr "Använd bild"
+
+msgid "Use this image"
+msgstr "Använd denna bild"
+
+msgid "You are not allowed to do this."
+msgstr "Du har inte behörighet att göra detta."
+
+msgid "free crop"
+msgstr "fri beskärning"
+
+msgid "full"
+msgstr "Full storlek"
+

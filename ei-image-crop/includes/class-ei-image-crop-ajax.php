@@ -86,6 +86,11 @@ class Ei_Image_Crop_Ajax {
 
 		$ratio = Ei_Image_Crop_Generator::parse_ratio( $ratio_label );
 
+		// The true original's own filename/dimensions, for the modal header -
+		// deliberately not $edit_source, which may be a smaller "large" size
+		// used only to keep the editor snappy.
+		$full_meta = wp_get_attachment_metadata( $source_id );
+
 		if ( $current_id ) {
 			$stored_box = get_post_meta( $current_id, '_ei_crop_box', true );
 			$box        = is_array( $stored_box ) ? Ei_Image_Crop_Generator::sanitize_box( $stored_box ) : false;
@@ -110,6 +115,9 @@ class Ei_Image_Crop_Ajax {
 				// which source the reuse row and later saves are against).
 				'source_id'   => $source_id,
 				'existing_id' => $current_id ? $current_id : '',
+				'filename'    => wp_basename( get_attached_file( $source_id ) ),
+				'full_width'  => isset( $full_meta['width'] ) ? (int) $full_meta['width'] : $edit_source['width'],
+				'full_height' => isset( $full_meta['height'] ) ? (int) $full_meta['height'] : $edit_source['height'],
 			)
 		);
 	}

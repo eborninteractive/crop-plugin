@@ -278,6 +278,7 @@ class Ei_Image_Crop_Field extends acf_field {
 				'i18n'    => array(
 					'selectImage'          => __( 'Select an image', 'ei-image-crop' ),
 					'useImage'             => __( 'Use this image', 'ei-image-crop' ),
+					'modalTitle'           => __( 'Crop image', 'ei-image-crop' ),
 					'editDetails'          => __( 'Edit image details (caption, alt text, etc.)', 'ei-image-crop' ),
 					'adjustCrop'           => __( 'Adjust crop', 'ei-image-crop' ),
 					'removeImage'          => __( 'Remove image', 'ei-image-crop' ),

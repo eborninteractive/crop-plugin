@@ -95,15 +95,42 @@
 	width: min(1100px, 94vw);
 	height: min(720px, 90vh);
 	display: flex;
+	flex-direction: column;
 	position: relative;
 	box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
 }
 
+.ei-image-crop-modal-header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 14px 16px;
+	border-bottom: 1px solid #dcdcde;
+}
+
+.ei-image-crop-modal-heading {
+	display: flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: 8px;
+	min-width: 0;
+}
+
+.ei-image-crop-modal-title {
+	font-size: 15px;
+}
+
+.ei-image-crop-modal-subtitle {
+	color: #646970;
+	font-size: 13px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
 .ei-image-crop-close {
-	position: absolute;
-	top: 10px;
-	right: 10px;
-	z-index: 1;
+	flex: 0 0 auto;
 	width: 32px;
 	height: 32px;
 	line-height: 1;
@@ -120,6 +147,12 @@
 .ei-image-crop-close:focus {
 	background: #1d2327;
 	border-color: rgba(255, 255, 255, 0.5);
+}
+
+.ei-image-crop-modal-body {
+	display: flex;
+	flex: 1;
+	min-height: 0;
 }
 
 .ei-image-crop-modal-main {
@@ -154,12 +187,13 @@
 	overflow: hidden;
 	background: #f0f0f1;
 	border: 1px solid #dcdcde;
-	/* The close button sits absolutely positioned over the top-right corner
-	 * of the whole modal (top: 10px, 32px tall), which is also where this,
-	 * the side panel's first element, would otherwise start - extra top
-	 * margin here (on top of the side panel's own 20px padding) clears it,
-	 * so hovering the close button can't read as "remove this image". */
-	margin: 28px 0 16px;
+}
+
+.ei-image-crop-live-preview-caption {
+	margin: 6px 0 16px;
+	color: #646970;
+	font-size: 12px;
+	text-align: center;
 }
 
 .ei-image-crop-reuse {
@@ -179,8 +213,10 @@
 
 .ei-image-crop-reuse-item {
 	position: relative;
-	padding: 0;
+	box-sizing: border-box;
+	padding: 3px;
 	border: 2px solid transparent;
+	border-radius: 4px;
 	background: none;
 	cursor: pointer;
 	height: 56px;
@@ -198,7 +234,8 @@
  * matching it, and the save button switched to "Use image") but not yet
  * committed to - cleared as soon as the crop box is adjusted by hand. */
 .ei-image-crop-reuse-item.is-selected {
-	border-color: #00a32a;
+	border-color: #2271b1;
+	background: #f0f6fc;
 }
 
 /* No forced square crop here - the <img> keeps the crop's real aspect
@@ -247,21 +284,33 @@
 	margin-right: 6px;
 }
 
+/* Deliberately not .button-primary (WP's default blue) - black by default,
+ * only turning green once a reuse thumbnail is selected below. */
+.ei-image-crop-save {
+	background: #1d2327;
+	border-color: #1d2327;
+	color: #fff;
+}
+
+.ei-image-crop-save:hover,
+.ei-image-crop-save:focus {
+	background: #2c3338;
+	border-color: #2c3338;
+	color: #fff;
+}
+
 /* Shown while a reuse thumbnail is selected - applying it needs a visually
- * distinct action from the default "crop the image" one. !important is
- * needed here because the button also carries WP core's own
- * .button-primary class (for its default blue styling), whose admin CSS
- * would otherwise win this tie. */
+ * distinct action from the default "crop the image" one. */
 .ei-image-crop-save.ei-image-crop-save-use {
-	background: #00a32a !important;
-	border-color: #00a32a !important;
-	color: #fff !important;
+	background: #00a32a;
+	border-color: #00a32a;
+	color: #fff;
 }
 
 .ei-image-crop-save.ei-image-crop-save-use:hover,
 .ei-image-crop-save.ei-image-crop-save-use:focus {
-	background: #008a20 !important;
-	border-color: #008a20 !important;
+	background: #008a20;
+	border-color: #008a20;
 }
 
 /* Delete confirmation dialog - stands in for window.confirm(), whose
