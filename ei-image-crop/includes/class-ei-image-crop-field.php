@@ -291,7 +291,7 @@ class Ei_Image_Crop_Field extends acf_field {
 					'delete'               => __( 'Delete', 'ei-image-crop' ),
 					'cancel'               => __( 'Cancel', 'ei-image-crop' ),
 					'previewTitle'         => __( 'Preview', 'ei-image-crop' ),
-					'reuseTitle'           => __( 'Existing crops of this image', 'ei-image-crop' ),
+					'reuseTitle'           => __( 'Existing crops', 'ei-image-crop' ),
 					/* translators: %d: number of existing crops of this image. */
 					'savedCount'           => __( '%d saved', 'ei-image-crop' ),
 					'error'                => __( 'Something went wrong while cropping the image.', 'ei-image-crop' ),

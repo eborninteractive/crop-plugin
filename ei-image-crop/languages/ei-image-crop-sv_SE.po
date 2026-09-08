@@ -65,8 +65,8 @@ msgstr "Redigera bilddetaljer (bildtext, alt-text, m.m.)"
 msgid "Ei Image Crop requires Advanced Custom Fields (or ACF PRO) to be installed and active."
 msgstr "Ei Image Crop kräver att Advanced Custom Fields (eller ACF PRO) är installerat och aktiverat."
 
-msgid "Existing crops of this image"
-msgstr "Befintliga beskärningar av denna bild"
+msgid "Existing crops"
+msgstr "Befintliga beskärningar"
 
 msgid "Free (no fixed ratio)"
 msgstr "Fri (inget fast förhållande)"

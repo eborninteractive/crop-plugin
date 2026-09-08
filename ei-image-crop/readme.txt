@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.3.2
+Stable tag: 1.3.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,13 @@ Yes — set "Aspect ratio" to "Free" in the field settings. The crop frame can t
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.3.3 =
+* Fixed the "Crop image"/"Use image" button silently falling back to WP's plain white/blue-outline button style - removing the .button-primary class in 1.3.0 also removed the !important overrides its color rules needed, and WP admin's own button CSS ties (or beats) a bare single-class selector like ours.
+* Made the "Crop image" popup's title bigger and explicitly black.
+* More breathing room between a reuse thumbnail's selection frame and the thumbnail image itself.
+* Added a divider line under the "Existing crops" heading.
+* Shortened "Existing crops of this image" to just "Existing crops".
 
 = 1.3.2 =
 * Gave the crop popup rounded corners, matching the mockup.
