@@ -179,11 +179,16 @@ class Ei_Image_Crop_Generator {
 	 * True pixel dimensions of the original, un-scaled source file. WordPress
 	 * may store a `-scaled` copy as the "full" size for big uploads; crop math
 	 * must run against the real original so normalized coordinates line up.
+	 * Public (not just used internally by generate()) because the same
+	 * "-scaled" trap applies wherever the true original's size matters -
+	 * e.g. Ei_Image_Crop_Ajax::get_source() reporting it for the modal
+	 * header and the undersized/upscale-warning check, both of which need
+	 * the real dimensions, not a possibly-downscaled "full" size.
 	 *
 	 * @param int $attachment_id
 	 * @return array{path: string, width: int, height: int}|WP_Error
 	 */
-	protected static function get_original_source( $attachment_id ) {
+	public static function get_original_source( $attachment_id ) {
 		$path = wp_get_original_image_path( $attachment_id );
 
 		if ( ! $path || ! file_exists( $path ) ) {

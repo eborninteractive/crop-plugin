@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.5.0
+Stable tag: 1.5.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.5.1 =
+* Fixed the undersized/upscale-warning (and the modal header's dimensions) comparing the crop box against the possibly-downscaled "-scaled"/"large" image shown in the editor, instead of the true original - WordPress auto-scales very large uploads and keeps the true original as a separate, bigger file, so a selection that looked "too small" against the shown copy could still be plenty large enough against the real one. Both now correctly use the true original's own pixel dimensions.
 
 = 1.5.0 =
 * Replaced the field's "Aspect ratio"/"Custom ratio" settings with a single "Image size" setting: pick any image size already registered on the site (core sizes, or anything added via add_image_size()) instead of typing a ratio.

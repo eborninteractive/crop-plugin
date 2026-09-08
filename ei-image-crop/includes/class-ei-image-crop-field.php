@@ -363,7 +363,15 @@ class Ei_Image_Crop_Field extends acf_field {
 			return '';
 		}
 
-		$box = Ei_Image_Crop_Generator::center_box( $edit_source['width'], $edit_source['height'], $ratio );
+		// The exact-target-size-vs-largest-fit decision inside center_box()
+		// needs the true original's absolute pixel size, not $edit_source's -
+		// which can be a smaller "-scaled" copy - even though the
+		// normalized fractions it returns apply the same either way.
+		$true_source = Ei_Image_Crop_Generator::get_original_source( $state['source'] );
+		$true_width  = is_wp_error( $true_source ) ? $edit_source['width'] : $true_source['width'];
+		$true_height = is_wp_error( $true_source ) ? $edit_source['height'] : $true_source['height'];
+
+		$box = Ei_Image_Crop_Generator::center_box( $true_width, $true_height, $ratio );
 
 		$generated = Ei_Image_Crop_Generator::generate( $state['source'], $box, $ratio_label, $field['key'] );
 

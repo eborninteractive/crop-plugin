@@ -424,7 +424,14 @@
 					modal.prop( 'hidden', false );
 
 					$img.one( 'load', function () {
-						initCropper( $field, this, data.box );
+						// The edit image can be a smaller "-scaled"/"large"
+						// copy of the true original (see get_edit_source()),
+						// so the crop box's on-screen pixels understate the
+						// actual crop's eventual size by this same factor -
+						// the undersized/upscale-warning check needs to
+						// compare against the real thing, not what's shown.
+						var trueScale = data.full_width / data.edit.width;
+						initCropper( $field, this, data.box, trueScale );
 					} );
 
 					$img.attr( 'src', data.edit.url );
@@ -529,7 +536,17 @@
 		} );
 	}
 
-	function initCropper( $field, imgEl, box ) {
+	/**
+	 * @param {jQuery} $field
+	 * @param {HTMLImageElement} imgEl
+	 * @param {Object} box Normalized 0-1 x/y/w/h to preselect.
+	 * @param {number} [trueScale] How many true-original pixels each pixel
+	 *   of imgEl (the edit image, possibly a smaller "-scaled"/"large"
+	 *   copy) actually represents - 1 when they're the same size. Used
+	 *   only for the undersized/upscale-warning check, which needs the
+	 *   crop's real eventual size, not what's shown on screen.
+	 */
+	function initCropper( $field, imgEl, box, trueScale ) {
 		if ( cropper ) {
 			cropper.destroy();
 		}
@@ -540,13 +557,14 @@
 		var aspectRatio = parseAspectRatio( $field.data( 'ratio' ) );
 		var targetSize  = parseTargetSize( $field.data( 'ratio' ) );
 		var $canvas     = $( imgEl ).closest( '.ei-image-crop-canvas' );
+		var scale       = trueScale > 0 ? trueScale : 1;
 
 		/**
 		 * Turns the crop box red (see .is-undersized in field.css) once the
-		 * selected area, in the source image's own pixels, is smaller than
-		 * the target size in either dimension - that's exactly when saving
-		 * would have to upscale the result, which is the blur warning this
-		 * is meant to give ahead of time.
+		 * selected area, scaled up to the true original's own pixels, is
+		 * smaller than the target size in either dimension - that's exactly
+		 * when saving would have to upscale the result, which is the blur
+		 * warning this is meant to give ahead of time.
 		 */
 		function updateUndersizedState() {
 			if ( ! cropper || ! targetSize ) {
@@ -555,7 +573,9 @@
 			}
 
 			var data = cropper.getData();
-			var undersized = data.width < targetSize.width - 0.5 || data.height < targetSize.height - 0.5;
+			var actualWidth = data.width * scale;
+			var actualHeight = data.height * scale;
+			var undersized = actualWidth < targetSize.width - 0.5 || actualHeight < targetSize.height - 0.5;
 
 			$canvas.toggleClass( 'is-undersized', undersized );
 		}

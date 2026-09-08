@@ -86,10 +86,22 @@ class Ei_Image_Crop_Ajax {
 
 		$ratio = Ei_Image_Crop_Generator::parse_ratio( $ratio_label );
 
-		// The true original's own filename/dimensions, for the modal header -
-		// deliberately not $edit_source, which may be a smaller "large" size
-		// used only to keep the editor snappy.
-		$full_meta = wp_get_attachment_metadata( $source_id );
+		// The true original's own dimensions, for the modal header and the
+		// client-side undersized/upscale-warning check - deliberately not
+		// $edit_source (which may be a smaller "large" size for editor
+		// speed) and deliberately not wp_get_attachment_metadata() either:
+		// WordPress stores a downscaled "-scaled" copy as the attachment's
+		// main/"full" size for big uploads, and that metadata's width/height
+		// reflect that scaled-down copy, not the real original. The crop
+		// itself is already computed against the true original file
+		// (get_original_source(), used below by generate() too) - the
+		// upscale-warning needs to compare against that same real size, or
+		// it flags a selection as "too small" when the actual crop (run
+		// against the bigger true original) wouldn't need any upscaling
+		// at all.
+		$true_source = Ei_Image_Crop_Generator::get_original_source( $source_id );
+		$true_width  = is_wp_error( $true_source ) ? $edit_source['width'] : $true_source['width'];
+		$true_height = is_wp_error( $true_source ) ? $edit_source['height'] : $true_source['height'];
 
 		if ( $current_id ) {
 			$stored_box = get_post_meta( $current_id, '_ei_crop_box', true );
@@ -99,7 +111,14 @@ class Ei_Image_Crop_Ajax {
 		}
 
 		if ( ! $box ) {
-			$box = Ei_Image_Crop_Generator::center_box( $edit_source['width'], $edit_source['height'], $ratio );
+			// The exact-target-size-vs-largest-fit decision inside
+			// center_box() needs the true original's absolute pixel size
+			// (whether the real file can actually fit the target box), not
+			// $edit_source's - which can be a smaller "-scaled" copy - even
+			// though the normalized fractions it returns apply the same
+			// either way (same aspect ratio, just a different absolute
+			// scale).
+			$box = Ei_Image_Crop_Generator::center_box( $true_width, $true_height, $ratio );
 		}
 
 		wp_send_json_success(
@@ -116,8 +135,8 @@ class Ei_Image_Crop_Ajax {
 				'source_id'   => $source_id,
 				'existing_id' => $current_id ? $current_id : '',
 				'filename'    => wp_basename( get_attached_file( $source_id ) ),
-				'full_width'  => isset( $full_meta['width'] ) ? (int) $full_meta['width'] : $edit_source['width'],
-				'full_height' => isset( $full_meta['height'] ) ? (int) $full_meta['height'] : $edit_source['height'],
+				'full_width'  => $true_width,
+				'full_height' => $true_height,
 			)
 		);
 	}
