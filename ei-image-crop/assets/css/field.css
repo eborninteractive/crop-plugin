@@ -198,10 +198,12 @@
  * updateBoxLabel() in field.js), whose top-left is the same coordinate
  * space cropper.getCropBoxData() reports in, so left/top need no extra
  * conversion. The negative translateY sits it just above the box
- * regardless of the tag's own rendered height. */
+ * regardless of the tag's own rendered height; translateX(-50%) centers
+ * it horizontally, since updateBoxLabel() gives it the box's horizontal
+ * midpoint rather than its left edge. */
 .ei-image-crop-box-label {
 	position: absolute;
-	transform: translateY(calc(-100% - 6px));
+	transform: translate(-50%, calc(-100% - 6px));
 	background: rgba(29, 35, 39, 0.9);
 	color: #fff;
 	font-size: 12px;
@@ -211,6 +213,58 @@
 	white-space: nowrap;
 	pointer-events: none;
 	z-index: 1;
+}
+
+/* Crop box handles: bold corner brackets instead of Cropper's default tiny
+ * dots, and only at the four corners - the four edge-midpoint handles are
+ * hidden entirely. Both stylesheets load in the same order every time
+ * (cropper.min.css always registered/enqueued first), so matching
+ * Cropper's own selector specificity here is enough to win the cascade -
+ * !important is extra insurance rather than a fix for a real tie loss. */
+.cropper-point.point-n,
+.cropper-point.point-e,
+.cropper-point.point-s,
+.cropper-point.point-w {
+	display: none !important;
+}
+
+.cropper-point.point-nw,
+.cropper-point.point-ne,
+.cropper-point.point-sw,
+.cropper-point.point-se {
+	width: 18px !important;
+	height: 18px !important;
+	background: transparent !important;
+	opacity: 1 !important;
+	border: 0 !important;
+}
+
+.cropper-point.point-nw {
+	top: -2px !important;
+	left: -2px !important;
+	border-top: 3px solid #000 !important;
+	border-left: 3px solid #000 !important;
+}
+
+.cropper-point.point-ne {
+	top: -2px !important;
+	right: -2px !important;
+	border-top: 3px solid #000 !important;
+	border-right: 3px solid #000 !important;
+}
+
+.cropper-point.point-sw {
+	bottom: -2px !important;
+	left: -2px !important;
+	border-bottom: 3px solid #000 !important;
+	border-left: 3px solid #000 !important;
+}
+
+.cropper-point.point-se {
+	bottom: -2px !important;
+	right: -2px !important;
+	border-bottom: 3px solid #000 !important;
+	border-right: 3px solid #000 !important;
 }
 
 .ei-image-crop-live-preview {

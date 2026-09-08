@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.3.3
+Stable tag: 1.3.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,10 @@ Yes — set "Aspect ratio" to "Free" in the field settings. The crop frame can t
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.3.4 =
+* Restyled the crop box's own handles to match the mockup: bold black corner brackets instead of Cropper.js's default small blue dots, and removed the four edge-midpoint handles entirely.
+* Centered the floating dimension tag above the crop box instead of left-aligning it to the box's edge.
 
 = 1.3.3 =
 * Fixed the "Crop image"/"Use image" button silently falling back to WP's plain white/blue-outline button style - removing the .button-primary class in 1.3.0 also removed the !important overrides its color rules needed, and WP admin's own button CSS ties (or beats) a bare single-class selector like ours.

@@ -496,10 +496,11 @@
 		var ratioLabel = $field.data( 'ratio' );
 		var text = ( ratioLabel && 'free' !== ratioLabel ) ? w + ' × ' + h + ' · ' + ratioLabel : w + ' × ' + h;
 
-		// Sits just above the box (see the negative translateY in field.css)
-		// rather than at its top edge, so it never overlaps the selection.
+		// Centered above the box horizontally (the negative translate in
+		// field.css does both that and sitting above rather than on top of
+		// the box's own top edge), not left-aligned to it.
 		$label.text( text ).css( {
-			left: box.left + 'px',
+			left: ( box.left + box.width / 2 ) + 'px',
 			top: box.top + 'px',
 		} );
 	}
