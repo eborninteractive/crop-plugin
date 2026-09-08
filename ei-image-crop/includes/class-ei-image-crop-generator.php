@@ -81,6 +81,38 @@ class Ei_Image_Crop_Generator {
 	}
 
 	/**
+	 * Walks `_ei_crop_parent` up from an attachment to the true root source -
+	 * the original upload that was never itself generated as a crop. Needed
+	 * because a crop can be made from another crop (e.g. reusing one from the
+	 * Media Library, then adjusting it again later): naively trusting a
+	 * single `_ei_crop_parent` lookup would treat that intermediate crop as
+	 * "the" source, so edits keep chaining onto an already-cropped image
+	 * instead of the real original, and _ei_crop_parent on new crops keeps
+	 * pointing one level too shallow.
+	 *
+	 * @param int $attachment_id
+	 * @return int The root attachment id (the input id itself if it isn't a crop of anything).
+	 */
+	public static function resolve_root( $attachment_id ) {
+		$current = (int) $attachment_id;
+		$seen    = array();
+
+		while ( $current && ! isset( $seen[ $current ] ) ) {
+			$seen[ $current ] = true;
+
+			$parent = (int) get_post_meta( $current, '_ei_crop_parent', true );
+
+			if ( ! $parent || ! wp_attachment_is_image( $parent ) ) {
+				break;
+			}
+
+			$current = $parent;
+		}
+
+		return $current;
+	}
+
+	/**
 	 * Best-resolution image to load in the browser cropper. Prefers the
 	 * "large" registered size over the full original so huge uploads stay
 	 * snappy to edit - normalized coordinates only remain valid doing that
@@ -233,6 +265,13 @@ class Ei_Image_Crop_Generator {
 		if ( ! wp_attachment_is_image( $parent_id ) ) {
 			return new WP_Error( 'ei_image_crop_bad_parent', __( 'Source is not a valid image attachment.', 'ei-image-crop' ) );
 		}
+
+		// Always resolve to the true root before doing anything else, so a
+		// crop made from another crop still gets parented directly to the
+		// real original (not the intermediate crop it happened to be made
+		// from) - otherwise every subsequent adjustment keeps chaining one
+		// level deeper onto an already-cropped image.
+		$parent_id = self::resolve_root( $parent_id );
 
 		$box = self::sanitize_box( $box );
 

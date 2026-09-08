@@ -66,17 +66,18 @@ class Ei_Image_Crop_Ajax {
 		// A fresh pick (no current_id yet) of an image that is itself
 		// already a crop - e.g. reused from the Media Library - should let
 		// you adjust it against its own true original with its existing box
-		// marked, not crop the crop. Resolve transparently to the real
-		// original, and treat the picked crop as the one being edited in
-		// place, so saving updates that same shared attachment rather than
-		// generating a derivative-of-a-derivative.
-		if ( ! $current_id ) {
-			$picked_parent = (int) get_post_meta( $source_id, '_ei_crop_parent', true );
-			if ( $picked_parent && wp_attachment_is_image( $picked_parent ) ) {
-				$current_id = $source_id;
-				$source_id  = $picked_parent;
-			}
+		// marked, not crop the crop. Treat the picked crop as the one being
+		// edited in place, so saving updates that same shared attachment
+		// rather than generating a derivative-of-a-derivative.
+		if ( ! $current_id && (int) get_post_meta( $source_id, '_ei_crop_parent', true ) ) {
+			$current_id = $source_id;
 		}
+
+		// Resolve all the way up the crop chain to the true root, not just
+		// one level - a crop can itself have been made from another crop
+		// (e.g. re-adjusting a reused crop), and stopping one level short
+		// would load an already-cropped image as if it were the original.
+		$source_id = Ei_Image_Crop_Generator::resolve_root( $source_id );
 
 		$edit_source = Ei_Image_Crop_Generator::get_edit_source( $source_id );
 		if ( ! $edit_source ) {

@@ -165,7 +165,7 @@ class Ei_Image_Crop_Field extends acf_field {
 	public function render_field( $field ) {
 		$value       = (int) $field['value'];
 		$ratio       = self::resolve_ratio( $field );
-		$parent_id   = $value ? (int) get_post_meta( $value, '_ei_crop_parent', true ) : 0;
+		$parent_id   = $value ? Ei_Image_Crop_Generator::resolve_root( $value ) : 0;
 		$preview_id  = $value ? $value : 0;
 		$preview_url = $preview_id ? wp_get_attachment_image_url( $preview_id, $field['preview_size'] ) : '';
 
