@@ -42,11 +42,13 @@
 	align-items: center;
 	justify-content: center;
 	padding: 0;
-	border: 1px solid #dcdcde;
+	border: 1px solid rgba(255, 255, 255, 0.25);
 	border-radius: 50%;
-	background: #fff;
-	color: #1d2327;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+	background: rgba(29, 35, 39, 0.85);
+	color: #fff;
+	font-size: 16px;
+	line-height: 1;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 	cursor: pointer;
 }
 
@@ -58,15 +60,14 @@
 
 .ei-image-crop-icon-btn:hover,
 .ei-image-crop-icon-btn:focus {
-	background: #f0f0f1;
-	border-color: #8c8f94;
+	background: #1d2327;
+	border-color: rgba(255, 255, 255, 0.5);
 }
 
 .ei-image-crop-icon-btn.ei-image-crop-remove:hover,
 .ei-image-crop-icon-btn.ei-image-crop-remove:focus {
 	background: #d63638;
 	border-color: #d63638;
-	color: #fff;
 }
 
 /* Modal */
@@ -107,18 +108,18 @@
 	height: 32px;
 	line-height: 1;
 	padding: 0;
-	border: 1px solid #dcdcde;
+	border: 1px solid rgba(255, 255, 255, 0.25);
 	border-radius: 50%;
-	background: #fff;
-	color: #1d2327;
+	background: rgba(29, 35, 39, 0.85);
+	color: #fff;
 	font-size: 20px;
 	cursor: pointer;
 }
 
 .ei-image-crop-close:hover,
 .ei-image-crop-close:focus {
-	background: #f0f0f1;
-	border-color: #8c8f94;
+	background: #1d2327;
+	border-color: rgba(255, 255, 255, 0.5);
 }
 
 .ei-image-crop-modal-main {
@@ -219,10 +220,10 @@
 	height: 20px;
 	line-height: 1;
 	padding: 0;
-	border: 1px solid #dcdcde;
+	border: 1px solid rgba(255, 255, 255, 0.25);
 	border-radius: 50%;
-	background: #fff;
-	color: #d63638;
+	background: rgba(29, 35, 39, 0.85);
+	color: #fff;
 	font-size: 14px;
 	cursor: pointer;
 }
@@ -231,7 +232,6 @@
 .ei-image-crop-reuse-delete:focus {
 	background: #d63638;
 	border-color: #d63638;
-	color: #fff;
 }
 
 .ei-image-crop-error {
@@ -262,6 +262,68 @@
 .ei-image-crop-save.ei-image-crop-save-use:focus {
 	background: #008a20 !important;
 	border-color: #008a20 !important;
+}
+
+/* Delete confirmation dialog - stands in for window.confirm(), whose
+ * native "From <host>:" chrome looks broken for something this final. */
+
+.ei-image-crop-confirm {
+	position: fixed;
+	inset: 0;
+	/* Above .ei-image-crop-modal (160000) since a delete can be triggered
+	 * from a reuse thumbnail while the crop popup itself is still open. */
+	z-index: 170000;
+	background: rgba(0, 0, 0, 0.5);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.ei-image-crop-confirm[hidden] {
+	display: none;
+}
+
+.ei-image-crop-confirm-inner {
+	background: #fff;
+	width: min(360px, 90vw);
+	padding: 24px;
+	border-radius: 6px;
+	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.ei-image-crop-confirm-title {
+	margin: 0 0 8px;
+	font-size: 16px;
+	font-weight: 600;
+}
+
+.ei-image-crop-confirm-message {
+	margin: 0 0 20px;
+	color: #50575e;
+}
+
+.ei-image-crop-confirm-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+}
+
+.ei-image-crop-confirm-actions .button {
+	margin: 0;
+}
+
+/* !important needed here too - .button-primary's own admin styling would
+ * otherwise win the tie, same as the save button's green "use" state. */
+.ei-image-crop-confirm-delete {
+	background: #d63638 !important;
+	border-color: #d63638 !important;
+	color: #fff !important;
+}
+
+.ei-image-crop-confirm-delete:hover,
+.ei-image-crop-confirm-delete:focus {
+	background: #b32d2e !important;
+	border-color: #b32d2e !important;
 }
 
 /* Media library toggle */

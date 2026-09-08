@@ -213,7 +213,7 @@ class Ei_Image_Crop_Field extends acf_field {
 			echo '<div class="ei-image-crop-overlay">';
 			echo '<a href="' . esc_url( admin_url( 'post.php?action=edit&post=' . $value ) ) . '" target="_blank" rel="noopener" class="ei-image-crop-icon-btn ei-image-crop-open-attachment" title="' . esc_attr__( 'Edit image details (caption, alt text, etc.)', 'ei-image-crop' ) . '"><span class="dashicons dashicons-edit"></span></a>';
 			echo '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-edit" title="' . esc_attr__( 'Adjust crop', 'ei-image-crop' ) . '">' . self::crop_icon() . '</button>';
-			echo '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-remove" title="' . esc_attr__( 'Remove image', 'ei-image-crop' ) . '"><span class="dashicons dashicons-no-alt"></span></button>';
+			echo '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-remove" title="' . esc_attr__( 'Remove image', 'ei-image-crop' ) . '">&times;</button>';
 			echo '</div>';
 		}
 		echo '</div>';
@@ -266,18 +266,21 @@ class Ei_Image_Crop_Field extends acf_field {
 				'nonce'       => wp_create_nonce( 'ei_image_crop' ),
 				'editUrlBase' => admin_url( 'post.php?action=edit&post=' ),
 				'i18n'    => array(
-					'selectImage'   => __( 'Select an image', 'ei-image-crop' ),
-					'useImage'      => __( 'Use this image', 'ei-image-crop' ),
-					'editDetails'   => __( 'Edit image details (caption, alt text, etc.)', 'ei-image-crop' ),
-					'adjustCrop'    => __( 'Adjust crop', 'ei-image-crop' ),
-					'removeImage'   => __( 'Remove image', 'ei-image-crop' ),
-					'save'          => __( 'Crop image', 'ei-image-crop' ),
-					'useCrop'       => __( 'Use image', 'ei-image-crop' ),
-					'close'         => __( 'Close', 'ei-image-crop' ),
-					'deleteCrop'    => __( 'Delete this crop', 'ei-image-crop' ),
-					'confirmDelete' => __( 'Delete this crop? This cannot be undone.', 'ei-image-crop' ),
-					'reuseTitle'    => __( 'Existing crops of this image', 'ei-image-crop' ),
-					'error'         => __( 'Something went wrong while cropping the image.', 'ei-image-crop' ),
+					'selectImage'          => __( 'Select an image', 'ei-image-crop' ),
+					'useImage'             => __( 'Use this image', 'ei-image-crop' ),
+					'editDetails'          => __( 'Edit image details (caption, alt text, etc.)', 'ei-image-crop' ),
+					'adjustCrop'           => __( 'Adjust crop', 'ei-image-crop' ),
+					'removeImage'          => __( 'Remove image', 'ei-image-crop' ),
+					'save'                 => __( 'Crop image', 'ei-image-crop' ),
+					'useCrop'              => __( 'Use image', 'ei-image-crop' ),
+					'close'                => __( 'Close', 'ei-image-crop' ),
+					'deleteCrop'           => __( 'Delete image', 'ei-image-crop' ),
+					'confirmDeleteTitle'   => __( 'Delete image?', 'ei-image-crop' ),
+					'confirmDeleteMessage' => __( 'This cannot be undone.', 'ei-image-crop' ),
+					'delete'               => __( 'Delete', 'ei-image-crop' ),
+					'cancel'               => __( 'Cancel', 'ei-image-crop' ),
+					'reuseTitle'           => __( 'Existing crops of this image', 'ei-image-crop' ),
+					'error'                => __( 'Something went wrong while cropping the image.', 'ei-image-crop' ),
 				),
 			)
 		);

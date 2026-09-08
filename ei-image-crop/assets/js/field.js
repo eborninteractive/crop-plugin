@@ -7,7 +7,7 @@
 ( function ( $ ) {
 	'use strict';
 
-	var $modal, cropper, currentField, currentSourceId, currentExistingId;
+	var $modal, $confirmModal, cropper, currentField, currentSourceId, currentExistingId;
 	// Set while a reuse thumbnail's own box is being shown for a look before
 	// committing to it; cleared as soon as the user adjusts the crop box
 	// themselves, or the modal closes. Drives the save button's "Use image"
@@ -21,6 +21,69 @@
 
 	function t( key ) {
 		return ( window.eiImageCrop && eiImageCrop.i18n && eiImageCrop.i18n[ key ] ) || key;
+	}
+
+	function buildConfirmDialog() {
+		if ( $confirmModal ) {
+			return $confirmModal;
+		}
+
+		$confirmModal = $(
+			'<div class="ei-image-crop-confirm" hidden>' +
+				'<div class="ei-image-crop-confirm-inner">' +
+					'<p class="ei-image-crop-confirm-title"></p>' +
+					'<p class="ei-image-crop-confirm-message"></p>' +
+					'<div class="ei-image-crop-confirm-actions">' +
+						'<button type="button" class="button ei-image-crop-confirm-cancel"></button>' +
+						'<button type="button" class="button button-primary ei-image-crop-confirm-delete"></button>' +
+					'</div>' +
+				'</div>' +
+			'</div>'
+		);
+
+		$( 'body' ).append( $confirmModal );
+
+		return $confirmModal;
+	}
+
+	/**
+	 * In-app replacement for window.confirm() - the browser's native dialog
+	 * wraps the message in its own "From <host>:" chrome, which looks broken
+	 * and unpolished for something as final as a permanent delete.
+	 *
+	 * @param {string} title
+	 * @param {string} message
+	 * @return {Promise<boolean>} Resolves true if the user confirmed.
+	 */
+	function confirmDialog( title, message ) {
+		var $dialog = buildConfirmDialog();
+
+		$dialog.find( '.ei-image-crop-confirm-title' ).text( title );
+		$dialog.find( '.ei-image-crop-confirm-message' ).text( message );
+		$dialog.find( '.ei-image-crop-confirm-cancel' ).text( t( 'cancel' ) );
+		$dialog.find( '.ei-image-crop-confirm-delete' ).text( t( 'delete' ) );
+		$dialog.prop( 'hidden', false );
+
+		return new Promise( function ( resolve ) {
+			function settle( result ) {
+				$dialog.prop( 'hidden', true );
+				$dialog.off( '.eiImageCropConfirm' );
+				resolve( result );
+			}
+
+			$dialog.on( 'click.eiImageCropConfirm', '.ei-image-crop-confirm-cancel', function () {
+				settle( false );
+			} );
+			$dialog.on( 'click.eiImageCropConfirm', '.ei-image-crop-confirm-delete', function () {
+				settle( true );
+			} );
+			// Clicking the dimmed backdrop itself (not the dialog card) cancels.
+			$dialog.on( 'click.eiImageCropConfirm', function ( e ) {
+				if ( e.target === $dialog[ 0 ] ) {
+					settle( false );
+				}
+			} );
+		} );
 	}
 
 	// Dashicons has no crop glyph, so "Adjust crop" uses this inline SVG
@@ -84,7 +147,7 @@
 							.attr( 'title', t( 'editDetails' ) ),
 						$( '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-edit">' + CROP_ICON_SVG + '</button>' )
 							.attr( 'title', t( 'adjustCrop' ) ),
-						$( '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-remove"><span class="dashicons dashicons-no-alt"></span></button>' )
+						$( '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-remove">&times;</button>' )
 							.attr( 'title', t( 'removeImage' ) )
 					)
 				)
@@ -461,41 +524,43 @@
 	 * longer exists.
 	 */
 	function deleteReuseCrop( $field, crop, $thumb ) {
-		if ( ! window.confirm( t( 'confirmDelete' ) ) ) { // eslint-disable-line no-alert
-			return;
-		}
+		confirmDialog( t( 'confirmDeleteTitle' ), t( 'confirmDeleteMessage' ) ).then( function ( confirmed ) {
+			if ( ! confirmed ) {
+				return;
+			}
 
-		$.post( eiImageCrop.ajaxUrl, {
-			action: 'ei_image_crop_delete',
-			nonce: eiImageCrop.nonce,
-			id: crop.id,
-		} )
-			.done( function ( response ) {
-				if ( ! response || ! response.success ) {
-					showError( ( response && response.data && response.data.message ) || t( 'error' ) );
-					return;
-				}
-
-				if ( selectedReuseCrop && selectedReuseCrop.id === crop.id ) {
-					selectedReuseCrop = null;
-					setSaveButtonState( false );
-				}
-
-				var state = getState( $field );
-				if ( String( state.id ) === String( crop.id ) ) {
-					setState( $field, { id: '', source: currentSourceId } );
-					setPreview( $field, '' );
-				}
-
-				$thumb.remove();
-
-				if ( ! $modal.find( '.ei-image-crop-reuse-item' ).length ) {
-					$modal.find( '.ei-image-crop-reuse' ).prop( 'hidden', true );
-				}
+			$.post( eiImageCrop.ajaxUrl, {
+				action: 'ei_image_crop_delete',
+				nonce: eiImageCrop.nonce,
+				id: crop.id,
 			} )
-			.fail( function () {
-				showError( t( 'error' ) );
-			} );
+				.done( function ( response ) {
+					if ( ! response || ! response.success ) {
+						showError( ( response && response.data && response.data.message ) || t( 'error' ) );
+						return;
+					}
+
+					if ( selectedReuseCrop && selectedReuseCrop.id === crop.id ) {
+						selectedReuseCrop = null;
+						setSaveButtonState( false );
+					}
+
+					var state = getState( $field );
+					if ( String( state.id ) === String( crop.id ) ) {
+						setState( $field, { id: '', source: currentSourceId } );
+						setPreview( $field, '' );
+					}
+
+					$thumb.remove();
+
+					if ( ! $modal.find( '.ei-image-crop-reuse-item' ).length ) {
+						$modal.find( '.ei-image-crop-reuse' ).prop( 'hidden', true );
+					}
+				} )
+				.fail( function () {
+					showError( t( 'error' ) );
+				} );
+		} );
 	}
 
 	/**
