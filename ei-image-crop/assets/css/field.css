@@ -159,6 +159,10 @@
 	color: #1d2327;
 }
 
+.ei-image-crop-close::after {
+	content: "×";
+}
+
 .ei-image-crop-modal-body {
 	display: flex;
 	flex: 1;
@@ -388,6 +392,10 @@
 	border-color: #d63638;
 }
 
+.ei-image-crop-reuse-delete::before {
+	content: "×";
+}
+
 .ei-image-crop-error {
 	color: #d63638;
 }
@@ -405,8 +413,8 @@
  * selector like ours, so without it this silently falls back to WP's
  * plain white/blue-outline secondary button style. */
 .ei-image-crop-save {
-	background: #1d2327 !important;
-	border-color: #1d2327 !important;
+	background: var(--wp-admin-theme-color) !important;
+	border-color: var(--wp-admin-theme-color) !important;
 	color: #fff !important;
 	border-radius: 5px !important;
 }

@@ -176,7 +176,9 @@
 							'<strong class="ei-image-crop-modal-title"></strong>' +
 							'<span class="ei-image-crop-modal-subtitle"></span>' +
 						'</div>' +
-						'<button type="button" class="ei-image-crop-close" aria-label="' + t( 'close' ) + '">&times;</button>' +
+						// The × itself is a ::after in field.css, not markup here -
+						// same approach as .ei-image-crop-reuse-delete.
+						'<button type="button" class="ei-image-crop-close" aria-label="' + t( 'close' ) + '"></button>' +
 					'</div>' +
 					'<div class="ei-image-crop-modal-body">' +
 						'<div class="ei-image-crop-modal-main">' +

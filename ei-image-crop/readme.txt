@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.3.9
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,10 @@ Yes — set "Aspect ratio" to "Free" in the field settings. The crop frame can t
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.4.0 =
+* Applied user-supplied field.css tweaks: the reuse thumbnail delete button's × as a ::before rule, and the "Crop image" button now uses --wp-admin-theme-color (the site's own admin color scheme) instead of a fixed color.
+* The popup's close button's × is now a ::after rule too, off its markup, matching the same approach already used for the reuse-delete button.
 
 = 1.3.9 =
 * Applied user-supplied field.css tweaks: thicker (3px) crop box outline, and the four corner brackets moved further out (-9px) with white instead of black borders.
