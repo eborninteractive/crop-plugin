@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.4.0
+Stable tag: 1.5.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -40,19 +40,30 @@ The ACF field itself stores only the resulting crop's attachment ID, and `format
 
 1. Upload the `ei-image-crop` folder to `/wp-content/plugins/`.
 2. Activate the plugin. Advanced Custom Fields must already be active.
-3. Add a field of type "Image Crop" to any field group, and configure its aspect ratio, admin preview size, library and return format.
+3. Add a field of type "Image Crop" to any field group, and configure its image size, admin preview size, library and return format.
 
 == Frequently Asked Questions ==
 
-= Can a field have a free-form (unlocked) aspect ratio? =
+= Which "Image size" should I pick in the field settings? =
 
-Yes — set "Aspect ratio" to "Free" in the field settings. The crop frame can then be resized independently on each axis instead of only scaled.
+Any image size already registered on the site - a core size (thumbnail, medium, large) or a custom one added via `add_image_size()`. The dropdown shows each one's pixel dimensions.
+
+A size registered with hard cropping (`add_image_size( $name, $width, $height, true )`, or a specific crop position) locks the field's crop frame to that exact shape, defaults new crops to that size centered on the image, and always outputs a crop at exactly those dimensions (scaling down a larger selection, or up - with a red on-screen warning while dragging - a smaller one).
+
+A size registered without hard cropping (`add_image_size( $name, $width, $height, false )`, WordPress's own "fit inside, don't force this shape" mode) is treated as a free-form crop: the frame can be resized independently on each axis, and the crop keeps whatever size it's actually dragged to.
 
 = What happens to a crop's file if I delete the source image? =
 
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.5.0 =
+* Replaced the field's "Aspect ratio"/"Custom ratio" settings with a single "Image size" setting: pick any image size already registered on the site (core sizes, or anything added via add_image_size()) instead of typing a ratio.
+  * A size registered with hard cropping locks the crop frame to its exact shape, defaults new crops to its literal pixel dimensions centered on the image (not just the largest box that happens to share the ratio), and always saves the crop at exactly those dimensions - scaling a larger selection down, or a smaller one up.
+  * A size registered without hard cropping (`add_image_size( $name, $w, $h, false )`) is treated as a free-form crop, same as the old "Free" ratio option.
+  * The crop frame turns red while dragging it smaller than the target size, warning that saving will need to upscale the result (blurrier than a same-size-or-larger selection).
+* Existing fields configured with the old Aspect ratio/Custom ratio settings will need to be reconfigured with the new Image size dropdown - the two settings aren't automatically migrated.
 
 = 1.4.0 =
 * Applied user-supplied field.css tweaks: the reuse thumbnail delete button's × as a ::before rule, and the "Crop image" button now uses --wp-admin-theme-color (the site's own admin color scheme) instead of a fixed color.

@@ -15,39 +15,42 @@ if ( ! class_exists( 'acf_field' ) ) {
 
 class Ei_Image_Crop_Field extends acf_field {
 
-	/**
-	 * Ratios offered in the field settings dropdown. Filterable.
-	 *
-	 * @var array
-	 */
-	public $ratio_choices;
-
 	public function __construct() {
 		$this->name     = 'ei_image_crop';
 		$this->label    = __( 'Image Crop', 'ei-image-crop' );
 		$this->category = 'content';
 		$this->defaults = array(
-			'aspect_ratio'  => '16:9',
-			'custom_ratio'  => '',
+			'image_size'    => '',
 			'preview_size'  => 'medium',
 			'library'       => 'all',
 			'return_format' => 'array',
 		);
 
-		$this->ratio_choices = apply_filters(
-			'ei_image_crop/ratio_choices',
-			array(
-				'free'  => __( 'Free (no fixed ratio)', 'ei-image-crop' ),
-				'1:1'   => '1:1',
-				'4:3'   => '4:3',
-				'3:2'   => '3:2',
-				'16:9'  => '16:9',
-				'21:9'  => '21:9',
-				'custom' => __( 'Custom…', 'ei-image-crop' ),
-			)
-		);
-
 		parent::__construct();
+	}
+
+	/**
+	 * Choices for the "Image size" field setting: every image size
+	 * registered on the site (core sizes plus anything added via
+	 * add_image_size()), labelled with its pixel dimensions. A size
+	 * registered without hard cropping (`add_image_size( $name, $w, $h,
+	 * false )`, WordPress's own "fit inside, don't force this shape"
+	 * mode) is labelled as a free crop and treated as one - there's no
+	 * fixed target shape to crop to, so nothing is locked or checked
+	 * against.
+	 *
+	 * @return array<string,string>
+	 */
+	protected function get_image_size_setting_choices() {
+		$choices = array();
+
+		foreach ( wp_get_registered_image_subsizes() as $name => $size ) {
+			$choices[ $name ] = empty( $size['crop'] )
+				? sprintf( '%s (%s)', $name, __( 'free crop', 'ei-image-crop' ) )
+				: sprintf( '%s (%d × %d)', $name, $size['width'], $size['height'] );
+		}
+
+		return $choices;
 	}
 
 	/**
@@ -59,27 +62,11 @@ class Ei_Image_Crop_Field extends acf_field {
 		acf_render_field_setting(
 			$field,
 			array(
-				'label'        => __( 'Aspect ratio', 'ei-image-crop' ),
-				'instructions' => __( 'A fixed ratio locks the crop frame while scaling it; Free lets the frame itself be resized.', 'ei-image-crop' ),
+				'label'        => __( 'Image size', 'ei-image-crop' ),
+				'instructions' => __( 'One of the image sizes registered on this site (Settings > Media, or added by a theme/plugin via add_image_size()). A size registered without hard cropping is treated as a free-form crop.', 'ei-image-crop' ),
 				'type'         => 'select',
-				'name'         => 'aspect_ratio',
-				'choices'      => $this->ratio_choices,
-			)
-		);
-
-		acf_render_field_setting(
-			$field,
-			array(
-				'label'        => __( 'Custom ratio', 'ei-image-crop' ),
-				'instructions' => __( 'Only used when Aspect ratio above is set to "Custom". Format: width:height, e.g. 5:2.', 'ei-image-crop' ),
-				'type'         => 'text',
-				'name'         => 'custom_ratio',
-				'placeholder'  => '5:2',
-				'conditions'   => array(
-					'field'    => 'aspect_ratio',
-					'operator' => '==',
-					'value'    => 'custom',
-				),
+				'name'         => 'image_size',
+				'choices'      => $this->get_image_size_setting_choices(),
 			)
 		);
 
@@ -141,20 +128,27 @@ class Ei_Image_Crop_Field extends acf_field {
 	}
 
 	/**
-	 * Resolve a field's configured ratio setting down to a "W:H" or "free" string.
+	 * Resolve a field's configured image size setting down to a "W:H" or
+	 * "free" string - literally the registered size's own pixel
+	 * dimensions when it hard-crops, not just their proportion, since
+	 * that's also what the cropper UI's default box and undersized/upscale
+	 * warning need. Falls back to "free" if the field has no size chosen
+	 * yet, or the chosen one no longer exists (renamed/removed since).
 	 *
 	 * @param array $field
 	 * @return string
 	 */
 	public static function resolve_ratio( $field ) {
-		$ratio = isset( $field['aspect_ratio'] ) ? $field['aspect_ratio'] : 'free';
+		$size_name = isset( $field['image_size'] ) ? $field['image_size'] : '';
+		$sizes     = wp_get_registered_image_subsizes();
 
-		if ( 'custom' === $ratio ) {
-			$custom = isset( $field['custom_ratio'] ) ? trim( $field['custom_ratio'] ) : '';
-			return Ei_Image_Crop_Generator::parse_ratio( $custom ) ? $custom : 'free';
+		if ( ! $size_name || empty( $sizes[ $size_name ] ) || empty( $sizes[ $size_name ]['crop'] ) ) {
+			return 'free';
 		}
 
-		return $ratio;
+		$size = $sizes[ $size_name ];
+
+		return $size['width'] . ':' . $size['height'];
 	}
 
 	/**

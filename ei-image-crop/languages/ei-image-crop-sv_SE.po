@@ -8,9 +8,6 @@ msgstr ""
 "Language: sv_SE\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "A fixed ratio locks the crop frame while scaling it; Free lets the frame itself be resized."
-msgstr "Ett fast bildförhållande låser croppramen medan den skalas; Fri gör att ramen själv kan ändra storlek."
-
 msgid "Adjust crop"
 msgstr "Justera beskärning"
 
@@ -19,9 +16,6 @@ msgstr "Förhandsvisningsstorlek i admin"
 
 msgid "All"
 msgstr "Alla"
-
-msgid "Aspect ratio"
-msgstr "Bildförhållande"
 
 msgid "Cancel"
 msgstr "Avbryt"
@@ -44,12 +38,6 @@ msgstr "Kunde inte läsa källbilden."
 msgid "Crop image"
 msgstr "Beskär bild"
 
-msgid "Custom ratio"
-msgstr "Eget bildförhållande"
-
-msgid "Custom…"
-msgstr "Eget…"
-
 msgid "Delete"
 msgstr "Radera"
 
@@ -68,9 +56,6 @@ msgstr "Ei Image Crop kräver att Advanced Custom Fields (eller ACF PRO) är ins
 msgid "Existing crops"
 msgstr "Befintliga beskärningar"
 
-msgid "Free (no fixed ratio)"
-msgstr "Fri (inget fast förhållande)"
-
 msgid "Image Crop"
 msgstr "Bildbeskärning"
 
@@ -83,6 +68,9 @@ msgstr "Bild-URL"
 msgid "Image array"
 msgstr "Bilddata (array)"
 
+msgid "Image size"
+msgstr "Bildformat"
+
 msgid "Image size used to preview the crop in the field editor."
 msgstr "Bildstorlek som används för att förhandsgranska beskärningen i fältredigeraren."
 
@@ -92,11 +80,11 @@ msgstr "Ogiltig källbild."
 msgid "Library"
 msgstr "Bibliotek"
 
+msgid "One of the image sizes registered on this site (Settings > Media, or added by a theme/plugin via add_image_size()). A size registered without hard cropping is treated as a free-form crop."
+msgstr "Ett av de bildformat som är registrerade på sajten (Inställningar > Media, eller tillagda av ett tema/plugin via add_image_size()). Ett format som registrerats utan hård beskärning behandlas som fri beskärning."
+
 msgid "Only show generated crops"
 msgstr "Visa endast genererade beskärningar"
-
-msgid "Only used when Aspect ratio above is set to \"Custom\". Format: width:height, e.g. 5:2."
-msgstr "Används bara när Bildförhållande ovan är satt till \"Eget\". Format: bredd:höjd, t.ex. 5:2."
 
 msgid "Please select an image."
 msgstr "Välj en bild."

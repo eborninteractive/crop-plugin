@@ -38,8 +38,16 @@ class Ei_Image_Crop_Generator {
 	}
 
 	/**
-	 * Calculate the largest centered box matching a ratio inside the source
-	 * dimensions, normalized to 0-1. Used as the default crop.
+	 * Calculate the default centered box inside the source dimensions,
+	 * normalized to 0-1. A ratio derived from a registered WP image size
+	 * (see Ei_Image_Crop_Field::resolve_ratio()) is always its own literal
+	 * target width:height, not just a proportion - so when the source is
+	 * at least that big in both dimensions, the default box is exactly
+	 * that many pixels, centered, rather than the largest box that
+	 * happens to share the ratio. Only falls back to "largest matching
+	 * ratio" when the source is too small to fit the literal target,
+	 * which is also exactly the case the undersized/upscale warning in
+	 * the cropper UI is watching for.
 	 *
 	 * @param int        $orig_w
 	 * @param int        $orig_h
@@ -57,20 +65,25 @@ class Ei_Image_Crop_Generator {
 		}
 
 		list( $ratio_w, $ratio_h ) = $ratio;
-		$target_ratio              = $ratio_w / $ratio_h;
-		$orig_ratio                = $orig_w / $orig_h;
 
-		if ( $orig_ratio > $target_ratio ) {
-			$box_h = $orig_h;
-			$box_w = $orig_h * $target_ratio;
-			$x     = ( $orig_w - $box_w ) / 2;
-			$y     = 0;
+		if ( $orig_w >= $ratio_w && $orig_h >= $ratio_h ) {
+			$box_w = $ratio_w;
+			$box_h = $ratio_h;
 		} else {
-			$box_w = $orig_w;
-			$box_h = $orig_w / $target_ratio;
-			$x     = 0;
-			$y     = ( $orig_h - $box_h ) / 2;
+			$target_ratio = $ratio_w / $ratio_h;
+			$orig_ratio   = $orig_w / $orig_h;
+
+			if ( $orig_ratio > $target_ratio ) {
+				$box_h = $orig_h;
+				$box_w = $orig_h * $target_ratio;
+			} else {
+				$box_w = $orig_w;
+				$box_h = $orig_w / $target_ratio;
+			}
 		}
+
+		$x = ( $orig_w - $box_w ) / 2;
+		$y = ( $orig_h - $box_h ) / 2;
 
 		return array(
 			'x' => $x / $orig_w,
@@ -305,7 +318,20 @@ class Ei_Image_Crop_Generator {
 			return $editor;
 		}
 
-		$cropped = $editor->crop( $px_x, $px_y, $px_w, $px_h, null, null, false );
+		// A ratio derived from a registered WP image size is always its own
+		// literal target width:height (see resolve_ratio()), not just a
+		// proportion - resizing the crop to exactly that during the same
+		// crop() call, rather than leaving it at whatever size the box was
+		// actually dragged to, is what makes a smaller-than-target
+		// selection upscale and a larger one downscale, always landing on
+		// the registered size's exact pixel dimensions. A free-form field
+		// (parse_ratio() returns null for "free") keeps the box's own
+		// native pixel size, same as before.
+		$target = self::parse_ratio( $ratio );
+		$dst_w  = $target ? (int) round( $target[0] ) : null;
+		$dst_h  = $target ? (int) round( $target[1] ) : null;
+
+		$cropped = $editor->crop( $px_x, $px_y, $px_w, $px_h, $dst_w, $dst_h, false );
 		if ( is_wp_error( $cropped ) ) {
 			return $cropped;
 		}

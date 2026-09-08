@@ -284,6 +284,26 @@
 	border-right: 3px solid #fff !important;
 }
 
+/* Set on .ei-image-crop-canvas (see updateUndersizedState() in field.js)
+ * once the selected area is smaller than the field's target image size in
+ * either dimension - saving would have to upscale the result, so the
+ * frame and its corner brackets turn red as a heads-up before that
+ * happens, instead of only after the fact in a blurry saved image. */
+.ei-image-crop-canvas.is-undersized .cropper-view-box {
+	outline-color: #d63638 !important;
+}
+
+.ei-image-crop-canvas.is-undersized .cropper-point.point-nw,
+.ei-image-crop-canvas.is-undersized .cropper-point.point-ne,
+.ei-image-crop-canvas.is-undersized .cropper-point.point-sw,
+.ei-image-crop-canvas.is-undersized .cropper-point.point-se {
+	border-color: #d63638 !important;
+}
+
+.ei-image-crop-canvas.is-undersized .ei-image-crop-box-label {
+	background: rgba(214, 54, 56, 0.9);
+}
+
 .ei-image-crop-live-preview {
 	width: 100%;
 	height: 200px;

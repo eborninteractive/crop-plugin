@@ -111,6 +111,32 @@
 		return w > 0 && h > 0 ? w / h : NaN;
 	}
 
+	/**
+	 * A field's ratio (see Ei_Image_Crop_Field::resolve_ratio()) is always
+	 * a registered WP image size's own literal pixel dimensions when it
+	 * locks the ratio at all, not just a proportion - this pulls those
+	 * back out for the undersized/upscale-warning check, which needs the
+	 * actual target size, not just its shape.
+	 *
+	 * @param {string} ratio
+	 * @return {{width: number, height: number}|null}
+	 */
+	function parseTargetSize( ratio ) {
+		if ( ! ratio || 'free' === ratio ) {
+			return null;
+		}
+
+		var parts = ratio.split( ':' );
+		if ( 2 !== parts.length ) {
+			return null;
+		}
+
+		var w = parseFloat( parts[ 0 ] );
+		var h = parseFloat( parts[ 1 ] );
+
+		return ( w > 0 && h > 0 ) ? { width: w, height: h } : null;
+	}
+
 	function getState( $field ) {
 		var raw = $field.find( '.ei-image-crop-value' ).val();
 
@@ -512,6 +538,27 @@
 		var $boxLabel = $( '<div class="ei-image-crop-box-label"></div>' );
 
 		var aspectRatio = parseAspectRatio( $field.data( 'ratio' ) );
+		var targetSize  = parseTargetSize( $field.data( 'ratio' ) );
+		var $canvas     = $( imgEl ).closest( '.ei-image-crop-canvas' );
+
+		/**
+		 * Turns the crop box red (see .is-undersized in field.css) once the
+		 * selected area, in the source image's own pixels, is smaller than
+		 * the target size in either dimension - that's exactly when saving
+		 * would have to upscale the result, which is the blur warning this
+		 * is meant to give ahead of time.
+		 */
+		function updateUndersizedState() {
+			if ( ! cropper || ! targetSize ) {
+				$canvas.removeClass( 'is-undersized' );
+				return;
+			}
+
+			var data = cropper.getData();
+			var undersized = data.width < targetSize.width - 0.5 || data.height < targetSize.height - 0.5;
+
+			$canvas.toggleClass( 'is-undersized', undersized );
+		}
 
 		cropper = new Cropper( imgEl, {
 			aspectRatio: aspectRatio,
@@ -545,6 +592,7 @@
 				suppressCropEvents = false;
 				updatePreviewCaption();
 				updateBoxLabel( $boxLabel );
+				updateUndersizedState();
 			},
 		} );
 
@@ -556,6 +604,7 @@
 		imgEl.addEventListener( 'crop', function () {
 			updatePreviewCaption();
 			updateBoxLabel( $boxLabel );
+			updateUndersizedState();
 
 			if ( suppressCropEvents || ! selectedReuseCrop ) {
 				return;
