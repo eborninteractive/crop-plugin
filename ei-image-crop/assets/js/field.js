@@ -555,9 +555,9 @@
 		var h = Math.round( data.height * currentTrueScale );
 
 		if ( currentTargetSize ) {
-			$caption.addClass( 'is-undersized' ).text( '⚠ ' + w + ' × ' + h );
+			$caption.addClass( 'is-undersized' ).text( '⚠ ' + w + ' × ' + h + ' px' );
 		} else {
-			$caption.removeClass( 'is-undersized' ).text( w + ' × ' + h );
+			$caption.removeClass( 'is-undersized' ).text( w + ' × ' + h + ' px' );
 		}
 	}
 
@@ -587,10 +587,10 @@
 		var text;
 
 		if ( currentTargetSize && ! isUndersized() ) {
-			text = currentTargetSize.width + ' × ' + currentTargetSize.height;
+			text = currentTargetSize.width + ' × ' + currentTargetSize.height + ' px';
 		} else {
 			var data = cropper.getData();
-			text = Math.round( data.width * currentTrueScale ) + ' × ' + Math.round( data.height * currentTrueScale );
+			text = Math.round( data.width * currentTrueScale ) + ' × ' + Math.round( data.height * currentTrueScale ) + ' px';
 		}
 
 		// Centered above the box horizontally (the negative translate in

@@ -316,6 +316,12 @@
 	margin: 6px 0 20px;
 	color: #646970;
 	font-size: 12px;
+	line-height: 16px;
+	/* Reserves room for the warning text before it ever appears (see
+	 * updatePreviewCaption() in field.js, which leaves this empty until
+	 * undersized) - without a fixed height here, everything below jumps
+	 * down the moment the text shows up. */
+	min-height: 16px;
 	text-align: center;
 }
 
