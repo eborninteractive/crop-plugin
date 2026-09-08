@@ -8,6 +8,14 @@
 	'use strict';
 
 	var $modal, $confirmModal, cropper, currentField, currentSourceId, currentExistingId;
+	// How many true-original pixels each on-screen crop-box pixel actually
+	// represents - see initCropper()'s trueScale param. 1 when the editor
+	// image is already the true original; only ever bigger, since the edit
+	// image is at most that size (a smaller "-scaled"/"large" copy, never
+	// larger). Read by updatePreviewCaption()/updateBoxLabel() so the
+	// pixel counts shown always reflect the real crop that would be
+	// produced, not the editor's own downscaled preview.
+	var currentTrueScale = 1;
 	// Set while a reuse thumbnail's own box is being shown for a look before
 	// committing to it; cleared as soon as the user adjusts the crop box
 	// themselves, or the modal closes. Drives the save button's "Use image"
@@ -333,6 +341,7 @@
 		currentSourceId = null;
 		currentExistingId = null;
 		selectedReuseCrop = null;
+		currentTrueScale = 1;
 	}
 
 	/**
@@ -503,8 +512,8 @@
 		}
 
 		var data = cropper.getData();
-		var w = Math.round( data.width );
-		var h = Math.round( data.height );
+		var w = Math.round( data.width * currentTrueScale );
+		var h = Math.round( data.height * currentTrueScale );
 
 		$modal.find( '.ei-image-crop-live-preview-caption' ).text( w + ' × ' + h );
 	}
@@ -524,8 +533,8 @@
 
 		var data = cropper.getData();
 		var box = cropper.getCropBoxData();
-		var w = Math.round( data.width );
-		var h = Math.round( data.height );
+		var w = Math.round( data.width * currentTrueScale );
+		var h = Math.round( data.height * currentTrueScale );
 
 		// Centered above the box horizontally (the negative translate in
 		// field.css does both that and sitting above rather than on top of
@@ -557,7 +566,8 @@
 		var aspectRatio = parseAspectRatio( $field.data( 'ratio' ) );
 		var targetSize  = parseTargetSize( $field.data( 'ratio' ) );
 		var $canvas     = $( imgEl ).closest( '.ei-image-crop-canvas' );
-		var scale       = trueScale > 0 ? trueScale : 1;
+
+		currentTrueScale = trueScale > 0 ? trueScale : 1;
 
 		/**
 		 * Turns the crop box red (see .is-undersized in field.css) once the
@@ -573,8 +583,8 @@
 			}
 
 			var data = cropper.getData();
-			var actualWidth = data.width * scale;
-			var actualHeight = data.height * scale;
+			var actualWidth = data.width * currentTrueScale;
+			var actualHeight = data.height * currentTrueScale;
 			var undersized = actualWidth < targetSize.width - 0.5 || actualHeight < targetSize.height - 0.5;
 
 			$canvas.toggleClass( 'is-undersized', undersized );

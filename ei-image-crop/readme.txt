@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.5.2
+Stable tag: 1.5.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.5.3 =
+* The floating dimension tag and the live preview's caption now show the crop's true final pixel size (scaled up to the true original, same fix as 1.5.1) instead of the editor's own possibly-downscaled on-screen pixels - 1.5.1 only corrected the undersized-warning threshold itself, the numbers shown were still off.
 
 = 1.5.2 =
 * The pencil icon now opens the Media Library's attachment details popup (upload.php?item={id}) instead of the full attachment edit screen.
