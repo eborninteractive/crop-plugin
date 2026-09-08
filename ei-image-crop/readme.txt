@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.3.4
+Stable tag: 1.3.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,9 @@ Yes — set "Aspect ratio" to "Free" in the field settings. The crop frame can t
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.3.5 =
+* Removed the reuse thumbnail delete button's × from its markup - it's meant to be added as a ::before rule in field.css instead, for full control over its own sizing/position. field.css itself wasn't touched in this release since it's currently being edited by hand directly.
 
 = 1.3.4 =
 * Restyled the crop box's own handles to match the mockup: bold black corner brackets instead of Cropper.js's default small blue dots, and removed the four edge-midpoint handles entirely.

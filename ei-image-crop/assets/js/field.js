@@ -584,10 +584,11 @@
 					selectReuseThumbnail( $field, crop, $thumb );
 				} );
 
+			// The × itself is a ::before in field.css now, not markup here -
+			// gives full control over its own sizing/position independent of
+			// the button's box model.
 			var $delete = $(
-				'<button type="button" class="ei-image-crop-reuse-delete" aria-label="' + t( 'deleteCrop' ) + '">' +
-					'&times;' +
-				'</button>'
+				'<button type="button" class="ei-image-crop-reuse-delete" aria-label="' + t( 'deleteCrop' ) + '"></button>'
 			).on( 'click', function ( e ) {
 				e.stopPropagation();
 				deleteReuseCrop( $field, crop, $thumb );
