@@ -26,11 +26,6 @@
 	// themselves, or the modal closes. Drives the save button's "Use image"
 	// vs. "Crop image" state.
 	var selectedReuseCrop = null;
-	// Guards the crop box's own 'crop' event handler against the setData()
-	// call selecting a reuse thumbnail makes on the user's behalf - without
-	// this, showing that thumbnail's box would immediately look like a
-	// manual adjustment and deselect itself.
-	var suppressCropEvents = false;
 
 	function t( key ) {
 		return ( window.eiImageCrop && eiImageCrop.i18n && eiImageCrop.i18n[ key ] ) || key;
@@ -336,7 +331,7 @@
 	 * Marks a reuse thumbnail selected: shows its own crop box (and, via
 	 * Cropper's own preview feature, the live preview) without committing to
 	 * it yet, and switches the save button to "Use image". Any further manual
-	 * adjustment of the crop box (see the 'crop' event handler in
+	 * adjustment of the crop box (see the 'cropstart' event handler in
 	 * initCropper()) clears this back out again.
 	 */
 	function selectReuseThumbnail( $field, crop, $thumb ) {
@@ -346,14 +341,12 @@
 
 		var natural = cropper.getImageData();
 
-		suppressCropEvents = true;
 		cropper.setData( {
 			x: crop.box.x * natural.naturalWidth,
 			y: crop.box.y * natural.naturalHeight,
 			width: crop.box.w * natural.naturalWidth,
 			height: crop.box.h * natural.naturalHeight,
 		} );
-		suppressCropEvents = false;
 
 		selectedReuseCrop = crop;
 		setSaveButtonState( true );
@@ -711,14 +704,12 @@
 				// it's actually there to append into.
 				$( imgEl ).closest( '.ei-image-crop-canvas' ).find( '.cropper-container' ).append( $boxLabel );
 
-				suppressCropEvents = true;
 				cropper.setData( {
 					x: box.x * natural.w,
 					y: box.y * natural.h,
 					width: box.w * natural.w,
 					height: box.h * natural.h,
 				} );
-				suppressCropEvents = false;
 				updatePreviewCaption();
 				updateBoxLabel( $boxLabel );
 				updateUndersizedState();
@@ -726,16 +717,24 @@
 		} );
 
 		// Cropper.js fires 'crop' on the image element for every crop box
-		// change, including the setData() calls above and in
-		// selectReuseThumbnail() - suppressCropEvents tells those apart from
-		// an actual manual adjustment, which should drop the "viewing an
-		// existing crop" selection back to a fresh "Crop image" state.
+		// change, including from a programmatic cropper.setData() call (the
+		// initial placement above, or selectReuseThumbnail()'s preview) - not
+		// just a manual drag - so it can only ever be used to keep the
+		// preview/label/undersized-state in sync, never to tell those apart
+		// from an actual user adjustment.
 		imgEl.addEventListener( 'crop', function () {
 			updatePreviewCaption();
 			updateBoxLabel( $boxLabel );
 			updateUndersizedState();
+		} );
 
-			if ( suppressCropEvents || ! selectedReuseCrop ) {
+		// Unlike 'crop', 'cropstart' only ever fires from the user actually
+		// pressing down on the crop box or one of its handles - never from a
+		// setData() call - so it's what reliably means "the user just
+		// changed this by hand", dropping the "viewing an existing crop"
+		// selection back to a fresh "Crop image" state.
+		imgEl.addEventListener( 'cropstart', function () {
+			if ( ! selectedReuseCrop ) {
 				return;
 			}
 
