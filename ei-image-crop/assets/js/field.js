@@ -7,7 +7,7 @@
 ( function ( $ ) {
 	'use strict';
 
-	var $modal, $confirmModal, cropper, currentField, currentSourceId, currentExistingId;
+	var $modal, $confirmModal, $attachmentModal, cropper, currentField, currentSourceId, currentExistingId;
 	// How many true-original pixels each on-screen crop-box pixel actually
 	// represents - see initCropper()'s trueScale param. 1 when the editor
 	// image is already the true original; only ever bigger, since the edit
@@ -97,6 +97,60 @@
 				}
 			} );
 		} );
+	}
+
+	function buildAttachmentModal() {
+		if ( $attachmentModal ) {
+			return $attachmentModal;
+		}
+
+		$attachmentModal = $(
+			'<div class="ei-image-crop-attachment-modal" hidden>' +
+				'<div class="ei-image-crop-attachment-modal-inner">' +
+					'<button type="button" class="ei-image-crop-close ei-image-crop-attachment-close" aria-label="' + t( 'close' ) + '"></button>' +
+					'<iframe class="ei-image-crop-attachment-frame" title="' + t( 'editDetails' ) + '"></iframe>' +
+				'</div>' +
+			'</div>'
+		);
+
+		$( 'body' ).append( $attachmentModal );
+
+		$attachmentModal.find( '.ei-image-crop-attachment-close' ).on( 'click', closeAttachmentModal );
+		// Clicking the dimmed backdrop itself (not the popup card) closes it too.
+		$attachmentModal.on( 'click', function ( e ) {
+			if ( e.target === $attachmentModal[ 0 ] ) {
+				closeAttachmentModal();
+			}
+		} );
+
+		return $attachmentModal;
+	}
+
+	/**
+	 * Shows the WP attachment details popup (Media Library's own
+	 * upload.php?item={id} view) in an iframe, on top of the current page,
+	 * instead of following the link - that link still works as a normal
+	 * <a> (middle-click/ctrl-click to open a real new tab still does), but
+	 * a plain left-click would otherwise navigate this whole tab away to
+	 * the Media Library, leaving you there once the WP popup is closed
+	 * instead of back on whatever you were editing.
+	 *
+	 * @param {string} href
+	 */
+	function openAttachmentModal( href ) {
+		var $modal = buildAttachmentModal();
+		$modal.find( '.ei-image-crop-attachment-frame' ).attr( 'src', href );
+		$modal.prop( 'hidden', false );
+	}
+
+	function closeAttachmentModal() {
+		if ( ! $attachmentModal ) {
+			return;
+		}
+		$attachmentModal.prop( 'hidden', true );
+		// Clears the iframe's content (not just hiding it) so any state in
+		// there (unsaved edits, playing media) doesn't linger for next time.
+		$attachmentModal.find( '.ei-image-crop-attachment-frame' ).attr( 'src', 'about:blank' );
 	}
 
 	// Dashicons has no crop glyph, so "Adjust crop" uses this inline SVG
@@ -896,6 +950,11 @@
 		$field.on( 'click', '.ei-image-crop-select', function ( e ) {
 			e.preventDefault();
 			openMediaFrame( $field );
+		} );
+
+		$field.on( 'click', '.ei-image-crop-open-attachment', function ( e ) {
+			e.preventDefault();
+			openAttachmentModal( $( this ).attr( 'href' ) );
 		} );
 
 		$field.on( 'click', '.ei-image-crop-edit', function ( e ) {
