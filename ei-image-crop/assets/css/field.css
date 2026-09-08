@@ -389,7 +389,7 @@
  * committed to - cleared as soon as the crop box is adjusted by hand. */
 .ei-image-crop-reuse-item.is-selected {
 	border-color: #2271b1;
-	background: #f0f6fc;
+	background: #e9f4ff;
 }
 
 /* No forced square crop here - the <img> keeps the crop's real aspect
