@@ -168,6 +168,7 @@ class Ei_Image_Crop_Field extends acf_field {
 		$parent_id   = $value ? Ei_Image_Crop_Generator::resolve_root( $value ) : 0;
 		$preview_id  = $value ? $value : 0;
 		$preview_url = $preview_id ? wp_get_attachment_image_url( $preview_id, $field['preview_size'] ) : '';
+		$has_image   = (bool) $preview_url;
 
 		// The field only ever submits ONE input to ACF (required for the field
 		// to work correctly when nested inside a repeater/flexible content/group,
@@ -200,23 +201,38 @@ class Ei_Image_Crop_Field extends acf_field {
 			)
 		);
 
-		echo '<div class="ei-image-crop-preview">';
-		if ( $preview_url ) {
+		// No image yet: nothing to show but the one button that lets you pick
+		// one - no dashed drop-zone placeholder, since dropping files onto it
+		// isn't actually supported and it only invites people to try.
+		echo '<div class="ei-image-crop-preview"' . ( $has_image ? '' : ' hidden' ) . '>';
+		if ( $has_image ) {
 			echo '<img src="' . esc_url( $preview_url ) . '" alt="" />';
-		} else {
-			echo '<div class="ei-image-crop-placeholder">' . esc_html__( 'No image selected', 'ei-image-crop' ) . '</div>';
+			echo '<div class="ei-image-crop-overlay">';
+			echo '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-select" title="' . esc_attr__( 'Change image', 'ei-image-crop' ) . '"><span class="dashicons dashicons-edit"></span></button>';
+			echo '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-edit" title="' . esc_attr__( 'Adjust crop', 'ei-image-crop' ) . '">' . self::crop_icon() . '</button>';
+			echo '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-remove" title="' . esc_attr__( 'Remove image', 'ei-image-crop' ) . '"><span class="dashicons dashicons-no-alt"></span></button>';
+			echo '</div>';
 		}
 		echo '</div>';
 
 		echo '<div class="ei-image-crop-existing" hidden></div>';
 
-		echo '<div class="ei-image-crop-actions">';
-		echo '<button type="button" class="button ei-image-crop-select">' . esc_html__( 'Select image', 'ei-image-crop' ) . '</button> ';
-		echo '<button type="button" class="button ei-image-crop-edit"' . ( $parent_id ? '' : ' hidden' ) . '>' . esc_html__( 'Adjust crop', 'ei-image-crop' ) . '</button> ';
-		echo '<button type="button" class="button-link-delete ei-image-crop-remove"' . ( $parent_id ? '' : ' hidden' ) . '>' . esc_html__( 'Remove', 'ei-image-crop' ) . '</button>';
+		echo '<div class="ei-image-crop-actions"' . ( $has_image ? ' hidden' : '' ) . '>';
+		echo '<button type="button" class="button ei-image-crop-select">' . esc_html__( 'Select image', 'ei-image-crop' ) . '</button>';
 		echo '</div>';
 
 		echo '</div>';
+	}
+
+	/**
+	 * Inline SVG crop icon - dashicons has no crop glyph, so the "Adjust
+	 * crop" button uses this instead, matching how dashicons-edit/no-alt are
+	 * rendered for the other two icon buttons.
+	 *
+	 * @return string
+	 */
+	public static function crop_icon() {
+		return '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M17 15h2V7c0-1.1-.9-2-2-2H9v2h8v8zM7 17V1H5v4H1v2h4v10c0 1.1.9 2 2 2h10v4h2v-4h4v-2H7z"/></svg>';
 	}
 
 	/**
@@ -226,6 +242,7 @@ class Ei_Image_Crop_Field extends acf_field {
 		$url = EI_IMAGE_CROP_URL;
 		$ver = EI_IMAGE_CROP_VERSION;
 
+		wp_enqueue_style( 'dashicons' );
 		wp_enqueue_style( 'ei-image-crop-cropperjs', $url . 'assets/vendor/cropperjs/cropper.min.css', array(), '1.6.2' );
 		wp_enqueue_script( 'ei-image-crop-cropperjs', $url . 'assets/vendor/cropperjs/cropper.min.js', array(), '1.6.2', true );
 
@@ -247,6 +264,9 @@ class Ei_Image_Crop_Field extends acf_field {
 				'i18n'    => array(
 					'selectImage'   => __( 'Select an image', 'ei-image-crop' ),
 					'useImage'      => __( 'Use this image', 'ei-image-crop' ),
+					'changeImage'   => __( 'Change image', 'ei-image-crop' ),
+					'adjustCrop'    => __( 'Adjust crop', 'ei-image-crop' ),
+					'removeImage'   => __( 'Remove image', 'ei-image-crop' ),
 					'save'          => __( 'Crop image', 'ei-image-crop' ),
 					'useCrop'       => __( 'Use image', 'ei-image-crop' ),
 					'close'         => __( 'Close', 'ei-image-crop' ),

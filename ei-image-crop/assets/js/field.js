@@ -23,6 +23,11 @@
 		return ( window.eiImageCrop && eiImageCrop.i18n && eiImageCrop.i18n[ key ] ) || key;
 	}
 
+	// Dashicons has no crop glyph, so "Adjust crop" uses this inline SVG
+	// instead - kept identical to Ei_Image_Crop_Field::crop_icon() so a
+	// freshly-saved preview (built here) looks the same as the server-rendered one.
+	var CROP_ICON_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M17 15h2V7c0-1.1-.9-2-2-2H9v2h8v8zM7 17V1H5v4H1v2h4v10c0 1.1.9 2 2 2h10v4h2v-4h4v-2H7z"/></svg>';
+
 	function parseAspectRatio( ratio ) {
 		if ( ! ratio || 'free' === ratio ) {
 			return NaN;
@@ -58,13 +63,26 @@
 
 	function setPreview( $field, url ) {
 		var $preview = $field.find( '.ei-image-crop-preview' );
+		var $actions = $field.find( '.ei-image-crop-actions' );
 
 		if ( url ) {
-			$preview.html( $( '<img />' ).attr( 'src', url ) );
-			$field.find( '.ei-image-crop-edit, .ei-image-crop-remove' ).prop( 'hidden', false );
+			$preview.empty()
+				.append( $( '<img />' ).attr( 'src', url ) )
+				.append(
+					$( '<div class="ei-image-crop-overlay" />' ).append(
+						$( '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-select"><span class="dashicons dashicons-edit"></span></button>' )
+							.attr( 'title', t( 'changeImage' ) ),
+						$( '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-edit">' + CROP_ICON_SVG + '</button>' )
+							.attr( 'title', t( 'adjustCrop' ) ),
+						$( '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-remove"><span class="dashicons dashicons-no-alt"></span></button>' )
+							.attr( 'title', t( 'removeImage' ) )
+					)
+				)
+				.prop( 'hidden', false );
+			$actions.prop( 'hidden', true );
 		} else {
-			$preview.html( '<div class="ei-image-crop-placeholder"></div>' );
-			$field.find( '.ei-image-crop-edit, .ei-image-crop-remove' ).prop( 'hidden', true );
+			$preview.empty().prop( 'hidden', true );
+			$actions.prop( 'hidden', false );
 		}
 	}
 
