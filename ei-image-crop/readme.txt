@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.6.2
+Stable tag: 1.6.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.6.3 =
+* Applied user-supplied field.css tweaks: smaller/repositioned reuse thumbnail delete button with a finer-tuned × glyph, and rounded-square (instead of circular) popup close button.
 
 = 1.6.2 =
 * Applied a user-supplied field.css tweak: lighter blue background on a selected reuse thumbnail.

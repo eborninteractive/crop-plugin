@@ -145,7 +145,7 @@
 	line-height: 1;
 	padding: 0;
 	border: 1px solid #dcdcde;
-	border-radius: 50%;
+	border-radius: 12px;
 	background: #fff;
 	color: #50575e;
 	font-size: 16px;
@@ -405,10 +405,10 @@
 
 .ei-image-crop-reuse-delete {
 	position: absolute;
-	top: -8px;
-	right: -8px;
-	width: 20px;
-	height: 20px;
+	top: -2px;
+	right: -2px;
+	width: 17px;
+	height: 17px;
 	line-height: 1;
 	padding: 0;
 	border: 1px solid rgba(255, 255, 255, 0.25);
@@ -427,6 +427,9 @@
 
 .ei-image-crop-reuse-delete::before {
 	content: "×";
+	vertical-align: top;
+	display: inline-block;
+	margin-top: -1px;
 }
 
 .ei-image-crop-error {
