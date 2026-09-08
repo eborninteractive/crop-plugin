@@ -319,6 +319,13 @@
 	text-align: center;
 }
 
+/* Only shown at all once the selection can't reach the target size
+ * without upscaling (see updatePreviewCaption() in field.js) - empty and
+ * invisible the rest of the time. */
+.ei-image-crop-live-preview-caption.is-undersized {
+	color: #d63638;
+}
+
 .ei-image-crop-reuse {
 	margin-bottom: 16px;
 }

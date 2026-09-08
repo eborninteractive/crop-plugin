@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.5.3
+Stable tag: 1.6.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,12 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.6.0 =
+* Reworked the target-size resolution displays to be more pedagogical, for a field with a fixed target size:
+  * The floating dimension tag on the crop box shows the fixed target size (e.g. "2000 × 1000") as long as the selection is big enough to reach it - saving always produces exactly that size either way - and only switches to showing the real, shrinking selection size once it can't.
+  * The live preview's caption is blank until the selection can't reach the target size without upscaling, at which point it shows the real pixel size in red with a small warning triangle.
+* A free-form field (no target size) is unaffected - both keep always showing the box's actual size.
 
 = 1.5.3 =
 * The floating dimension tag and the live preview's caption now show the crop's true final pixel size (scaled up to the true original, same fix as 1.5.1) instead of the editor's own possibly-downscaled on-screen pixels - 1.5.1 only corrected the undersized-warning threshold itself, the numbers shown were still off.

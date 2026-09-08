@@ -16,6 +16,11 @@
 	// pixel counts shown always reflect the real crop that would be
 	// produced, not the editor's own downscaled preview.
 	var currentTrueScale = 1;
+	// The current field's target size (see parseTargetSize()), or null for
+	// a free-form field - set in initCropper(). Read by isUndersized(),
+	// updatePreviewCaption() and updateBoxLabel() so they don't each need
+	// their own reference to it.
+	var currentTargetSize = null;
 	// Set while a reuse thumbnail's own box is being shown for a look before
 	// committing to it; cleared as soon as the user adjusts the crop box
 	// themselves, or the modal closes. Drives the save button's "Use image"
@@ -342,6 +347,7 @@
 		currentExistingId = null;
 		selectedReuseCrop = null;
 		currentTrueScale = 1;
+		currentTargetSize = null;
 	}
 
 	/**
@@ -502,44 +508,95 @@
 	}
 
 	/**
-	 * Keeps the "860 × 430" caption under the live preview in sync with the
-	 * crop box - just the resulting crop's actual pixel size, not the
-	 * source image's.
+	 * The crop box's real final pixel size (scaled up from the editor
+	 * image's own, possibly smaller, on-screen pixels - see currentTrueScale)
+	 * is smaller than the field's target size in either dimension - i.e.
+	 * whether saving now would need to upscale the result.
+	 * Always false for a free-form field (currentTargetSize is null).
+	 *
+	 * @return {boolean}
+	 */
+	function isUndersized() {
+		if ( ! cropper || ! currentTargetSize ) {
+			return false;
+		}
+
+		var data = cropper.getData();
+		var actualWidth = data.width * currentTrueScale;
+		var actualHeight = data.height * currentTrueScale;
+
+		return actualWidth < currentTargetSize.width - 0.5 || actualHeight < currentTargetSize.height - 0.5;
+	}
+
+	/**
+	 * The live preview's caption is deliberately quiet for a target-size
+	 * field as long as the selection is big enough - saving always
+	 * produces exactly the target size either way (see generate()'s
+	 * resize), so there's nothing to report until the selection can't
+	 * reach it without upscaling, at which point the real (smaller, and
+	 * shrinking further as the box does) pixel size is worth calling out
+	 * as a warning. A free-form field has no target to compare against,
+	 * so it always just shows the box's actual size.
 	 */
 	function updatePreviewCaption() {
 		if ( ! cropper ) {
 			return;
 		}
 
+		var $caption = $modal.find( '.ei-image-crop-live-preview-caption' );
+
+		if ( currentTargetSize && ! isUndersized() ) {
+			$caption.empty().removeClass( 'is-undersized' );
+			return;
+		}
+
 		var data = cropper.getData();
 		var w = Math.round( data.width * currentTrueScale );
 		var h = Math.round( data.height * currentTrueScale );
 
-		$modal.find( '.ei-image-crop-live-preview-caption' ).text( w + ' × ' + h );
+		if ( currentTargetSize ) {
+			$caption.addClass( 'is-undersized' ).text( '⚠ ' + w + ' × ' + h );
+		} else {
+			$caption.removeClass( 'is-undersized' ).text( w + ' × ' + h );
+		}
 	}
 
 	/**
-	 * Small "860 × 430" tag floating just above the crop box itself,
-	 * mirroring the same info as the live preview's caption but where you're
-	 * actually looking while dragging. Positioned with cropper.getCropBoxData(),
-	 * which already reports on-screen pixels relative to Cropper's own
-	 * .cropper-container - the element this tag lives inside - so no extra
-	 * coordinate conversion is needed.
+	 * Small tag floating just above the crop box itself, mirroring the same
+	 * info as the live preview's caption but where you're actually looking
+	 * while dragging - except while the selection is big enough for a
+	 * target-size field, when it shows that fixed target size instead of
+	 * the fluctuating actual selection: saving always produces exactly the
+	 * target size in that case (see generate()'s resize), so the target
+	 * itself is the more useful, stable number to show. Only once the
+	 * selection can't reach the target without upscaling does the real,
+	 * shrinking size become the more honest thing to show. A free-form
+	 * field just always shows the box's actual size.
+	 *
+	 * Positioned with cropper.getCropBoxData(), which already reports
+	 * on-screen pixels relative to Cropper's own .cropper-container - the
+	 * element this tag lives inside - so no extra coordinate conversion is
+	 * needed.
 	 */
 	function updateBoxLabel( $label ) {
 		if ( ! cropper ) {
 			return;
 		}
 
-		var data = cropper.getData();
 		var box = cropper.getCropBoxData();
-		var w = Math.round( data.width * currentTrueScale );
-		var h = Math.round( data.height * currentTrueScale );
+		var text;
+
+		if ( currentTargetSize && ! isUndersized() ) {
+			text = currentTargetSize.width + ' × ' + currentTargetSize.height;
+		} else {
+			var data = cropper.getData();
+			text = Math.round( data.width * currentTrueScale ) + ' × ' + Math.round( data.height * currentTrueScale );
+		}
 
 		// Centered above the box horizontally (the negative translate in
 		// field.css does both that and sitting above rather than on top of
 		// the box's own top edge), not left-aligned to it.
-		$label.text( w + ' × ' + h ).css( {
+		$label.text( text ).css( {
 			left: ( box.left + box.width / 2 ) + 'px',
 			top: box.top + 'px',
 		} );
@@ -564,30 +621,18 @@
 		var $boxLabel = $( '<div class="ei-image-crop-box-label"></div>' );
 
 		var aspectRatio = parseAspectRatio( $field.data( 'ratio' ) );
-		var targetSize  = parseTargetSize( $field.data( 'ratio' ) );
 		var $canvas     = $( imgEl ).closest( '.ei-image-crop-canvas' );
 
 		currentTrueScale = trueScale > 0 ? trueScale : 1;
+		currentTargetSize = parseTargetSize( $field.data( 'ratio' ) );
 
 		/**
 		 * Turns the crop box red (see .is-undersized in field.css) once the
-		 * selected area, scaled up to the true original's own pixels, is
-		 * smaller than the target size in either dimension - that's exactly
-		 * when saving would have to upscale the result, which is the blur
-		 * warning this is meant to give ahead of time.
+		 * selection can't reach the target size without upscaling - the
+		 * blur warning this is meant to give ahead of time, not after.
 		 */
 		function updateUndersizedState() {
-			if ( ! cropper || ! targetSize ) {
-				$canvas.removeClass( 'is-undersized' );
-				return;
-			}
-
-			var data = cropper.getData();
-			var actualWidth = data.width * currentTrueScale;
-			var actualHeight = data.height * currentTrueScale;
-			var undersized = actualWidth < targetSize.width - 0.5 || actualHeight < targetSize.height - 0.5;
-
-			$canvas.toggleClass( 'is-undersized', undersized );
+			$canvas.toggleClass( 'is-undersized', isUndersized() );
 		}
 
 		cropper = new Cropper( imgEl, {
