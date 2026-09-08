@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.3.7
+Stable tag: 1.3.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,10 @@ Yes — set "Aspect ratio" to "Free" in the field settings. The crop frame can t
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.3.8 =
+* Applied a user-supplied field.css tweak: adjusted padding on the modal side panel.
+* Restyled the popup's close button to a smaller, lighter outline style (white background, thin gray border, muted gray ×) instead of the solid dark circle, per a reference screenshot.
 
 = 1.3.7 =
 * Applied user-supplied field.css tweaks: top padding on the modal header's heading block, and left margin on the filename/dimensions subtitle.

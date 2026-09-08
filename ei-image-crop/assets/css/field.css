@@ -140,22 +140,23 @@
 
 .ei-image-crop-close {
 	flex: 0 0 auto;
-	width: 32px;
-	height: 32px;
+	width: 28px;
+	height: 28px;
 	line-height: 1;
 	padding: 0;
-	border: 1px solid rgba(255, 255, 255, 0.25);
+	border: 1px solid #dcdcde;
 	border-radius: 50%;
-	background: rgba(29, 35, 39, 0.85);
-	color: #fff;
-	font-size: 20px;
+	background: #fff;
+	color: #50575e;
+	font-size: 16px;
 	cursor: pointer;
 }
 
 .ei-image-crop-close:hover,
 .ei-image-crop-close:focus {
-	background: #1d2327;
-	border-color: rgba(255, 255, 255, 0.5);
+	background: #f0f0f1;
+	border-color: #8c8f94;
+	color: #1d2327;
 }
 
 .ei-image-crop-modal-body {
@@ -184,7 +185,7 @@
 .ei-image-crop-modal-side {
 	flex: 0 0 32%;
 	max-width: 340px;
-	padding: 24px;
+	padding: 12px 24px 24px;
 	overflow-y: auto;
 	display: flex;
 	flex-direction: column;
