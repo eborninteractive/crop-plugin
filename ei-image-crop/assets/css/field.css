@@ -58,16 +58,28 @@
 	font-size: 16px;
 }
 
+/* color: #fff !important is needed here because the pencil icon is an
+ * <a> tag - WP admin's own link-hover color would otherwise win and
+ * turn it blue on hover/focus. */
 .ei-image-crop-icon-btn:hover,
 .ei-image-crop-icon-btn:focus {
 	background: #1d2327;
 	border-color: rgba(255, 255, 255, 0.5);
+	color: #fff !important;
 }
 
 .ei-image-crop-icon-btn.ei-image-crop-remove:hover,
 .ei-image-crop-icon-btn.ei-image-crop-remove:focus {
 	background: #d63638;
 	border-color: #d63638;
+	color: #fff !important;
+}
+
+.ei-image-crop-icon-btn.ei-image-crop-remove::before {
+	content: "×";
+	vertical-align: top;
+	display: inline-block;
+	margin-top: -1px;
 }
 
 /* Modal */

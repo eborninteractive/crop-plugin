@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.6.6
+Stable tag: 1.6.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,10 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.6.7 =
+* Fixed the pencil icon turning blue on hover/focus - it's an <a> tag, so WP admin's own link-hover color was winning over the icon buttons' white.
+* The field's own "remove image" icon button now renders its × via a ::before rule too, matching the close/reuse-delete buttons, instead of markup text.
 
 = 1.6.6 =
 * Added !important to .cropper-view-box's outline override - something on at least one live site (likely a CSS concatenation/optimization plugin reordering enqueued stylesheets) was letting cropper.min.css's own 1px outline win despite field.css being enqueued after it.

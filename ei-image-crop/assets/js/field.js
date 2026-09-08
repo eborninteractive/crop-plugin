@@ -190,7 +190,7 @@
 							.attr( 'title', t( 'editDetails' ) ),
 						$( '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-edit">' + CROP_ICON_SVG + '</button>' )
 							.attr( 'title', t( 'adjustCrop' ) ),
-						$( '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-remove">&times;</button>' )
+						$( '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-remove"></button>' )
 							.attr( 'title', t( 'removeImage' ) )
 					)
 				)
