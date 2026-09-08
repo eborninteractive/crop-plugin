@@ -245,13 +245,15 @@ class Ei_Image_Crop_Field extends acf_field {
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 				'nonce'   => wp_create_nonce( 'ei_image_crop' ),
 				'i18n'    => array(
-					'selectImage'  => __( 'Select an image', 'ei-image-crop' ),
-					'useImage'     => __( 'Use this image', 'ei-image-crop' ),
-					'save'         => __( 'Save crop', 'ei-image-crop' ),
-					'saveNew'      => __( 'Save as new crop', 'ei-image-crop' ),
-					'cancel'       => __( 'Cancel', 'ei-image-crop' ),
-					'reuseTitle'   => __( 'Existing crops of this image', 'ei-image-crop' ),
-					'error'        => __( 'Something went wrong while cropping the image.', 'ei-image-crop' ),
+					'selectImage'   => __( 'Select an image', 'ei-image-crop' ),
+					'useImage'      => __( 'Use this image', 'ei-image-crop' ),
+					'save'          => __( 'Crop image', 'ei-image-crop' ),
+					'useCrop'       => __( 'Use Crop', 'ei-image-crop' ),
+					'close'         => __( 'Close', 'ei-image-crop' ),
+					'deleteCrop'    => __( 'Delete this crop', 'ei-image-crop' ),
+					'confirmDelete' => __( 'Delete this crop? This cannot be undone.', 'ei-image-crop' ),
+					'reuseTitle'    => __( 'Existing crops of this image', 'ei-image-crop' ),
+					'error'         => __( 'Something went wrong while cropping the image.', 'ei-image-crop' ),
 				),
 			)
 		);

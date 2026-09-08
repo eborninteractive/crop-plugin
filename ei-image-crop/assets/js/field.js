@@ -8,6 +8,16 @@
 	'use strict';
 
 	var $modal, cropper, currentField, currentSourceId, currentExistingId;
+	// Set while a reuse thumbnail's own box is being shown for a look before
+	// committing to it; cleared as soon as the user adjusts the crop box
+	// themselves, or the modal closes. Drives the save button's "Use Crop"
+	// vs. "Crop image" state.
+	var selectedReuseCrop = null;
+	// Guards the crop box's own 'crop' event handler against the setData()
+	// call selecting a reuse thumbnail makes on the user's behalf - without
+	// this, showing that thumbnail's box would immediately look like a
+	// manual adjustment and deselect itself.
+	var suppressCropEvents = false;
 
 	function t( key ) {
 		return ( window.eiImageCrop && eiImageCrop.i18n && eiImageCrop.i18n[ key ] ) || key;
@@ -66,6 +76,7 @@
 		$modal = $(
 			'<div class="ei-image-crop-modal" hidden>' +
 				'<div class="ei-image-crop-modal-inner">' +
+					'<button type="button" class="ei-image-crop-close" aria-label="' + t( 'close' ) + '">&times;</button>' +
 					'<div class="ei-image-crop-modal-main">' +
 						'<div class="ei-image-crop-canvas"><img class="ei-image-crop-img" alt="" /></div>' +
 					'</div>' +
@@ -78,8 +89,6 @@
 						'<p class="ei-image-crop-error" hidden></p>' +
 						'<div class="ei-image-crop-modal-actions">' +
 							'<button type="button" class="button button-primary ei-image-crop-save"></button>' +
-							'<button type="button" class="button ei-image-crop-save-new" hidden></button>' +
-							'<button type="button" class="button ei-image-crop-cancel"></button>' +
 						'</div>' +
 					'</div>' +
 				'</div>' +
@@ -88,16 +97,80 @@
 
 		$( 'body' ).append( $modal );
 
-		$modal.find( '.ei-image-crop-save' ).text( t( 'save' ) ).on( 'click', function () {
-			performSave( false );
-		} );
-		$modal.find( '.ei-image-crop-save-new' ).text( t( 'saveNew' ) ).on( 'click', function () {
-			performSave( true );
-		} );
-		$modal.find( '.ei-image-crop-cancel' ).text( t( 'cancel' ) ).on( 'click', closeModal );
+		$modal.find( '.ei-image-crop-save' ).text( t( 'save' ) ).on( 'click', onSaveButtonClick );
+		$modal.find( '.ei-image-crop-close' ).on( 'click', closeModal );
 		$modal.find( '.ei-image-crop-reuse-title' ).text( t( 'reuseTitle' ) );
 
 		return $modal;
+	}
+
+	/**
+	 * The single save button does one of two things depending on whether a
+	 * reuse thumbnail is currently selected (and hasn't been deselected by
+	 * an adjustment since): apply that exact crop as-is ("Use Crop"), or
+	 * crop the image fresh from the current box ("Crop image").
+	 */
+	function onSaveButtonClick() {
+		if ( selectedReuseCrop ) {
+			useSelectedCrop();
+		} else {
+			performSave();
+		}
+	}
+
+	/**
+	 * Switches the save button between its two states/labels/colors.
+	 */
+	function setSaveButtonState( isUseCrop ) {
+		$modal.find( '.ei-image-crop-save' )
+			.text( isUseCrop ? t( 'useCrop' ) : t( 'save' ) )
+			.toggleClass( 'ei-image-crop-save-use', isUseCrop );
+	}
+
+	/**
+	 * Marks a reuse thumbnail selected: shows its own crop box (and, via
+	 * Cropper's own preview feature, the live preview) without committing to
+	 * it yet, and switches the save button to "Use Crop". Any further manual
+	 * adjustment of the crop box (see the 'crop' event handler in
+	 * initCropper()) clears this back out again.
+	 */
+	function selectReuseThumbnail( $field, crop, $thumb ) {
+		if ( ! cropper || ! crop.box ) {
+			return;
+		}
+
+		var natural = cropper.getImageData();
+
+		suppressCropEvents = true;
+		cropper.setData( {
+			x: crop.box.x * natural.naturalWidth,
+			y: crop.box.y * natural.naturalHeight,
+			width: crop.box.w * natural.naturalWidth,
+			height: crop.box.h * natural.naturalHeight,
+		} );
+		suppressCropEvents = false;
+
+		selectedReuseCrop = crop;
+		setSaveButtonState( true );
+
+		$modal.find( '.ei-image-crop-reuse-item' ).removeClass( 'is-selected' );
+		$thumb.addClass( 'is-selected' );
+	}
+
+	/**
+	 * Applies the selected reuse thumbnail as-is (no new crop generated) and
+	 * closes the modal - what clicking a thumbnail used to do immediately;
+	 * now it's a deliberate second step via the "Use Crop" button, so
+	 * clicking a thumbnail can show a look at it first without committing.
+	 */
+	function useSelectedCrop() {
+		if ( ! selectedReuseCrop || ! currentField ) {
+			return;
+		}
+
+		setState( currentField, { id: selectedReuseCrop.id, source: currentSourceId } );
+		setPreview( currentField, selectedReuseCrop.preview );
+		closeModal();
 	}
 
 	function showError( message ) {
@@ -121,6 +194,7 @@
 		currentField = null;
 		currentSourceId = null;
 		currentExistingId = null;
+		selectedReuseCrop = null;
 	}
 
 	/**
@@ -148,10 +222,8 @@
 		clearError();
 		modal.find( '.ei-image-crop-reuse' ).prop( 'hidden', true );
 		modal.find( '.ei-image-crop-reuse-list' ).empty();
-		// Only offer "save as new" when there's an existing crop that a plain
-		// Save would otherwise overwrite in place; a brand new selection has
-		// nothing to preserve, so the two buttons would do the same thing.
-		modal.find( '.ei-image-crop-save-new' ).prop( 'hidden', ! existingId );
+		selectedReuseCrop = null;
+		setSaveButtonState( false );
 
 		var $img = modal.find( '.ei-image-crop-img' );
 		$img.attr( 'src', '' );
@@ -180,12 +252,11 @@
 				// later marks its actual existing box on the real original
 				// instead of treating the crop as a brand new source to
 				// crop again. Carry the resolved values forward for the
-				// rest of this session (reuse row, save, save-as-new).
+				// rest of this session (reuse row, save).
 				sourceId   = data.source_id;
 				existingId = data.existing_id || '';
 				currentSourceId    = sourceId;
 				currentExistingId  = existingId;
-				modal.find( '.ei-image-crop-save-new' ).prop( 'hidden', ! existingId );
 
 				// Picking an already-cropped image on purpose means using
 				// that exact crop, not being forced to make a new one right
@@ -296,13 +367,30 @@
 			ready: function () {
 				var natural = { w: imgEl.naturalWidth, h: imgEl.naturalHeight };
 
+				suppressCropEvents = true;
 				cropper.setData( {
 					x: box.x * natural.w,
 					y: box.y * natural.h,
 					width: box.w * natural.w,
 					height: box.h * natural.h,
 				} );
+				suppressCropEvents = false;
 			},
+		} );
+
+		// Cropper.js fires 'crop' on the image element for every crop box
+		// change, including the setData() calls above and in
+		// selectReuseThumbnail() - suppressCropEvents tells those apart from
+		// an actual manual adjustment, which should drop the "viewing an
+		// existing crop" selection back to a fresh "Crop image" state.
+		imgEl.addEventListener( 'crop', function () {
+			if ( suppressCropEvents || ! selectedReuseCrop ) {
+				return;
+			}
+
+			selectedReuseCrop = null;
+			setSaveButtonState( false );
+			$modal.find( '.ei-image-crop-reuse-item' ).removeClass( 'is-selected' );
 		} );
 	}
 
@@ -314,15 +402,23 @@
 		var $list = $modal.find( '.ei-image-crop-reuse-list' ).empty();
 
 		crops.forEach( function ( crop ) {
-			var $thumb = $( '<button type="button" class="ei-image-crop-reuse-item"></button>' )
+			var $thumb = $( '<div class="ei-image-crop-reuse-item"></div>' )
 				.attr( 'title', crop.title )
 				.append( $( '<img />' ).attr( 'src', crop.url ) )
 				.on( 'click', function () {
-					setState( $field, { id: crop.id, source: currentSourceId } );
-					setPreview( $field, crop.preview );
-					closeModal();
+					selectReuseThumbnail( $field, crop, $thumb );
 				} );
 
+			var $delete = $(
+				'<button type="button" class="ei-image-crop-reuse-delete" aria-label="' + t( 'deleteCrop' ) + '">' +
+					'&times;' +
+				'</button>'
+			).on( 'click', function ( e ) {
+				e.stopPropagation();
+				deleteReuseCrop( $field, crop, $thumb );
+			} );
+
+			$thumb.append( $delete );
 			$list.append( $thumb );
 		} );
 
@@ -330,11 +426,62 @@
 	}
 
 	/**
-	 * @param {boolean} forceNew When true, always create a new crop
-	 *   attachment instead of overwriting the one currently being edited -
-	 *   for keeping an alternate composition around instead of replacing it.
+	 * Permanently deletes a crop from the reuse row (and the Media Library
+	 * entirely), after confirming - this can't be undone. If it turns out to
+	 * be the field's own already-saved value, that value is cleared too,
+	 * since it would otherwise be left pointing at an attachment that no
+	 * longer exists.
 	 */
-	function performSave( forceNew ) {
+	function deleteReuseCrop( $field, crop, $thumb ) {
+		if ( ! window.confirm( t( 'confirmDelete' ) ) ) { // eslint-disable-line no-alert
+			return;
+		}
+
+		$.post( eiImageCrop.ajaxUrl, {
+			action: 'ei_image_crop_delete',
+			nonce: eiImageCrop.nonce,
+			id: crop.id,
+		} )
+			.done( function ( response ) {
+				if ( ! response || ! response.success ) {
+					showError( ( response && response.data && response.data.message ) || t( 'error' ) );
+					return;
+				}
+
+				if ( selectedReuseCrop && selectedReuseCrop.id === crop.id ) {
+					selectedReuseCrop = null;
+					setSaveButtonState( false );
+				}
+
+				var state = getState( $field );
+				if ( String( state.id ) === String( crop.id ) ) {
+					setState( $field, { id: '', source: currentSourceId } );
+					setPreview( $field, '' );
+				}
+
+				$thumb.remove();
+
+				if ( ! $modal.find( '.ei-image-crop-reuse-item' ).length ) {
+					$modal.find( '.ei-image-crop-reuse' ).prop( 'hidden', true );
+				}
+			} )
+			.fail( function () {
+				showError( t( 'error' ) );
+			} );
+	}
+
+	/**
+	 * Crops the image fresh from the current box. Always produces a new
+	 * attachment (or reuses an existing one via hash-based dedup if it's
+	 * identical to a crop that already exists) - it never overwrites
+	 * whatever crop the field currently holds, even when adjusting one via
+	 * "Adjust crop"; that in-place-overwrite behavior isn't reachable from
+	 * this single button on purpose, since silently mutating a crop that
+	 * may be shared elsewhere is surprising. "Use Crop" (see
+	 * useSelectedCrop()) is the only way this modal applies an existing
+	 * attachment as-is.
+	 */
+	function performSave() {
 		if ( ! cropper || ! currentField ) {
 			return;
 		}
@@ -352,16 +499,15 @@
 		var fieldKey = $field.data( 'field-key' );
 		var ratio = $field.data( 'ratio' );
 		var sourceId = currentSourceId;
-		var existingId = forceNew ? '' : currentExistingId;
 
 		clearError();
-		$modal.find( '.ei-image-crop-save, .ei-image-crop-save-new' ).prop( 'disabled', true );
+		$modal.find( '.ei-image-crop-save' ).prop( 'disabled', true );
 
 		$.post( eiImageCrop.ajaxUrl, {
 			action: 'ei_image_crop_save',
 			nonce: eiImageCrop.nonce,
 			source_id: sourceId,
-			existing_id: existingId,
+			existing_id: '',
 			field_key: fieldKey,
 			ratio: ratio,
 			box: box,
@@ -381,7 +527,7 @@
 				showError( t( 'error' ) );
 			} )
 			.always( function () {
-				$modal.find( '.ei-image-crop-save, .ei-image-crop-save-new' ).prop( 'disabled', false );
+				$modal.find( '.ei-image-crop-save' ).prop( 'disabled', false );
 			} );
 	}
 

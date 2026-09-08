@@ -14,6 +14,7 @@ class Ei_Image_Crop_Ajax {
 	public static function init() {
 		add_action( 'wp_ajax_ei_image_crop_get_source', array( __CLASS__, 'get_source' ) );
 		add_action( 'wp_ajax_ei_image_crop_save', array( __CLASS__, 'save' ) );
+		add_action( 'wp_ajax_ei_image_crop_delete', array( __CLASS__, 'delete_crop' ) );
 	}
 
 	/**
@@ -158,6 +159,34 @@ class Ei_Image_Crop_Ajax {
 	}
 
 	/**
+	 * Permanently deletes a crop attachment, e.g. from the "existing crops"
+	 * row's per-item delete button. Refuses anything that isn't actually a
+	 * crop this plugin generated, so this endpoint can't be used to delete
+	 * arbitrary attachments.
+	 */
+	public static function delete_crop() {
+		self::check_access();
+
+		$id = isset( $_POST['id'] ) ? (int) $_POST['id'] : 0;
+
+		if ( ! $id || ! get_post_meta( $id, '_ei_crop_parent', true ) ) {
+			wp_send_json_error( array( 'message' => __( 'That is not a crop this plugin can delete.', 'ei-image-crop' ) ) );
+		}
+
+		if ( ! current_user_can( 'delete_post', $id ) ) {
+			wp_send_json_error( array( 'message' => __( 'You are not allowed to do this.', 'ei-image-crop' ) ), 403 );
+		}
+
+		$deleted = wp_delete_attachment( $id, true );
+
+		if ( ! $deleted ) {
+			wp_send_json_error( array( 'message' => __( 'Could not delete that crop.', 'ei-image-crop' ) ) );
+		}
+
+		wp_send_json_success( array( 'id' => $id ) );
+	}
+
+	/**
 	 * @param int    $parent_id
 	 * @param string $ratio_label
 	 * @param string $preview_size Size to report back as `preview`, used when
@@ -165,7 +194,7 @@ class Ei_Image_Crop_Ajax {
 	 *                             image - kept separate from the small `url`
 	 *                             icon so the row itself never has to load
 	 *                             large images just to render a row of icons.
-	 * @return array<int, array{id:int, url:string, preview:string, title:string}>
+	 * @return array<int, array{id:int, url:string, preview:string, title:string, box:array}>
 	 */
 	protected static function get_existing_crops( $parent_id, $ratio_label, $preview_size = 'medium' ) {
 		$ids = get_posts(
@@ -205,11 +234,17 @@ class Ei_Image_Crop_Ajax {
 				continue;
 			}
 
+			$stored_box = get_post_meta( $id, '_ei_crop_box', true );
+
 			$crops[] = array(
 				'id'      => $id,
 				'url'     => $thumb,
 				'preview' => wp_get_attachment_image_url( $id, $preview_size ) ?: $thumb,
 				'title'   => get_the_title( $id ),
+				// Lets the picker mark this crop's own region on the source
+				// image when it's selected for a look before committing to it,
+				// instead of only ever showing a flat thumbnail.
+				'box'     => is_array( $stored_box ) ? Ei_Image_Crop_Generator::sanitize_box( $stored_box ) : null,
 			);
 		}
 

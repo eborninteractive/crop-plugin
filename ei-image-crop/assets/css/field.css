@@ -60,7 +60,31 @@
 	width: min(1100px, 94vw);
 	height: min(720px, 90vh);
 	display: flex;
+	position: relative;
 	box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+}
+
+.ei-image-crop-close {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	z-index: 1;
+	width: 32px;
+	height: 32px;
+	line-height: 1;
+	padding: 0;
+	border: 1px solid #dcdcde;
+	border-radius: 50%;
+	background: #fff;
+	color: #1d2327;
+	font-size: 20px;
+	cursor: pointer;
+}
+
+.ei-image-crop-close:hover,
+.ei-image-crop-close:focus {
+	background: #f0f0f1;
+	border-color: #8c8f94;
 }
 
 .ei-image-crop-modal-main {
@@ -114,19 +138,27 @@
 }
 
 .ei-image-crop-reuse-item {
+	position: relative;
 	padding: 0;
 	border: 2px solid transparent;
 	background: none;
 	cursor: pointer;
 	height: 56px;
 	max-width: 96px;
-	overflow: hidden;
+	overflow: visible;
 	display: block;
 }
 
 .ei-image-crop-reuse-item:hover,
 .ei-image-crop-reuse-item:focus {
 	border-color: #2271b1;
+}
+
+/* Currently shown (its own box marked in the crop area, live preview
+ * matching it, and the save button switched to "Use Crop") but not yet
+ * committed to - cleared as soon as the crop box is adjusted by hand. */
+.ei-image-crop-reuse-item.is-selected {
+	border-color: #00a32a;
 }
 
 /* No forced square crop here - the <img> keeps the crop's real aspect
@@ -137,6 +169,30 @@
 	height: 100%;
 	width: auto;
 	max-width: 100%;
+	overflow: hidden;
+}
+
+.ei-image-crop-reuse-delete {
+	position: absolute;
+	top: -8px;
+	right: -8px;
+	width: 20px;
+	height: 20px;
+	line-height: 1;
+	padding: 0;
+	border: 1px solid #dcdcde;
+	border-radius: 50%;
+	background: #fff;
+	color: #d63638;
+	font-size: 14px;
+	cursor: pointer;
+}
+
+.ei-image-crop-reuse-delete:hover,
+.ei-image-crop-reuse-delete:focus {
+	background: #d63638;
+	border-color: #d63638;
+	color: #fff;
 }
 
 .ei-image-crop-error {
@@ -150,6 +206,20 @@
 
 .ei-image-crop-modal-actions .button {
 	margin-right: 6px;
+}
+
+/* Shown while a reuse thumbnail is selected - applying it needs a visually
+ * distinct action from the default "crop the image" one. */
+.ei-image-crop-save.ei-image-crop-save-use {
+	background: #00a32a;
+	border-color: #00a32a;
+	color: #fff;
+}
+
+.ei-image-crop-save.ei-image-crop-save-use:hover,
+.ei-image-crop-save.ei-image-crop-save-use:focus {
+	background: #008a20;
+	border-color: #008a20;
 }
 
 /* Media library toggle */

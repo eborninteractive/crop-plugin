@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.13
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,13 @@ Yes — set "Aspect ratio" to "Free" in the field settings. The crop frame can t
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.1.0 =
+* Reworked the crop modal's controls:
+  * One save button ("Crop image") instead of two - it now always behaves like the old "Save as new crop" (never silently overwrites a shared crop in place).
+  * Clicking an existing-crop thumbnail no longer closes the modal immediately - it marks that crop's own box in the crop area and switches the save button to a green "Use Crop", which applies it as-is. Adjusting the crop box by hand afterward deselects it and reverts the button.
+  * Added a delete button on each existing-crop thumbnail to remove it (with confirmation) without leaving the modal.
+  * Replaced the Cancel button with a close (×) button in the modal's top-right corner.
 
 = 1.0.13 =
 * Crops no longer generate the site's full registered set of intermediate sizes (thumbnail/medium/large/etc.) - only the cropped file itself is saved. Anything that requests a specific named size on a crop now falls back to that one file, same as WordPress does natively when a size doesn't exist.
