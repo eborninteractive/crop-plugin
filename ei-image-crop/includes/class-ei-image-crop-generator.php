@@ -83,27 +83,43 @@ class Ei_Image_Crop_Generator {
 	/**
 	 * Best-resolution image to load in the browser cropper. Prefers the
 	 * "large" registered size over the full original so huge uploads stay
-	 * snappy to edit; normalized coordinates remain valid either way since
-	 * WordPress resizes proportionally.
+	 * snappy to edit - normalized coordinates only remain valid doing that
+	 * if "large" is actually proportional to the original, which WordPress's
+	 * own default definition of it is, but a theme or plugin can re-register
+	 * "large" (or any named size) as a hard crop to a fixed, unrelated shape.
+	 * Using such a size here would silently load a reshaped image into the
+	 * editor instead of the real original, and the resulting crop box would
+	 * no longer line up with the actual file - so it's only used when its
+	 * own aspect ratio actually matches the original's.
 	 *
 	 * @param int $attachment_id
 	 * @return array{url: string, width: int, height: int}|false
 	 */
 	public static function get_edit_source( $attachment_id ) {
-		$large = image_get_intermediate_size( $attachment_id, 'large' );
+		$meta = wp_get_attachment_metadata( $attachment_id );
 
-		if ( $large ) {
-			return array(
-				'url'    => $large['url'],
-				'width'  => (int) $large['width'],
-				'height' => (int) $large['height'],
-			);
+		if ( empty( $meta['width'] ) || empty( $meta['height'] ) ) {
+			return false;
+		}
+
+		$original_ratio = $meta['width'] / $meta['height'];
+		$large          = image_get_intermediate_size( $attachment_id, 'large' );
+
+		if ( $large && ! empty( $large['width'] ) && ! empty( $large['height'] ) ) {
+			$large_ratio = $large['width'] / $large['height'];
+
+			if ( abs( $large_ratio - $original_ratio ) / $original_ratio < 0.01 ) {
+				return array(
+					'url'    => $large['url'],
+					'width'  => (int) $large['width'],
+					'height' => (int) $large['height'],
+				);
+			}
 		}
 
 		$url = wp_get_attachment_image_url( $attachment_id, 'full' );
-		$meta = wp_get_attachment_metadata( $attachment_id );
 
-		if ( ! $url || empty( $meta['width'] ) || empty( $meta['height'] ) ) {
+		if ( ! $url ) {
 			return false;
 		}
 

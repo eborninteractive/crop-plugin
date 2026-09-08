@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,9 @@ Yes — set "Aspect ratio" to "Free" in the field settings. The crop frame can t
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.1.2 =
+* Fixed "Adjust crop" loading a reshaped image instead of the true original: it preferred the registered "large" size for speed, assuming it's always proportional to the original, but a theme or plugin can re-register "large" as a hard crop to a fixed, unrelated shape. get_edit_source() now only uses "large" when its own aspect ratio actually matches the true original's, falling back to the full-size image otherwise.
 
 = 1.1.1 =
 * Renamed "Use Crop" to "Use image".
