@@ -305,11 +305,10 @@
 }
 
 .ei-image-crop-live-preview {
-	width: 100%;
-	height: 200px;
 	overflow: hidden;
 	background: #f0f0f1;
 	border: 1px solid #dcdcde;
+	border-radius: 8px;
 }
 
 .ei-image-crop-live-preview-caption {
@@ -401,6 +400,7 @@
 	width: auto;
 	max-width: 100%;
 	overflow: hidden;
+	border-radius: 4px;
 }
 
 .ei-image-crop-reuse-delete {
