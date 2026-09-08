@@ -388,7 +388,7 @@
 .ei-image-crop-reuse-list {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 6px;
+	gap: 2px 6px;
 }
 
 .ei-image-crop-reuse-item {
@@ -439,8 +439,8 @@
 
 .ei-image-crop-reuse-delete {
 	position: absolute;
-	top: -2px;
-	right: -2px;
+	top: 0px;
+	right: 0px;
 	width: 17px;
 	height: 17px;
 	line-height: 1;
