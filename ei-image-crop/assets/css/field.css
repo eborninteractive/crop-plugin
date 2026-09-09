@@ -473,6 +473,7 @@
 	padding-top: 16px;
 	display: flex;
 	justify-content: flex-start;
+	gap: 8px;
 }
 
 /* Deliberately not .button-primary (WP's default blue) - black by default,

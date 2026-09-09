@@ -353,6 +353,7 @@
 							'</div>' +
 							'<p class="ei-image-crop-error" hidden></p>' +
 							'<div class="ei-image-crop-modal-actions">' +
+								'<button type="button" class="button ei-image-crop-cancel"></button>' +
 								'<button type="button" class="button ei-image-crop-save"></button>' +
 							'</div>' +
 						'</div>' +
@@ -366,6 +367,7 @@
 		$modal.find( '.ei-image-crop-modal-title' ).text( t( 'modalTitle' ) );
 		$modal.find( '.ei-image-crop-preview-title' ).text( t( 'previewTitle' ) );
 		$modal.find( '.ei-image-crop-save' ).text( t( 'save' ) ).on( 'click', onSaveButtonClick );
+		$modal.find( '.ei-image-crop-cancel' ).text( t( 'cancel' ) ).on( 'click', closeModal );
 		$modal.find( '.ei-image-crop-close' ).on( 'click', closeModal );
 		$modal.find( '.ei-image-crop-reuse-title' ).text( t( 'reuseTitle' ) );
 

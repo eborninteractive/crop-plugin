@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.8.3
+Stable tag: 1.8.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.8.4 =
+* Added a plain "Cancel" button next to "Crop image" in the crop modal, so closing without saving no longer requires reaching for the small × in the corner.
 
 = 1.8.3 =
 * Fixed the "Existing crops" reuse thumbnails being clipped/padded inside a fixed 72px-tall box - height is now automatic so the row simply matches the (max-width-constrained) thumbnails themselves. Also dropped now-unused `position: relative` and `background: none` from that item's styles.
