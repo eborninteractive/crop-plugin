@@ -1147,8 +1147,22 @@
 		} );
 	}
 
+	/**
+	 * $('.ei-image-crop-field', $context) only ever matches DESCENDANTS of
+	 * $context - if $context passed to ACF's "append" action IS itself the
+	 * field's own wrapper (confirmed live: exactly what happens for a
+	 * field inside an ACF block, as opposed to e.g. a repeater "add row"
+	 * appending a wrapper that CONTAINS one or more fields), that finds
+	 * nothing and silently skips it forever, leaving it with no click
+	 * handlers at all. Checking $context itself in addition to its
+	 * descendants covers both shapes.
+	 *
+	 * @param {jQuery|Element|Document} $context
+	 */
 	function initAll( $context ) {
-		$( '.ei-image-crop-field', $context ).each( function () {
+		var $ctx = $( $context );
+
+		$ctx.filter( '.ei-image-crop-field' ).add( $ctx.find( '.ei-image-crop-field' ) ).each( function () {
 			initField( this );
 		} );
 	}

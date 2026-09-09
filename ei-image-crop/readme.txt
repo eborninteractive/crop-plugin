@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.9.2
+Stable tag: 1.9.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.9.3 =
+* Found the actual reason a field inside an ACF block never got its click handlers bound, confirmed live by comparing two matching fields on the same page: `initAll()` only ever searched for `.ei-image-crop-field` *inside* the element ACF's "append" action handed it, but for a field inside an ACF block that element turns out to already BE the field's own wrapper, not a container around it - so the search found nothing and silently skipped it forever, every time. Now also checks whether the handed-in element itself is the field before searching its descendants.
 
 = 1.9.2 =
 * Found the actual reason the crop popup never opened inside an ACF block, confirmed via console logs: the click handlers WERE registering correctly (1.9.1's fix wasn't the missing piece after all) - the real bug is that the modal itself, built with `position: fixed; inset: 0` to cover the whole viewport, was appended to `$('body')`, which inside an ACF block means the block editor's own canvas iframe's body, not the real page. The popup was very likely opening the whole time, just invisibly confined to that iframe's own small rectangle. It's now explicitly appended to the real top-level document's body (adopting the node across documents where needed), which is a no-op - and behaves exactly as before - outside an ACF block.
