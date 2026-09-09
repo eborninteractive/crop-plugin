@@ -8,6 +8,12 @@ msgstr ""
 "Language: sv_SE\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgid " (note: the old field never resized to this exact size, just locked the shape - this plugin always will)"
+msgstr " (obs: det gamla fältet skalade aldrig till exakt denna storlek, det låste bara formen - det här tillägget gör det alltid)"
+
+msgid "%d cropped attachment(s) found."
+msgstr "%d beskurna bilder hittades."
+
 msgid "Adjust crop"
 msgstr "Justera beskärning"
 
@@ -19,6 +25,9 @@ msgstr "Avbryt"
 
 msgid "Close"
 msgstr "Stäng"
+
+msgid "Configured size"
+msgstr "Konfigurerad storlek"
 
 msgid "Could not delete that crop."
 msgstr "Kunde inte radera den beskärningen."
@@ -32,11 +41,20 @@ msgstr "Kunde inte läsa originalbildens dimensioner."
 msgid "Could not read the source image."
 msgstr "Kunde inte läsa källbilden."
 
+msgid "Crop"
+msgstr "Beskärning"
+
 msgid "Crop image"
 msgstr "Beskär bild"
 
+msgid "Crop type"
+msgstr "Beskärningstyp"
+
 msgid "Crops"
 msgstr "Beskärningar"
+
+msgid "Currently used by"
+msgstr "Används för närvarande av"
 
 msgid "Delete"
 msgstr "Radera"
@@ -53,8 +71,23 @@ msgstr "Redigera bilddetaljer (bildtext, alt-text, m.m.)"
 msgid "Ei Image Crop requires Advanced Custom Fields (or ACF PRO) to be installed and active."
 msgstr "Ei Image Crop kräver att Advanced Custom Fields (eller ACF PRO) är installerat och aktiverat."
 
+msgid "Existing cropped attachments"
+msgstr "Befintliga beskurna bilagor"
+
 msgid "Existing crops"
 msgstr "Befintliga beskärningar"
+
+msgid "Field"
+msgstr "Fält"
+
+msgid "Field group"
+msgstr "Fältgrupp"
+
+msgid "Fields using the old field type"
+msgstr "Fält som använder den gamla fälttypen"
+
+msgid "Free crop - leave \"Image size\" unset, or register one with add_image_size(..., false) for a max resolution cap"
+msgstr "Fri beskärning - lämna \"Bildformat\" tomt, eller registrera ett med add_image_size(..., false) för ett maxupplösningstak"
 
 msgid "Image Crop"
 msgstr "Bild med beskäring (Ei Image Crop)"
@@ -74,14 +107,41 @@ msgstr "Bildformat"
 msgid "Invalid source image."
 msgstr "Ogiltig källbild."
 
+msgid "Issues"
+msgstr "Problem"
+
 msgid "Keep in mind that the image is permanently deleted, and if this exact crop is used anywhere else on the site, it will need to be replaced."
 msgstr "Tänk på att bilden försvinner permanent och om du använder just denna beskärning av bilden någon annanstans på hemsidan måste den ersättas."
 
 msgid "Library"
 msgstr "Bibliotek"
 
+msgid "Migrate Image Crops"
+msgstr "Migrera bildbeskärningar"
+
+msgid "Migrate from ACF Image Aspect Ratio Crop"
+msgstr "Migrera från ACF Image Aspect Ratio Crop"
+
+msgid "Missing width/height - cannot suggest a setup"
+msgstr "Bredd/höjd saknas - kan inte föreslå en konfiguration"
+
+msgid "None found in any field group."
+msgstr "Inga hittades i någon fältgrupp."
+
+msgid "None found."
+msgstr "Inga hittades."
+
+msgid "Normalized box"
+msgstr "Normaliserad ruta"
+
+msgid "Not carried over"
+msgstr "Förs inte över"
+
 msgid "One of the image sizes registered on this site (Settings > Media, or added by a theme/plugin via add_image_size()). A size registered without hard cropping is treated as a free-form crop."
 msgstr "Ett av de bildformat som är registrerade på sajten (Inställningar > Media, eller tillagda av ett tema/plugin via add_image_size()). Ett format som registrerats utan hård beskärning behandlas som fri beskärning."
+
+msgid "Original"
+msgstr "Original"
 
 msgid "Original images"
 msgstr "Originalbilder"
@@ -113,11 +173,23 @@ msgstr "Något gick fel vid beskärning av bilden."
 msgid "Source is not a valid image attachment."
 msgstr "Källan är inte en giltig bifogad bildfil."
 
+msgid "Stored pixel box"
+msgstr "Sparad pixel-ruta"
+
+msgid "Suggested Ei Image Crop setup"
+msgstr "Föreslagen Ei Image Crop-konfiguration"
+
 msgid "That is not a crop this plugin can delete."
 msgstr "Det är inte en beskärning som det här tillägget kan radera."
 
+msgid "This page only reads data - nothing on your site is changed by viewing it."
+msgstr "Den här sidan läser bara data - inget på din sajt ändras genom att visa den."
+
 msgid "Uploaded to post"
 msgstr "Uppladdad till inlägget"
+
+msgid "Use existing size \"%s\""
+msgstr "Använd befintligt format \"%s\""
 
 msgid "Use image"
 msgstr "Använd bild"
@@ -130,4 +202,13 @@ msgstr "Du har inte behörighet att göra detta."
 
 msgid "free crop"
 msgstr "fri beskärning"
+
+msgid "no stored coordinates"
+msgstr "inga sparade koordinater"
+
+msgid "not currently referenced"
+msgstr "refereras inte för närvarande"
+
+msgid "original image missing"
+msgstr "originalbild saknas"
 
