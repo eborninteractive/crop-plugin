@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.8.7
+Stable tag: 1.8.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.8.8 =
+* Moved `position: relative` from the reuse thumbnail's `.is-selected` state onto the base `.ei-image-crop-reuse-item` rule itself, so every thumbnail is a positioning context, not just the selected one.
 
 = 1.8.7 =
 * Lined up the "Original images"/"Crops" tabs in the media picker's grid toolbar with the neighboring date filter dropdown - they were sitting noticeably higher than it, since they were independently centered around a shorter box height instead of matching the dropdown's own ~30px height.
