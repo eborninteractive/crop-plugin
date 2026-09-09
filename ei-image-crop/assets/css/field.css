@@ -418,6 +418,7 @@
 .ei-image-crop-reuse-item.is-selected {
 	border-color: #2271b1;
 	background: #e9f4ff;
+	position: relative;
 }
 
 /* No forced square crop here - the <img> keeps the crop's real aspect
