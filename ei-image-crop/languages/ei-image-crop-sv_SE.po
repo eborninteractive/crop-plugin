@@ -11,9 +11,6 @@ msgstr ""
 msgid "Adjust crop"
 msgstr "Justera beskärning"
 
-msgid "Admin preview size"
-msgstr "Förhandsvisningsstorlek i admin"
-
 msgid "All"
 msgstr "Alla"
 
@@ -74,9 +71,6 @@ msgstr "Bilddata (array)"
 msgid "Image size"
 msgstr "Bildformat"
 
-msgid "Image size used to preview the crop in the field editor. Only sizes that scale proportionally are offered, so the preview always keeps the crop's own shape, just at a smaller resolution."
-msgstr "Bildstorlek som används för att förhandsgranska beskärningen i fältredigeraren. Endast storlekar som skalar proportionerligt visas, så förhandsvisningen alltid behåller beskärningens form, fast i lägre upplösning."
-
 msgid "Invalid source image."
 msgstr "Ogiltig källbild."
 
@@ -136,7 +130,4 @@ msgstr "Du har inte behörighet att göra detta."
 
 msgid "free crop"
 msgstr "fri beskärning"
-
-msgid "full"
-msgstr "Full storlek"
 

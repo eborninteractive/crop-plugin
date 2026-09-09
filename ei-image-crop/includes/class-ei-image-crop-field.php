@@ -21,7 +21,6 @@ class Ei_Image_Crop_Field extends acf_field {
 		$this->category = 'content';
 		$this->defaults = array(
 			'image_size'    => '',
-			'preview_size'  => 'medium',
 			'library'       => 'all',
 			'return_format' => 'array',
 		);
@@ -73,17 +72,6 @@ class Ei_Image_Crop_Field extends acf_field {
 		acf_render_field_setting(
 			$field,
 			array(
-				'label'        => __( 'Admin preview size', 'ei-image-crop' ),
-				'instructions' => __( 'Image size used to preview the crop in the field editor. Only sizes that scale proportionally are offered, so the preview always keeps the crop\'s own shape, just at a smaller resolution.', 'ei-image-crop' ),
-				'type'         => 'select',
-				'name'         => 'preview_size',
-				'choices'      => $this->get_image_size_choices(),
-			)
-		);
-
-		acf_render_field_setting(
-			$field,
-			array(
 				'label'   => __( 'Library', 'ei-image-crop' ),
 				'type'    => 'radio',
 				'name'    => 'library',
@@ -109,30 +97,6 @@ class Ei_Image_Crop_Field extends acf_field {
 				),
 			)
 		);
-	}
-
-	/**
-	 * Only offers sizes that scale the crop down proportionally
-	 * (crop => false) - a size that hard-crops to its own fixed shape
-	 * (e.g. the default "Thumbnail" size, square by default) would show
-	 * the field's own preview at a DIFFERENT aspect ratio than what was
-	 * actually cropped, making an already-correct crop look wrong at a
-	 * glance. Lower resolution is fine here; a different shape isn't.
-	 *
-	 * @return array<string,string>
-	 */
-	protected function get_image_size_choices() {
-		$choices = array();
-
-		foreach ( wp_get_registered_image_subsizes() as $name => $size ) {
-			if ( empty( $size['crop'] ) ) {
-				$choices[ $name ] = $name;
-			}
-		}
-
-		$choices['full'] = __( 'full', 'ei-image-crop' );
-
-		return $choices;
 	}
 
 	/**
@@ -183,7 +147,13 @@ class Ei_Image_Crop_Field extends acf_field {
 		$ratio       = self::resolve_ratio( $field );
 		$parent_id   = $value ? Ei_Image_Crop_Generator::resolve_root( $value ) : 0;
 		$preview_id  = $value ? $value : 0;
-		$preview_url = $preview_id ? wp_get_attachment_image_url( $preview_id, $field['preview_size'] ) : '';
+		// 'full' rather than a configurable admin size on purpose: a crop
+		// attachment never gets WordPress's usual thumbnail/medium/large
+		// copies generated for it at all (see generate()'s use of the
+		// intermediate_image_sizes_advanced filter) - only its own one
+		// file exists, so any other named size would just fall back to
+		// this same file anyway, just via an extra, pointless lookup.
+		$preview_url = $preview_id ? wp_get_attachment_image_url( $preview_id, 'full' ) : '';
 		$has_image   = (bool) $preview_url;
 
 		// The field only ever submits ONE input to ACF (required for the field
@@ -202,7 +172,6 @@ class Ei_Image_Crop_Field extends acf_field {
 			'class'              => 'ei-image-crop-field',
 			'data-field-key'     => $field['key'],
 			'data-ratio'         => $ratio,
-			'data-preview-size'  => $field['preview_size'],
 			'data-library'       => $field['library'],
 			'data-mime-types'    => 'image',
 		);

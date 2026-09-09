@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.7.15
+Stable tag: 1.7.16
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.7.16 =
+* Removed the "Admin preview size" field setting entirely - a crop never gets WordPress's usual thumbnail/medium/large copies generated for it at all (see 1.0.13's use of the intermediate_image_sizes_advanced filter to suppress that, avoiding needless mass file generation), so any size chosen there always silently fell back to the crop's own one full-size file anyway. The field's preview now just requests 'full' directly everywhere - same result, one less setting to think about.
 
 = 1.7.15 =
 * "Admin preview size" now only offers image sizes that scale proportionally (e.g. Medium, Large) - a hard-cropped size like the default Thumbnail (square by default) would show the field's own preview at a different aspect ratio than what was actually cropped, making an already-correct crop look wrong at a glance. Lower resolution is fine; a different shape isn't.

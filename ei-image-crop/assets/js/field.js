@@ -503,7 +503,6 @@
 			source_id: sourceId,
 			current_id: existingId || '',
 			ratio: $field.data( 'ratio' ),
-			preview_size: $field.data( 'preview-size' ),
 		} )
 			.done( function ( response ) {
 				if ( ! response || ! response.success ) {
@@ -534,10 +533,13 @@
 				// so wasFreshPick is false) remains the explicit way to open
 				// the editor for it afterward.
 				if ( wasFreshPick && existingId ) {
-					var previewSize = $field.data( 'preview-size' );
-					var previewUrl = ( pickedAttachment && pickedAttachment.sizes && pickedAttachment.sizes[ previewSize ] )
-						? pickedAttachment.sizes[ previewSize ].url
-						: ( pickedAttachment ? pickedAttachment.url : data.edit.url );
+					// pickedAttachment.url (rather than any of its .sizes)
+					// on purpose - a crop never gets WordPress's usual
+					// thumbnail/medium/large copies generated for it at all
+					// (see generate()'s use of the
+					// intermediate_image_sizes_advanced filter), so its
+					// .sizes object never has anything useful to offer here.
+					var previewUrl = pickedAttachment ? pickedAttachment.url : data.edit.url;
 
 					setState( $field, { id: existingId, source: sourceId } );
 					setPreview( $field, previewUrl, existingId );
@@ -606,7 +608,6 @@
 			field_key: $field.data( 'field-key' ),
 			ratio: ratio,
 			box: box,
-			preview_size: $field.data( 'preview-size' ),
 		} )
 			.done( function ( response ) {
 				if ( ! response || ! response.success ) {
@@ -1010,7 +1011,6 @@
 			field_key: fieldKey,
 			ratio: ratio,
 			box: box,
-			preview_size: $field.data( 'preview-size' ),
 		} )
 			.done( function ( response ) {
 				if ( ! response || ! response.success ) {

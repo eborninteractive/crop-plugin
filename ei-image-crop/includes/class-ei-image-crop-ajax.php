@@ -29,24 +29,6 @@ class Ei_Image_Crop_Ajax {
 	}
 
 	/**
-	 * Validates a requested preview size against what's actually registered,
-	 * so the field preview shown right after saving/reusing a crop is built
-	 * from the exact same size render_field() will use after a page reload
-	 * (instead of a hardcoded guess that may not match, and looks like a
-	 * "smaller until you reload" bug when it doesn't).
-	 *
-	 * @param mixed $raw
-	 * @return string
-	 */
-	protected static function sanitize_preview_size( $raw ) {
-		$raw          = is_string( $raw ) ? sanitize_key( $raw ) : '';
-		$valid_sizes  = get_intermediate_image_sizes();
-		$valid_sizes[] = 'full';
-
-		return in_array( $raw, $valid_sizes, true ) ? $raw : 'medium';
-	}
-
-	/**
 	 * Returns the data needed to open the cropper for a given source image:
 	 * the best-resolution edit URL, a default (or existing) crop box, and a
 	 * list of already-existing crops of this source at the same ratio for reuse.
@@ -57,7 +39,6 @@ class Ei_Image_Crop_Ajax {
 		$source_id    = isset( $_POST['source_id'] ) ? (int) $_POST['source_id'] : 0;
 		$ratio_label  = isset( $_POST['ratio'] ) ? sanitize_text_field( wp_unslash( $_POST['ratio'] ) ) : 'free';
 		$current_id   = isset( $_POST['current_id'] ) ? (int) $_POST['current_id'] : 0;
-		$preview_size = self::sanitize_preview_size( $_POST['preview_size'] ?? '' );
 
 		if ( ! wp_attachment_is_image( $source_id ) ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid source image.', 'ei-image-crop' ) ) );
@@ -118,7 +99,7 @@ class Ei_Image_Crop_Ajax {
 			array(
 				'edit'        => $edit_source,
 				'box'         => $box,
-				'existing'    => self::get_existing_crops( $source_id, $ratio_label, $preview_size ),
+				'existing'    => self::get_existing_crops( $source_id, $ratio_label ),
 				// Echo these back since a fresh pick of an already-cropped
 				// image gets resolved above to its true original + that
 				// crop's own id - the client started the request not
@@ -145,7 +126,6 @@ class Ei_Image_Crop_Ajax {
 		$field_key    = isset( $_POST['field_key'] ) ? sanitize_text_field( wp_unslash( $_POST['field_key'] ) ) : '';
 		$existing_id  = isset( $_POST['existing_id'] ) ? (int) $_POST['existing_id'] : 0;
 		$box          = isset( $_POST['box'] ) && is_array( $_POST['box'] ) ? wp_unslash( $_POST['box'] ) : array();
-		$preview_size = self::sanitize_preview_size( $_POST['preview_size'] ?? '' );
 
 		if ( ! wp_attachment_is_image( $source_id ) ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid source image.', 'ei-image-crop' ) ) );
@@ -174,7 +154,12 @@ class Ei_Image_Crop_Ajax {
 		wp_send_json_success(
 			array(
 				'id'  => $result,
-				'url' => wp_get_attachment_image_url( $result, $preview_size ),
+				// 'full' rather than a configurable size on purpose - a crop
+				// never gets WordPress's usual thumbnail/medium/large copies
+				// generated for it at all (see generate()'s use of the
+				// intermediate_image_sizes_advanced filter), so any other
+				// named size would just fall back to this same file anyway.
+				'url' => wp_get_attachment_image_url( $result, 'full' ),
 			)
 		);
 	}
@@ -210,14 +195,9 @@ class Ei_Image_Crop_Ajax {
 	/**
 	 * @param int    $parent_id
 	 * @param string $ratio_label
-	 * @param string $preview_size Size to report back as `preview`, used when
-	 *                             a row item is picked as the field's active
-	 *                             image - kept separate from the small `url`
-	 *                             icon so the row itself never has to load
-	 *                             large images just to render a row of icons.
 	 * @return array<int, array{id:int, url:string, preview:string, title:string, box:array}>
 	 */
-	protected static function get_existing_crops( $parent_id, $ratio_label, $preview_size = 'medium' ) {
+	protected static function get_existing_crops( $parent_id, $ratio_label ) {
 		$ids = get_posts(
 			array(
 				'post_type'      => 'attachment',
@@ -242,15 +222,13 @@ class Ei_Image_Crop_Ajax {
 		$crops = array();
 
 		foreach ( $ids as $id ) {
-			// 'thumbnail' is a hard, forced-square crop by default, which
-			// would misrepresent the crop's real aspect ratio. An array
-			// size doesn't reliably avoid that either: WordPress matches it
-			// against registered sizes by *closest aspect ratio*, and a
-			// square target (e.g. 120x120) matches the square 'thumbnail'
-			// size and returns that same hard crop. 'medium' is a real
-			// registered, proportionally-resized (crop=false) size, so it
-			// actually reflects the crop's true shape.
-			$thumb = wp_get_attachment_image_url( $id, 'medium' );
+			// 'full' rather than a smaller named size on purpose - a crop
+			// never gets WordPress's usual thumbnail/medium/large copies
+			// generated for it at all (see generate()'s use of the
+			// intermediate_image_sizes_advanced filter), so any other named
+			// size (and 'thumbnail' specifically would also force a square
+			// crop) would just fall back to this exact same file anyway.
+			$thumb = wp_get_attachment_image_url( $id, 'full' );
 			if ( ! $thumb ) {
 				continue;
 			}
@@ -260,7 +238,7 @@ class Ei_Image_Crop_Ajax {
 			$crops[] = array(
 				'id'      => $id,
 				'url'     => $thumb,
-				'preview' => wp_get_attachment_image_url( $id, $preview_size ) ?: $thumb,
+				'preview' => $thumb,
 				'title'   => get_the_title( $id ),
 				// Lets the picker mark this crop's own region on the source
 				// image when it's selected for a look before committing to it,
