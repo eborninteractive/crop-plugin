@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.7.8
+Stable tag: 1.7.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.7.9 =
+* The crop frame now turns red for a free-crop field capped by a registered size's own width/height (see 1.7.8) when the drawn box falls below that cap in BOTH dimensions - a heads-up that the result won't reach the size the cap allows for, not an upscale warning (a free crop is never upscaled). A single-axis cap (one side left at 0) never triggers this.
 
 = 1.7.8 =
 * A free-crop image size registered with a non-zero width and/or height (e.g. `add_image_size( 'kvadrat-fri', 1500, 1500, false )`) now treats those numbers as a resolution cap, same as WordPress's own proportional thumbnails: the result is scaled down to fit within them (never upscaled) if the drawn box is bigger, left at its own size otherwise. Previously a free crop's registered width/height were ignored entirely and the result kept whatever native resolution the drawn box happened to be. The pixel counts shown in the crop popup (live preview caption and the floating box label) now reflect the same cap.

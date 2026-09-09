@@ -619,16 +619,30 @@
 	}
 
 	/**
-	 * The crop box's real final pixel size (scaled up from the editor
-	 * image's own, possibly smaller, on-screen pixels - see currentTrueScale)
-	 * is smaller than the field's target size in either dimension - i.e.
-	 * whether saving now would need to upscale the result.
-	 * Always false for a free-form field (currentTargetSize is null).
+	 * Whether the crop box's real final pixel size (scaled up from the
+	 * editor image's own, possibly smaller, on-screen pixels - see
+	 * currentTrueScale) warrants the red "heads up" outline.
+	 *
+	 * For a fixed-target-size field (currentTargetSize): smaller than the
+	 * target in EITHER dimension - i.e. saving now would need to upscale
+	 * the result, since that size is always hit exactly (see generate()'s
+	 * resize).
+	 *
+	 * For a free-form field capped by a registered size's own width/height
+	 * (currentMaxSize, with both sides actually capped - see
+	 * parseMaxSize()): smaller than that cap in BOTH dimensions - since
+	 * a free crop is never upscaled, this isn't a quality warning, just a
+	 * heads-up that the result won't reach the size that cap allows for.
+	 * A single-axis cap (one side left at 0, i.e. uncapped) never
+	 * triggers this - "smaller in both dimensions" doesn't mean anything
+	 * when only one of them has a ceiling to fall short of.
+	 *
+	 * Always false for a fully free field (neither set).
 	 *
 	 * @return {boolean}
 	 */
 	function isUndersized() {
-		if ( ! cropper || ! currentTargetSize ) {
+		if ( ! cropper ) {
 			return false;
 		}
 
@@ -636,7 +650,15 @@
 		var actualWidth = data.width * currentTrueScale;
 		var actualHeight = data.height * currentTrueScale;
 
-		return actualWidth < currentTargetSize.width - 0.5 || actualHeight < currentTargetSize.height - 0.5;
+		if ( currentTargetSize ) {
+			return actualWidth < currentTargetSize.width - 0.5 || actualHeight < currentTargetSize.height - 0.5;
+		}
+
+		if ( currentMaxSize && currentMaxSize.width > 0 && currentMaxSize.height > 0 ) {
+			return actualWidth < currentMaxSize.width - 0.5 && actualHeight < currentMaxSize.height - 0.5;
+		}
+
+		return false;
 	}
 
 	/**
