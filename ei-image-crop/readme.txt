@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.8.10
+Stable tag: 1.8.11
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.8.11 =
+* Changed the runtime alignment added in 1.8.10 to match bottom edges instead of vertical centers - the "Original images"/"Crops" tabs now line up with the same bottom line as the date filter dropdown and the search box next to it, instead of just centering on the dropdown.
 
 = 1.8.10 =
 * Replaced the ineffective align-self attempt (1.8.9 - .media-toolbar-secondary turned out not to be a flex container at all, confirmed via its own .spinner child using plain absolute positioning) with a runtime fix: media-toggle.js now measures the neighboring date filter dropdown's actual rendered position and nudges the "Original images"/"Crops" tabs to its vertical center, instead of guessing a fixed CSS offset that could drift with admin font size or WP version.

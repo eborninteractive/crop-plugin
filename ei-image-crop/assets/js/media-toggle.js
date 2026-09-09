@@ -138,8 +138,9 @@
 	 * land level with the label instead of the select beneath it. Rather
 	 * than guess a fixed pixel offset (which would drift with admin font
 	 * size, WP version, or a different theme's toolbar height), measure
-	 * the actual rendered position of that <select> and nudge ourselves to
-	 * its vertical center.
+	 * the actual rendered position of that <select> and nudge ourselves
+	 * down to sit on the same bottom line as it (and the search box next
+	 * to it, which already shares that line with the select natively).
 	 *
 	 * @param {jQuery} $toggle The already-inserted .ei-image-crop-toggle.
 	 * @param {jQuery} $scope  Its container - searched for a <select> to align to.
@@ -153,7 +154,7 @@
 
 		var selectRect = $select[ 0 ].getBoundingClientRect();
 		var toggleRect = $toggle[ 0 ].getBoundingClientRect();
-		var delta = ( selectRect.top + selectRect.height / 2 ) - ( toggleRect.top + toggleRect.height / 2 );
+		var delta = selectRect.bottom - toggleRect.bottom;
 
 		if ( delta ) {
 			$toggle.css( { position: 'relative', top: Math.round( delta ) + 'px' } );
