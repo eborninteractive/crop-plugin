@@ -485,7 +485,7 @@
 	background: var(--wp-admin-theme-color) !important;
 	border-color: var(--wp-admin-theme-color) !important;
 	color: #fff !important;
-	border-radius: 5px !important;
+	border-radius: 2px !important;
 }
 
 .ei-image-crop-save:hover,
