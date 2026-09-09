@@ -326,6 +326,25 @@ class Ei_Image_Crop_Generator {
 	}
 
 	/**
+	 * intermediate_image_sizes_advanced callback used while generating a
+	 * crop's own metadata - keeps only the registered sizes that scale
+	 * proportionally (crop => false), dropping any hard-cropped custom
+	 * size (its own fixed, unrelated shape) before WordPress generates a
+	 * single file for it.
+	 *
+	 * @param array $sizes Size name => array{width,height,crop,...}.
+	 * @return array
+	 */
+	public static function keep_only_proportional_sizes( $sizes ) {
+		return array_filter(
+			$sizes,
+			function ( $size ) {
+				return empty( $size['crop'] );
+			}
+		);
+	}
+
+	/**
 	 * Generate (or reuse) a cropped attachment.
 	 *
 	 * @param int      $parent_id  Source attachment ID.
@@ -474,17 +493,21 @@ class Ei_Image_Crop_Generator {
 
 		require_once ABSPATH . 'wp-admin/includes/image.php';
 
-		// A crop only ever needs to exist at the one size it was actually
-		// cropped to - generating the site's whole registered set of
-		// thumbnail/medium/large/etc. copies on top of that is wasted disk
-		// space and processing for every single crop. Suppressing it here
-		// still leaves wp_generate_attachment_metadata() computing the
-		// crop's own width/height/file as normal; anything that later asks
-		// for a specific named size on this attachment just falls back to
-		// the full/only file WordPress already does that natively.
-		add_filter( 'intermediate_image_sizes_advanced', '__return_empty_array' );
+		// Generating the site's whole registered set of custom
+		// thumbnail/medium/large/etc. copies for every single crop would be
+		// wasted disk space and processing - most of them would go unused
+		// anyway. wp_calculate_image_srcset() only ever draws candidates
+		// from sizes sharing the crop's own aspect ratio, which a
+		// crop=>true custom size (its own fixed, unrelated shape) never
+		// does - it'd be filtered right back out at display time even if
+		// generated here. Keeping only the crop=>false (proportional)
+		// sizes is exactly the subset srcset can actually use; WordPress's
+		// own image_make_intermediate_size() already skips any of those
+		// that come out bigger than the crop's own dimensions on its own,
+		// without any help needed here.
+		add_filter( 'intermediate_image_sizes_advanced', array( __CLASS__, 'keep_only_proportional_sizes' ) );
 		$metadata = wp_generate_attachment_metadata( $attachment_id, $saved['path'] );
-		remove_filter( 'intermediate_image_sizes_advanced', '__return_empty_array' );
+		remove_filter( 'intermediate_image_sizes_advanced', array( __CLASS__, 'keep_only_proportional_sizes' ) );
 
 		wp_update_attachment_metadata( $attachment_id, $metadata );
 
