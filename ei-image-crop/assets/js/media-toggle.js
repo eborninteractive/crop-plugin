@@ -123,11 +123,14 @@
 		( $secondaryEl || browserView.toolbar.$el ).append( $toggle );
 
 		if ( $secondaryEl ) {
-			alignToggleWithNeighbor( $toggle, $secondaryEl );
+			alignToggleWithNeighbor( $toggle, $secondaryEl, 0 );
 		}
 
 		return true;
 	}
+
+	var ALIGN_MAX_ATTEMPTS = 20;
+	var ALIGN_RETRY_DELAY = 100;
 
 	/**
 	 * .media-toolbar-secondary isn't a flex container - its own .spinner
@@ -142,19 +145,34 @@
 	 * down to sit on the same bottom line as it (and the search box next
 	 * to it, which already shares that line with the select natively).
 	 *
-	 * @param {jQuery} $toggle The already-inserted .ei-image-crop-toggle.
-	 * @param {jQuery} $scope  Its container - searched for a <select> to align to.
+	 * The <select> itself is populated from an async request (it needs to
+	 * know which months have attachments), so it can still not exist yet
+	 * at the exact moment secondaryEl itself does - retry for a bit rather
+	 * than silently giving up on the very first (likely too-early) check.
+	 *
+	 * @param {jQuery}  $toggle The already-inserted .ei-image-crop-toggle.
+	 * @param {jQuery}  $scope  Its container - searched for a <select> to align to.
+	 * @param {number}  attempt
 	 */
-	function alignToggleWithNeighbor( $toggle, $scope ) {
+	function alignToggleWithNeighbor( $toggle, $scope, attempt ) {
 		var $select = $scope.find( 'select' ).first();
 
 		if ( ! $select.length ) {
+			if ( attempt < ALIGN_MAX_ATTEMPTS ) {
+				setTimeout( function () {
+					alignToggleWithNeighbor( $toggle, $scope, attempt + 1 );
+				}, ALIGN_RETRY_DELAY );
+			} else {
+				console.warn( '[Ei Image Crop] toggle alignment gave up - no <select> found in toolbar-secondary after ' + attempt + ' attempts' );
+			}
 			return;
 		}
 
 		var selectRect = $select[ 0 ].getBoundingClientRect();
 		var toggleRect = $toggle[ 0 ].getBoundingClientRect();
 		var delta = selectRect.bottom - toggleRect.bottom;
+
+		console.log( '[Ei Image Crop] aligning toggle to select bottom - select.bottom: ' + selectRect.bottom + ', toggle.bottom: ' + toggleRect.bottom + ', delta: ' + delta + ' (attempt ' + attempt + ')' );
 
 		if ( delta ) {
 			$toggle.css( { position: 'relative', top: Math.round( delta ) + 'px' } );
