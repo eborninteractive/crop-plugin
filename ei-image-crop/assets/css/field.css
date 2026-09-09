@@ -607,12 +607,24 @@
 
 .ei-image-crop-toggle {
 	margin-left: 12px;
+	/* In the grid/picker toolbar (see media-toggle.js), .media-toolbar-secondary
+	 * is a flex row - align-self here re-centers us on it regardless of
+	 * whatever the row's own align-items ends up being. No-op in the classic
+	 * list table, where this span isn't inside a flex container at all. */
+	align-self: center;
 }
 
 .ei-image-crop-tab {
-	display: inline-block;
+	display: inline-flex;
+	align-items: center;
+	/* Matches the ~30px WP admin default control height (e.g. the grid
+	 * toolbar's date filter <select>) so the two sit at the same visual
+	 * height instead of being independently centered around two different
+	 * box heights. */
+	height: 30px;
+	box-sizing: border-box;
 	margin: 0;
-	padding: 4px 10px;
+	padding: 0 10px;
 	border: none;
 	border-radius: 4px;
 	background: none;
