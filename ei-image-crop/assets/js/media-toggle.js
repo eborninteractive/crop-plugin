@@ -122,7 +122,42 @@
 
 		( $secondaryEl || browserView.toolbar.$el ).append( $toggle );
 
+		if ( $secondaryEl ) {
+			alignToggleWithNeighbor( $toggle, $secondaryEl );
+		}
+
 		return true;
+	}
+
+	/**
+	 * .media-toolbar-secondary isn't a flex container - its own .spinner
+	 * child is positioned with plain absolute offsets, not flex alignment,
+	 * so neither align-items nor align-self does anything for a normal
+	 * appended sibling here. The date filter next to us is a label stacked
+	 * above its <select>, taller than our own pill row, so without help we
+	 * land level with the label instead of the select beneath it. Rather
+	 * than guess a fixed pixel offset (which would drift with admin font
+	 * size, WP version, or a different theme's toolbar height), measure
+	 * the actual rendered position of that <select> and nudge ourselves to
+	 * its vertical center.
+	 *
+	 * @param {jQuery} $toggle The already-inserted .ei-image-crop-toggle.
+	 * @param {jQuery} $scope  Its container - searched for a <select> to align to.
+	 */
+	function alignToggleWithNeighbor( $toggle, $scope ) {
+		var $select = $scope.find( 'select' ).first();
+
+		if ( ! $select.length ) {
+			return;
+		}
+
+		var selectRect = $select[ 0 ].getBoundingClientRect();
+		var toggleRect = $toggle[ 0 ].getBoundingClientRect();
+		var delta = ( selectRect.top + selectRect.height / 2 ) - ( toggleRect.top + toggleRect.height / 2 );
+
+		if ( delta ) {
+			$toggle.css( { position: 'relative', top: Math.round( delta ) + 'px' } );
+		}
 	}
 
 	/**
