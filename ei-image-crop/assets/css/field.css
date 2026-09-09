@@ -392,16 +392,14 @@
 }
 
 .ei-image-crop-reuse-item {
-	position: relative;
 	box-sizing: border-box;
 	/* Deliberately more than a hairline - a visible gap between the
 	 * selection frame and the thumbnail itself, not just a colored edge. */
 	padding: 6px;
 	border: 2px solid transparent;
 	border-radius: 4px;
-	background: none;
 	cursor: pointer;
-	height: 72px;
+	height: auto;
 	max-width: 96px;
 	overflow: visible;
 	display: flex;
