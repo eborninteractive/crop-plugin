@@ -128,12 +128,18 @@ class Ei_Image_Crop_Field extends acf_field {
 	}
 
 	/**
-	 * Resolve a field's configured image size setting down to a "W:H" or
-	 * "free" string - literally the registered size's own pixel
-	 * dimensions when it hard-crops, not just their proportion, since
-	 * that's also what the cropper UI's default box and undersized/upscale
-	 * warning need. Falls back to "free" if the field has no size chosen
-	 * yet, or the chosen one no longer exists (renamed/removed since).
+	 * Resolve a field's configured image size setting down to a "W:H",
+	 * "free:W:H", or plain "free" string - literally the registered size's
+	 * own pixel dimensions when it hard-crops, not just their proportion,
+	 * since that's also what the cropper UI's default box and
+	 * undersized/upscale warning need. A size registered without hard
+	 * cropping but with a non-zero width and/or height still carries those
+	 * through as "free:W:H" - a cap on the result's resolution (see
+	 * Ei_Image_Crop_Generator::parse_max_size()), the same way WordPress's
+	 * own proportional thumbnails treat those numbers, without locking the
+	 * crop box to that shape. Falls back to plain "free" if the field has
+	 * no size chosen yet, the chosen one no longer exists (renamed/removed
+	 * since), or it was registered with both dimensions at 0.
 	 *
 	 * @param array $field
 	 * @return string
@@ -142,13 +148,21 @@ class Ei_Image_Crop_Field extends acf_field {
 		$size_name = isset( $field['image_size'] ) ? $field['image_size'] : '';
 		$sizes     = wp_get_registered_image_subsizes();
 
-		if ( ! $size_name || empty( $sizes[ $size_name ] ) || empty( $sizes[ $size_name ]['crop'] ) ) {
+		if ( ! $size_name || empty( $sizes[ $size_name ] ) ) {
 			return 'free';
 		}
 
 		$size = $sizes[ $size_name ];
 
-		return $size['width'] . ':' . $size['height'];
+		if ( ! empty( $size['crop'] ) ) {
+			return $size['width'] . ':' . $size['height'];
+		}
+
+		if ( $size['width'] > 0 || $size['height'] > 0 ) {
+			return 'free:' . (int) $size['width'] . ':' . (int) $size['height'];
+		}
+
+		return 'free';
 	}
 
 	/**

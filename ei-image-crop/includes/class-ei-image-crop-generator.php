@@ -12,13 +12,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Ei_Image_Crop_Generator {
 
 	/**
-	 * Parse a ratio string like "16:9" into array( 16, 9 ). Returns null for "free"/empty.
+	 * Parse a ratio string like "16:9" into array( 16, 9 ). Returns null for
+	 * "free", "free:W:H" (see parse_max_size()), or empty - none of those
+	 * lock the crop box to a fixed shape.
 	 *
 	 * @param string $ratio
 	 * @return array|null
 	 */
 	public static function parse_ratio( $ratio ) {
-		if ( empty( $ratio ) || 'free' === $ratio ) {
+		if ( empty( $ratio ) || 'free' === $ratio || 0 === strpos( (string) $ratio, 'free:' ) ) {
 			return null;
 		}
 
@@ -35,6 +37,70 @@ class Ei_Image_Crop_Generator {
 		}
 
 		return array( $w, $h );
+	}
+
+	/**
+	 * The optional max width/height encoded in a "free:W:H" ratio label
+	 * (see Ei_Image_Crop_Field::resolve_ratio()) - a free-form crop whose
+	 * registered image size still has a non-zero width and/or height,
+	 * meant as a cap on the result's resolution the same way WordPress's
+	 * own (non-cropped) thumbnail generation treats those numbers, not a
+	 * fixed ratio to lock the crop box's shape to. A 0 on either side
+	 * means that axis isn't capped, matching how add_image_size() itself
+	 * treats a 0 width or height. Returns null for anything else (a hard
+	 * ratio, or "free" with no size behind it at all).
+	 *
+	 * @param string $ratio
+	 * @return array{0:int,1:int}|null
+	 */
+	public static function parse_max_size( $ratio ) {
+		if ( 0 !== strpos( (string) $ratio, 'free:' ) ) {
+			return null;
+		}
+
+		$parts = explode( ':', substr( $ratio, 5 ) );
+		if ( 2 !== count( $parts ) ) {
+			return null;
+		}
+
+		$w = (int) $parts[0];
+		$h = (int) $parts[1];
+
+		if ( $w <= 0 && $h <= 0 ) {
+			return null;
+		}
+
+		return array( $w, $h );
+	}
+
+	/**
+	 * Scales $w x $h down (never up) to fit within $max_w x $max_h,
+	 * preserving its own aspect ratio - a 0 max on either axis means no
+	 * cap there. Returns null when it already fits, so the caller can
+	 * leave the crop at its own native pixel size untouched.
+	 *
+	 * @param int $w
+	 * @param int $h
+	 * @param int $max_w
+	 * @param int $max_h
+	 * @return array{0:int,1:int}|null
+	 */
+	public static function fit_within( $w, $h, $max_w, $max_h ) {
+		$scale = 1.0;
+
+		if ( $max_w > 0 && $w > $max_w ) {
+			$scale = min( $scale, $max_w / $w );
+		}
+
+		if ( $max_h > 0 && $h > $max_h ) {
+			$scale = min( $scale, $max_h / $h );
+		}
+
+		if ( $scale >= 1.0 ) {
+			return null;
+		}
+
+		return array( (int) round( $w * $scale ), (int) round( $h * $scale ) );
 	}
 
 	/**
@@ -321,12 +387,29 @@ class Ei_Image_Crop_Generator {
 		// crop() call, rather than leaving it at whatever size the box was
 		// actually dragged to, is what makes a smaller-than-target
 		// selection upscale and a larger one downscale, always landing on
-		// the registered size's exact pixel dimensions. A free-form field
-		// (parse_ratio() returns null for "free") keeps the box's own
-		// native pixel size, same as before.
+		// the registered size's exact pixel dimensions.
 		$target = self::parse_ratio( $ratio );
-		$dst_w  = $target ? (int) round( $target[0] ) : null;
-		$dst_h  = $target ? (int) round( $target[1] ) : null;
+		$dst_w  = null;
+		$dst_h  = null;
+
+		if ( $target ) {
+			$dst_w = (int) round( $target[0] );
+			$dst_h = (int) round( $target[1] );
+		} else {
+			// A free-form field whose registered size still carries a
+			// width/height (see parse_max_size()) treats those as a cap on
+			// the result, same as WordPress's own proportional (non-cropped)
+			// thumbnails - scaled down to fit when the drawn box is bigger,
+			// left at its own native pixel size otherwise (fit_within()
+			// returns null when it already fits - never upscaled).
+			$max = self::parse_max_size( $ratio );
+			if ( $max ) {
+				$fit = self::fit_within( $px_w, $px_h, $max[0], $max[1] );
+				if ( $fit ) {
+					list( $dst_w, $dst_h ) = $fit;
+				}
+			}
+		}
 
 		$cropped = $editor->crop( $px_x, $px_y, $px_w, $px_h, $dst_w, $dst_h, false );
 		if ( is_wp_error( $cropped ) ) {

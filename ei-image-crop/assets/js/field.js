@@ -21,6 +21,15 @@
 	// updatePreviewCaption() and updateBoxLabel() so they don't each need
 	// their own reference to it.
 	var currentTargetSize = null;
+	// The current field's max width/height (see parseMaxSize()), or null
+	// when it isn't a free-form field capped by a registered size's own
+	// dimensions - set in initCropper(). Unlike currentTargetSize this is
+	// never a fixed shape to lock the crop box to or upscale toward, only
+	// a ceiling the result is scaled down to fit within (see
+	// Ei_Image_Crop_Generator::fit_within() on the PHP side) - read by
+	// updatePreviewCaption() and updateBoxLabel() to show the size the
+	// crop would actually be saved at, not the raw dragged box.
+	var currentMaxSize = null;
 	// Set while a reuse thumbnail's own box is being shown for a look before
 	// committing to it; cleared as soon as the user adjusts the crop box
 	// themselves, or the modal closes. Drives the save button's "Use image"
@@ -197,6 +206,60 @@
 		var h = parseFloat( parts[ 1 ] );
 
 		return ( w > 0 && h > 0 ) ? { width: w, height: h } : null;
+	}
+
+	/**
+	 * A "free:W:H" ratio (see Ei_Image_Crop_Field::resolve_ratio()) is a
+	 * free-form field whose registered image size still carries a
+	 * width/height - a cap on the eventual result, not a shape to lock the
+	 * crop box to (parseAspectRatio() already treats this exact string as
+	 * free-form, since it isn't "W:H"). 0 on either side means that axis
+	 * isn't capped, mirroring add_image_size() itself. Returns null for
+	 * anything else (a hard ratio, or "free" with no size behind it).
+	 *
+	 * @param {string} ratio
+	 * @return {{width: number, height: number}|null}
+	 */
+	function parseMaxSize( ratio ) {
+		if ( ! ratio || 0 !== ratio.indexOf( 'free:' ) ) {
+			return null;
+		}
+
+		var parts = ratio.slice( 5 ).split( ':' );
+		if ( 2 !== parts.length ) {
+			return null;
+		}
+
+		var w = parseInt( parts[ 0 ], 10 ) || 0;
+		var h = parseInt( parts[ 1 ], 10 ) || 0;
+
+		return ( w > 0 || h > 0 ) ? { width: w, height: h } : null;
+	}
+
+	/**
+	 * Scales $w x $h down (never up) to fit within maxSize, preserving its
+	 * own aspect ratio - mirrors Ei_Image_Crop_Generator::fit_within() on
+	 * the PHP side, so the popup shows the same result generate() would
+	 * actually save. A 0 on either side of maxSize means that axis isn't
+	 * capped.
+	 *
+	 * @param {number} w
+	 * @param {number} h
+	 * @param {{width: number, height: number}} maxSize
+	 * @return {{width: number, height: number}}
+	 */
+	function fitWithinMax( w, h, maxSize ) {
+		var scale = 1;
+
+		if ( maxSize.width > 0 && w > maxSize.width ) {
+			scale = Math.min( scale, maxSize.width / w );
+		}
+
+		if ( maxSize.height > 0 && h > maxSize.height ) {
+			scale = Math.min( scale, maxSize.height / h );
+		}
+
+		return { width: Math.round( w * scale ), height: Math.round( h * scale ) };
 	}
 
 	function getState( $field ) {
@@ -395,6 +458,7 @@
 		selectedReuseCrop = null;
 		currentTrueScale = 1;
 		currentTargetSize = null;
+		currentMaxSize = null;
 	}
 
 	/**
@@ -604,6 +668,11 @@
 		if ( currentTargetSize ) {
 			$caption.addClass( 'is-undersized' ).text( '⚠ ' + w + ' × ' + h + ' px' );
 		} else {
+			if ( currentMaxSize ) {
+				var fit = fitWithinMax( w, h, currentMaxSize );
+				w = fit.width;
+				h = fit.height;
+			}
 			$caption.removeClass( 'is-undersized' ).text( w + ' × ' + h + ' px' );
 		}
 	}
@@ -618,7 +687,11 @@
 	 * itself is the more useful, stable number to show. Only once the
 	 * selection can't reach the target without upscaling does the real,
 	 * shrinking size become the more honest thing to show. A free-form
-	 * field just always shows the box's actual size.
+	 * field capped by a registered size's own width/height (currentMaxSize)
+	 * shows what the drawn box would actually be scaled down to instead -
+	 * never upscaled, so there's no equivalent warning state for it. A
+	 * fully free field with no cap at all just always shows the box's
+	 * actual size.
 	 *
 	 * Positioned with cropper.getCropBoxData(), which already reports
 	 * on-screen pixels relative to Cropper's own .cropper-container - the
@@ -637,7 +710,16 @@
 			text = currentTargetSize.width + ' × ' + currentTargetSize.height + ' px';
 		} else {
 			var data = cropper.getData();
-			text = Math.round( data.width * currentTrueScale ) + ' × ' + Math.round( data.height * currentTrueScale ) + ' px';
+			var w = Math.round( data.width * currentTrueScale );
+			var h = Math.round( data.height * currentTrueScale );
+
+			if ( ! currentTargetSize && currentMaxSize ) {
+				var fit = fitWithinMax( w, h, currentMaxSize );
+				w = fit.width;
+				h = fit.height;
+			}
+
+			text = w + ' × ' + h + ' px';
 		}
 
 		// Centered above the box horizontally (the negative translate in
@@ -672,6 +754,7 @@
 
 		currentTrueScale = trueScale > 0 ? trueScale : 1;
 		currentTargetSize = parseTargetSize( $field.data( 'ratio' ) );
+		currentMaxSize = parseMaxSize( $field.data( 'ratio' ) );
 
 		/**
 		 * Turns the crop box red (see .is-undersized in field.css) once the
