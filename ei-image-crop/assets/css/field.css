@@ -607,13 +607,20 @@
 
 .ei-image-crop-toggle {
 	margin-left: 12px;
-	/* In the grid/picker toolbar, .media-toolbar-secondary isn't a flex
-	 * container (confirmed via its own .spinner child, which is positioned
-	 * with plain absolute offsets, not flex alignment) - align-self has no
-	 * effect there. media-toggle.js measures the neighboring date filter
-	 * <select> at runtime instead and nudges us to its vertical center via
-	 * an inline `top` offset, which is why there's no CSS vertical
+	/* .media-toolbar-secondary is a 2x2 CSS grid (align-items: end) that we
+	 * apparently don't land in the right cell of as a plain appended
+	 * sibling - media-toggle.js measures the neighboring date filter
+	 * <select> at runtime instead and nudges us to its exact bottom edge
+	 * via an inline `top` offset, which is why there's no CSS vertical
 	 * alignment rule here to speak of. */
+}
+
+/* .media-toolbar-secondary itself was sitting close enough to the row
+ * above it that its bottom-aligned content (the date filter <select>, and
+ * our toggle once media-toggle.js lines it up with that select) reads as
+ * clipped/too far down - confirmed live via the browser's dev tools. */
+.media-modal .media-toolbar-secondary {
+	margin-top: -10px;
 }
 
 .ei-image-crop-tab {

@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.8.13
+Stable tag: 1.8.14
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.8.14 =
+* Fixed the media-picker toolbar row (date filter dropdown, and our "Original images"/"Crops" tabs once aligned to it) sitting close enough to the row above it to read as clipped/too far down - .media-toolbar-secondary turned out to be a CSS grid (align-items: end), not flex or floats as earlier changelog entries assumed; nudging it up 10px (confirmed live via browser dev tools) fixes it without affecting the relative alignment between the select and our tabs.
 
 = 1.8.13 =
 * Fixed 1.8.12's retry only checking that the date filter `<select>` existed, not that it (and our own toggle) actually had a rendered size yet - confirmed live, the very first check found the `<select>` but measured an all-zero box for both elements (the modal was still mid fade-in), so "delta" came out to a false-positive 0 and nothing was ever applied. Now retries until both elements report real height, not just until the `<select>` exists.
