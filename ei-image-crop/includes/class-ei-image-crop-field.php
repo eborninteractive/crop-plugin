@@ -219,7 +219,7 @@ class Ei_Image_Crop_Field extends acf_field {
 			// the pencil icon is for something else entirely (see below).
 			echo '<img src="' . esc_url( $preview_url ) . '" alt="" class="ei-image-crop-select" />';
 			echo '<div class="ei-image-crop-overlay">';
-			echo '<a href="' . esc_url( admin_url( 'upload.php?item=' . $value ) ) . '" target="_blank" rel="noopener" class="ei-image-crop-icon-btn ei-image-crop-open-attachment" title="' . esc_attr__( 'Edit image details (caption, alt text, etc.)', 'ei-image-crop' ) . '">' . self::pencil_icon() . '</a>';
+			echo '<a href="' . esc_url( admin_url( 'upload.php?item=' . $value ) ) . '" target="_blank" rel="noopener" data-attachment-id="' . esc_attr( $value ) . '" class="ei-image-crop-icon-btn ei-image-crop-open-attachment" title="' . esc_attr__( 'Edit image details (caption, alt text, etc.)', 'ei-image-crop' ) . '">' . self::pencil_icon() . '</a>';
 			echo '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-edit" title="' . esc_attr__( 'Adjust crop', 'ei-image-crop' ) . '">' . self::crop_icon() . '</button>';
 			echo '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-remove" title="' . esc_attr__( 'Remove image', 'ei-image-crop' ) . '"></button>';
 			echo '</div>';
