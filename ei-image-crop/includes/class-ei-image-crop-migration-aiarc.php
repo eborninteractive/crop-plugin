@@ -1,11 +1,14 @@
 <?php
 /**
- * Read-only migration report for sites moving from "ACF Image Aspect Ratio
- * Crop" (Johannes Siipola's acf-image-aspect-ratio-crop plugin) to this one.
- * Inventories what that plugin left behind - which fields used its field
- * type and how they were configured, and every cropped attachment it ever
- * generated - so all of it can be reviewed before any actual migration
- * writes a single row. This page never modifies the database.
+ * Migration report and metadata backfill for sites moving from "ACF Image
+ * Aspect Ratio Crop" (Johannes Siipola's acf-image-aspect-ratio-crop
+ * plugin) to this one. Inventories what that plugin left behind - which
+ * fields used its field type and how they were configured, and every
+ * cropped attachment it ever generated - and, once reviewed, can backfill
+ * this plugin's own crop metadata onto those same attachments so this
+ * plugin recognizes them as crops of their true original. Loading the page
+ * only ever reads data; the one write path (apply_migration()) only runs
+ * when its own "Apply migration" form is explicitly submitted.
  *
  * @package Ei_Image_Crop
  */
@@ -18,6 +21,7 @@ class Ei_Image_Crop_Migration_Aiarc {
 
 	const LEGACY_META_KEY   = 'acf_image_aspect_ratio_crop';
 	const LEGACY_FIELD_TYPE = 'image_aspect_ratio_crop';
+	const NONCE_ACTION      = 'ei_image_crop_migrate_aiarc';
 
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'register_page' ) );
@@ -62,7 +66,13 @@ class Ei_Image_Crop_Migration_Aiarc {
 
 		echo '<div class="wrap">';
 		echo '<h1>' . esc_html__( 'Migrate from ACF Image Aspect Ratio Crop', 'ei-image-crop' ) . '</h1>';
-		echo '<p>' . esc_html__( 'This page only reads data - nothing on your site is changed by viewing it.', 'ei-image-crop' ) . '</p>';
+
+		if ( isset( $_POST['ei_image_crop_migrate_aiarc_apply'] ) ) {
+			check_admin_referer( self::NONCE_ACTION );
+			self::render_apply_results( self::apply_migration() );
+		}
+
+		echo '<p>' . esc_html__( 'The report below only reads data. The "Apply migration" button further down writes this plugin\'s own crop metadata onto the attachments listed - review the report first, ideally on a test copy of the site.', 'ei-image-crop' ) . '</p>';
 
 		$fields = self::collect_legacy_fields();
 		self::render_fields_table( $fields );
@@ -70,7 +80,164 @@ class Ei_Image_Crop_Migration_Aiarc {
 		$field_names = wp_list_pluck( $fields, 'name' );
 		self::render_crops_table( $field_names );
 
+		self::render_apply_form();
+
 		echo '</div>';
+	}
+
+	/**
+	 * Backfills this plugin's own crop metadata (_ei_crop_parent,
+	 * _ei_crop_ratio, _ei_crop_box, _ei_crop_hash, and _ei_crop_field_key
+	 * when a referencing field is found) onto every legacy cropped
+	 * attachment that doesn't already have it - the exact metadata this
+	 * plugin needs to recognize it as a crop of its true original (see
+	 * Ei_Image_Crop_Generator::resolve_root()), rather than treating the
+	 * already-cropped image as if it were itself an uncropped source.
+	 *
+	 * Never touches any file, never deletes the old plugin's own
+	 * metadata, and skips (rather than overwrites) any attachment that
+	 * already has _ei_crop_parent - safe to run more than once.
+	 *
+	 * @return array{migrated: array, skipped: array, already: array}
+	 */
+	protected static function apply_migration() {
+		global $wpdb;
+
+		$fields         = self::collect_legacy_fields();
+		$field_names    = wp_list_pluck( $fields, 'name' );
+		$fields_by_name = array();
+		foreach ( $fields as $field ) {
+			$fields_by_name[ $field['name'] ] = $field;
+		}
+
+		$crop_ids = get_posts(
+			array(
+				'post_type'      => 'attachment',
+				'post_status'    => 'inherit',
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				'meta_key'       => self::LEGACY_META_KEY, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+			)
+		);
+
+		$results = array(
+			'migrated' => array(),
+			'skipped'  => array(),
+			'already'  => array(),
+		);
+
+		foreach ( $crop_ids as $crop_id ) {
+			if ( get_post_meta( $crop_id, '_ei_crop_parent', true ) ) {
+				$results['already'][] = $crop_id;
+				continue;
+			}
+
+			$original_id = (int) get_post_meta( $crop_id, 'acf_image_aspect_ratio_crop_original_image_id', true );
+			$coords      = get_post_meta( $crop_id, 'acf_image_aspect_ratio_crop_coordinates', true );
+
+			if ( ! $original_id || ! get_post( $original_id ) ) {
+				$results['skipped'][] = array(
+					'id'     => $crop_id,
+					'reason' => __( 'original image missing', 'ei-image-crop' ),
+				);
+				continue;
+			}
+
+			if ( ! is_array( $coords ) || ! isset( $coords['x'], $coords['y'], $coords['width'], $coords['height'] ) ) {
+				$results['skipped'][] = array(
+					'id'     => $crop_id,
+					'reason' => __( 'no stored coordinates', 'ei-image-crop' ),
+				);
+				continue;
+			}
+
+			$source = Ei_Image_Crop_Generator::get_original_source( $original_id );
+
+			if ( is_wp_error( $source ) ) {
+				$results['skipped'][] = array(
+					'id'     => $crop_id,
+					'reason' => $source->get_error_message(),
+				);
+				continue;
+			}
+
+			$box = Ei_Image_Crop_Generator::sanitize_box(
+				array(
+					'x' => $coords['x'] / $source['width'],
+					'y' => $coords['y'] / $source['height'],
+					'w' => $coords['width'] / $source['width'],
+					'h' => $coords['height'] / $source['height'],
+				)
+			);
+
+			// Derived directly from the old field's own settings, not
+			// whatever the new field's "Image size" happens to be set to
+			// right now - correct regardless of migration order, as long
+			// as the new field ends up pointed at a registered size with
+			// these same dimensions (see suggest_image_size()).
+			$ratio     = 'free';
+			$field_key = '';
+			$usage     = self::find_usage( $crop_id, $field_names, $wpdb );
+
+			if ( $usage && isset( $fields_by_name[ $usage[0]['field_name'] ] ) ) {
+				$field = $fields_by_name[ $usage[0]['field_name'] ];
+				$field_key = $field['key'];
+
+				if ( 'free_crop' !== $field['crop_type'] && $field['width'] && $field['height'] ) {
+					$ratio = $field['width'] . ':' . $field['height'];
+				}
+			}
+
+			$hash = Ei_Image_Crop_Generator::box_hash( $original_id, $ratio, $box );
+
+			update_post_meta( $crop_id, '_ei_crop_parent', $original_id );
+			update_post_meta( $crop_id, '_ei_crop_ratio', $ratio );
+			update_post_meta( $crop_id, '_ei_crop_box', $box );
+			update_post_meta( $crop_id, '_ei_crop_hash', $hash );
+
+			if ( $field_key ) {
+				update_post_meta( $crop_id, '_ei_crop_field_key', $field_key );
+			}
+
+			$results['migrated'][] = array(
+				'id'    => $crop_id,
+				'ratio' => $ratio,
+			);
+		}
+
+		return $results;
+	}
+
+	/**
+	 * @param array $results
+	 */
+	protected static function render_apply_results( array $results ) {
+		echo '<div class="notice notice-success"><p>';
+		printf(
+			/* translators: 1: migrated count, 2: already-migrated count, 3: skipped count */
+			esc_html__( 'Migrated %1$d attachment(s). %2$d already had this plugin\'s metadata and were left untouched. %3$d were skipped.', 'ei-image-crop' ),
+			count( $results['migrated'] ),
+			count( $results['already'] ),
+			count( $results['skipped'] )
+		);
+		echo '</p></div>';
+
+		if ( $results['skipped'] ) {
+			echo '<div class="notice notice-warning"><p>' . esc_html__( 'Skipped:', 'ei-image-crop' ) . '</p><ul>';
+			foreach ( $results['skipped'] as $skip ) {
+				echo '<li>#' . esc_html( $skip['id'] ) . ' - ' . esc_html( $skip['reason'] ) . '</li>';
+			}
+			echo '</ul></div>';
+		}
+	}
+
+	protected static function render_apply_form() {
+		echo '<h2>' . esc_html__( 'Apply migration', 'ei-image-crop' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Writes this plugin\'s own crop metadata onto every cropped attachment above that doesn\'t already have it, using the resolved original and normalized box shown in the table. Nothing is deleted and no image files are touched - the old plugin\'s own metadata is left in place. Attachments that already have this plugin\'s metadata are left untouched, so this is safe to run more than once.', 'ei-image-crop' ) . '</p>';
+		echo '<form method="post">';
+		wp_nonce_field( self::NONCE_ACTION );
+		submit_button( __( 'Apply migration now', 'ei-image-crop' ), 'primary', 'ei_image_crop_migrate_aiarc_apply' );
+		echo '</form>';
 	}
 
 	/**
@@ -324,14 +491,18 @@ class Ei_Image_Crop_Migration_Aiarc {
 			}
 		}
 
-		$usage = self::find_usage( $crop_id, $field_names, $wpdb );
+		$usage         = self::find_usage( $crop_id, $field_names, $wpdb );
+		$usage_display = array();
+		foreach ( $usage as $used_by ) {
+			$usage_display[] = '#' . $used_by['post_id'] . ' (' . $used_by['field_name'] . ')';
+		}
 
 		echo '<tr>';
 		echo '<td>' . esc_html( $crop_id . ' - ' . get_the_title( $crop_id ) ) . '</td>';
 		echo '<td>' . esc_html( $original_id ? ( $original_id . ' - ' . get_the_title( $original_id ) ) : '—' ) . '</td>';
 		echo '<td>' . esc_html( is_array( $coords ) ? wp_json_encode( $coords ) : '—' ) . '</td>';
 		echo '<td>' . esc_html( $normalized ) . '</td>';
-		echo '<td>' . esc_html( $usage ? implode( ', ', $usage ) : __( 'not currently referenced', 'ei-image-crop' ) ) . '</td>';
+		echo '<td>' . esc_html( $usage_display ? implode( ', ', $usage_display ) : __( 'not currently referenced', 'ei-image-crop' ) ) . '</td>';
 		echo '<td>' . esc_html( $issues ? implode( '; ', $issues ) : '—' ) . '</td>';
 		echo '</tr>';
 	}
@@ -340,8 +511,9 @@ class Ei_Image_Crop_Migration_Aiarc {
 	 * @param int      $crop_id
 	 * @param string[] $field_names
 	 * @param wpdb     $wpdb
-	 * @return string[] "#<post_id> (<field_name>)" for every post whose
-	 *   value for one of the collected field names is this crop.
+	 * @return array<int, array{post_id: int, field_name: string}> One entry
+	 *   for every post whose value for one of the collected field names is
+	 *   this crop.
 	 */
 	protected static function find_usage( $crop_id, array $field_names, $wpdb ) {
 		if ( ! $field_names ) {
@@ -359,7 +531,10 @@ class Ei_Image_Crop_Migration_Aiarc {
 
 		$usage = array();
 		foreach ( $rows as $row ) {
-			$usage[] = '#' . $row->post_id . ' (' . $row->meta_key . ')';
+			$usage[] = array(
+				'post_id'    => (int) $row->post_id,
+				'field_name' => $row->meta_key,
+			);
 		}
 
 		return $usage;

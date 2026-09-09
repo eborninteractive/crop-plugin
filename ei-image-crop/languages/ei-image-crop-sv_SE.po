@@ -20,6 +20,12 @@ msgstr "Justera beskärning"
 msgid "All"
 msgstr "Alla"
 
+msgid "Apply migration"
+msgstr "Genomför migrering"
+
+msgid "Apply migration now"
+msgstr "Genomför migrering nu"
+
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -122,6 +128,9 @@ msgstr "Migrera bildbeskärningar"
 msgid "Migrate from ACF Image Aspect Ratio Crop"
 msgstr "Migrera från ACF Image Aspect Ratio Crop"
 
+msgid "Migrated %1$d attachment(s). %2$d already had this plugin's metadata and were left untouched. %3$d were skipped."
+msgstr "Migrerade %1$d bilaga(or). %2$d hade redan detta tilläggs metadata och lämnades orörda. %3$d hoppades över."
+
 msgid "Missing width/height - cannot suggest a setup"
 msgstr "Bredd/höjd saknas - kan inte föreslå en konfiguration"
 
@@ -167,6 +176,9 @@ msgstr "Välj en bild"
 msgid "Select image"
 msgstr "Välj bild"
 
+msgid "Skipped:"
+msgstr "Överhoppade:"
+
 msgid "Something went wrong while cropping the image."
 msgstr "Något gick fel vid beskärning av bilden."
 
@@ -182,8 +194,8 @@ msgstr "Föreslagen Ei Image Crop-konfiguration"
 msgid "That is not a crop this plugin can delete."
 msgstr "Det är inte en beskärning som det här tillägget kan radera."
 
-msgid "This page only reads data - nothing on your site is changed by viewing it."
-msgstr "Den här sidan läser bara data - inget på din sajt ändras genom att visa den."
+msgid "The report below only reads data. The \"Apply migration\" button further down writes this plugin's own crop metadata onto the attachments listed - review the report first, ideally on a test copy of the site."
+msgstr "Rapporten nedan läser bara data. Knappen \"Genomför migrering\" längre ner skriver detta tilläggs egen beskärningsmetadata på de listade bilagorna - granska rapporten först, helst på en testkopia av sajten."
 
 msgid "Uploaded to post"
 msgstr "Uppladdad till inlägget"
@@ -196,6 +208,9 @@ msgstr "Använd bild"
 
 msgid "Use this image"
 msgstr "Använd denna bild"
+
+msgid "Writes this plugin's own crop metadata onto every cropped attachment above that doesn't already have it, using the resolved original and normalized box shown in the table. Nothing is deleted and no image files are touched - the old plugin's own metadata is left in place. Attachments that already have this plugin's metadata are left untouched, so this is safe to run more than once."
+msgstr "Skriver detta tilläggs egen beskärningsmetadata på varje beskuren bilaga ovan som inte redan har det, med den uppslagna originalbilden och den normaliserade rutan som visas i tabellen. Inget tas bort och inga bildfiler rörs - det gamla tilläggets egen metadata lämnas orörd. Bilagor som redan har detta tilläggs metadata lämnas orörda, så det är säkert att köra mer än en gång."
 
 msgid "You are not allowed to do this."
 msgstr "Du har inte behörighet att göra detta."
