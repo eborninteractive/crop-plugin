@@ -533,15 +533,20 @@
 				// so wasFreshPick is false) remains the explicit way to open
 				// the editor for it afterward.
 				if ( wasFreshPick && existingId ) {
-					// pickedAttachment.sizes.medium when it exists - a crop
+					// pickedAttachment.sizes.large when it exists - a crop
 					// always gets that size generated for it whenever it's
 					// actually bigger (see generate()'s
 					// keep_only_proportional_sizes()), sharing its own true
-					// aspect ratio - falling back to the full picked url
-					// otherwise (a crop too small to have a 'medium' of its
-					// own, same as wp_get_attachment_image_url() would do).
-					var previewUrl = ( pickedAttachment && pickedAttachment.sizes && pickedAttachment.sizes.medium )
-						? pickedAttachment.sizes.medium.url
+					// aspect ratio. The field's own preview is displayed at
+					// a fixed CSS max-height rather than the image's own
+					// native size, so the extra resolution over 'medium'
+					// buys real sharpness on high-density screens instead
+					// of being upscaled and blurry - falling back to the
+					// full picked url otherwise (a crop too small to have a
+					// 'large' of its own, same as
+					// wp_get_attachment_image_url() would do).
+					var previewUrl = ( pickedAttachment && pickedAttachment.sizes && pickedAttachment.sizes.large )
+						? pickedAttachment.sizes.large.url
 						: ( pickedAttachment ? pickedAttachment.url : data.edit.url );
 
 					setState( $field, { id: existingId, source: sourceId } );

@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.7.19
+Stable tag: 1.7.20
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.7.20 =
+* Bumped the admin preview images (field thumbnail, "Existing crops" reuse preview, post-save preview) from 1.7.19's 'medium' to 'large' - they're displayed at a fixed CSS max-height rather than their own native size, so 'medium' was being upscaled and looked visibly soft/blurry. 'large' gives real headroom for high-density screens instead. The "Existing crops" row icons themselves stay at 'medium' - plenty for their much smaller footprint.
 
 = 1.7.19 =
 * Admin-side preview images (the field's own thumbnail, the "Existing crops" row icons, and the preview shown right after saving/reusing a crop) now automatically use the smaller 'medium' size instead of the full-resolution crop, now that 1.7.18 guarantees it exists (and shares the crop's true aspect ratio) whenever the crop is actually bigger than it. No setting to configure - it's always correct by construction, so there's nothing to choose.

@@ -154,14 +154,18 @@ class Ei_Image_Crop_Ajax {
 		wp_send_json_success(
 			array(
 				'id'  => $result,
-				// 'medium' rather than a configurable size on purpose - a
+				// 'large' rather than a configurable size on purpose - a
 				// crop always gets that size generated for it whenever it's
 				// actually bigger (see generate()'s
 				// keep_only_proportional_sizes()), sharing its own true
-				// aspect ratio since it's a proportional resize. Falls back
-				// to the full file on its own for a crop too small to have
-				// one - never wrong, just occasionally identical to 'full'.
-				'url' => wp_get_attachment_image_url( $result, 'medium' ),
+				// aspect ratio since it's a proportional resize. The
+				// field's own preview is displayed at a fixed CSS
+				// max-height, not the image's own native size, so the
+				// extra resolution over 'medium' buys real sharpness on
+				// high-density screens instead of being upscaled and
+				// blurry. Falls back to the full file on its own for a
+				// crop too small to have a 'large' of its own.
+				'url' => wp_get_attachment_image_url( $result, 'large' ),
 			)
 		);
 	}
@@ -242,7 +246,16 @@ class Ei_Image_Crop_Ajax {
 			$crops[] = array(
 				'id'      => $id,
 				'url'     => $thumb,
-				'preview' => $thumb,
+				// 'large' rather than $thumb's own 'medium' here - this
+				// becomes the field's own big preview (see
+				// selectReuseThumbnail()/useSelectedCrop() in field.js) if
+				// this row item is picked, which is displayed at a fixed
+				// CSS max-height rather than the image's own native size,
+				// same reasoning as save()'s response - 'medium' would be
+				// upscaled and blurry there. Falls back to $thumb (in turn
+				// already falling back to the full file) for a crop too
+				// small to have a 'large' of its own.
+				'preview' => wp_get_attachment_image_url( $id, 'large' ) ?: $thumb,
 				'title'   => get_the_title( $id ),
 				// Lets the picker mark this crop's own region on the source
 				// image when it's selected for a look before committing to it,
