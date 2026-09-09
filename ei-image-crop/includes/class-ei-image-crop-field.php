@@ -44,9 +44,18 @@ class Ei_Image_Crop_Field extends acf_field {
 		$choices = array();
 
 		foreach ( wp_get_registered_image_subsizes() as $name => $size ) {
-			$choices[ $name ] = empty( $size['crop'] )
-				? sprintf( '%s (%s)', $name, __( 'free crop', 'ei-image-crop' ) )
-				: sprintf( '%s (%d × %d)', $name, $size['width'], $size['height'] );
+			if ( empty( $size['crop'] ) ) {
+				// A free-crop size with a non-zero width and/or height
+				// still caps the result's resolution (see
+				// Ei_Image_Crop_Generator::parse_max_size()), so it's worth
+				// naming here too - only a size registered with both at 0
+				// (truly unbounded) has nothing to show beyond "free crop".
+				$choices[ $name ] = ( $size['width'] > 0 || $size['height'] > 0 )
+					? sprintf( '%s (%d × %d, %s)', $name, $size['width'], $size['height'], __( 'free crop', 'ei-image-crop' ) )
+					: sprintf( '%s (%s)', $name, __( 'free crop', 'ei-image-crop' ) );
+			} else {
+				$choices[ $name ] = sprintf( '%s (%d × %d)', $name, $size['width'], $size['height'] );
+			}
 		}
 
 		return $choices;
