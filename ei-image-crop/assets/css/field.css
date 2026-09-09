@@ -607,11 +607,14 @@
 
 .ei-image-crop-toggle {
 	margin-left: 12px;
-	/* In the grid/picker toolbar (see media-toggle.js), .media-toolbar-secondary
-	 * is a flex row - align-self here re-centers us on it regardless of
-	 * whatever the row's own align-items ends up being. No-op in the classic
-	 * list table, where this span isn't inside a flex container at all. */
-	align-self: center;
+	/* In the grid/picker toolbar (see media-toggle.js), the date filter next
+	 * to us is a "Filter by date" label stacked above its <select> - the
+	 * whole stack is taller than we are, and the toolbar row's default
+	 * top-alignment was landing us next to that label instead of the
+	 * select below it. align-self: flex-end pins us to the bottom of the
+	 * row instead, level with the select. No-op in the classic list table,
+	 * where this span isn't inside a flex container at all. */
+	align-self: flex-end;
 }
 
 .ei-image-crop-tab {
