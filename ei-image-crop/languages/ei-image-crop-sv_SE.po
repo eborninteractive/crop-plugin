@@ -57,7 +57,7 @@ msgid "Existing crops"
 msgstr "Befintliga beskärningar"
 
 msgid "Image Crop"
-msgstr "Bildbeskärning"
+msgstr "Bild med beskäring (Ei Image Crop)"
 
 msgid "Image ID"
 msgstr "Bild-ID"
