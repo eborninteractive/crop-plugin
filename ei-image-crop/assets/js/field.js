@@ -145,6 +145,17 @@
 			var attachment = wp.media.attachment( attachmentId );
 			attachment.fetch();
 			frame.state().get( 'selection' ).add( attachment );
+
+			// The frame's own default guess at which router tab to show
+			// first ("Upload files" vs. "Media Library") is based on
+			// whether its collection already has any items at the exact
+			// moment the state activates - since ours is scoped down to
+			// this one attachment and its fetch is still in flight right
+			// above, that guess isn't reliable and can land on the empty
+			// upload dropzone instead of the library view this popup
+			// actually needs to show. Force it every time rather than
+			// trust the guess.
+			frame.content.mode( 'browse' );
 		} );
 
 		frame.open();
