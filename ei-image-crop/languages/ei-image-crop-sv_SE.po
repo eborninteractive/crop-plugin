@@ -74,8 +74,8 @@ msgstr "Bilddata (array)"
 msgid "Image size"
 msgstr "Bildformat"
 
-msgid "Image size used to preview the crop in the field editor."
-msgstr "Bildstorlek som används för att förhandsgranska beskärningen i fältredigeraren."
+msgid "Image size used to preview the crop in the field editor. Only sizes that scale proportionally are offered, so the preview always keeps the crop's own shape, just at a smaller resolution."
+msgstr "Bildstorlek som används för att förhandsgranska beskärningen i fältredigeraren. Endast storlekar som skalar proportionerligt visas, så förhandsvisningen alltid behåller beskärningens form, fast i lägre upplösning."
 
 msgid "Invalid source image."
 msgstr "Ogiltig källbild."

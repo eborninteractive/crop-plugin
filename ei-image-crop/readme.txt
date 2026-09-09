@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.7.14
+Stable tag: 1.7.15
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.7.15 =
+* "Admin preview size" now only offers image sizes that scale proportionally (e.g. Medium, Large) - a hard-cropped size like the default Thumbnail (square by default) would show the field's own preview at a different aspect ratio than what was actually cropped, making an already-correct crop look wrong at a glance. Lower resolution is fine; a different shape isn't.
 
 = 1.7.14 =
 * Fixed the pencil icon's popup (1.7.13) sometimes opening on the empty "Upload files" tab instead of the Media Library view showing the attachment's own details - the frame's own guess at which tab to show first depends on whether its (still loading) collection already has items at that exact moment, which isn't reliable for a query scoped down to one attachment. The Media Library tab is now forced open every time instead.

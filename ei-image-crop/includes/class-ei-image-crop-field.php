@@ -74,7 +74,7 @@ class Ei_Image_Crop_Field extends acf_field {
 			$field,
 			array(
 				'label'        => __( 'Admin preview size', 'ei-image-crop' ),
-				'instructions' => __( 'Image size used to preview the crop in the field editor.', 'ei-image-crop' ),
+				'instructions' => __( 'Image size used to preview the crop in the field editor. Only sizes that scale proportionally are offered, so the preview always keeps the crop\'s own shape, just at a smaller resolution.', 'ei-image-crop' ),
 				'type'         => 'select',
 				'name'         => 'preview_size',
 				'choices'      => $this->get_image_size_choices(),
@@ -112,14 +112,22 @@ class Ei_Image_Crop_Field extends acf_field {
 	}
 
 	/**
+	 * Only offers sizes that scale the crop down proportionally
+	 * (crop => false) - a size that hard-crops to its own fixed shape
+	 * (e.g. the default "Thumbnail" size, square by default) would show
+	 * the field's own preview at a DIFFERENT aspect ratio than what was
+	 * actually cropped, making an already-correct crop look wrong at a
+	 * glance. Lower resolution is fine here; a different shape isn't.
+	 *
 	 * @return array<string,string>
 	 */
 	protected function get_image_size_choices() {
-		$sizes   = get_intermediate_image_sizes();
 		$choices = array();
 
-		foreach ( $sizes as $size ) {
-			$choices[ $size ] = $size;
+		foreach ( wp_get_registered_image_subsizes() as $name => $size ) {
+			if ( empty( $size['crop'] ) ) {
+				$choices[ $name ] = $name;
+			}
 		}
 
 		$choices['full'] = __( 'full', 'ei-image-crop' );
