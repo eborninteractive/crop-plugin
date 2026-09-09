@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.8.12
+Stable tag: 1.8.13
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.8.13 =
+* Fixed 1.8.12's retry only checking that the date filter `<select>` existed, not that it (and our own toggle) actually had a rendered size yet - confirmed live, the very first check found the `<select>` but measured an all-zero box for both elements (the modal was still mid fade-in), so "delta" came out to a false-positive 0 and nothing was ever applied. Now retries until both elements report real height, not just until the `<select>` exists.
 
 = 1.8.12 =
 * Fixed 1.8.10/1.8.11's alignment silently never applying: the date filter's `<select>` is populated from an async request (it needs to know which months have attachments) and often doesn't exist yet at the exact moment we first check, so the alignment code was finding zero `<select>` elements and giving up immediately. It now retries for up to 2 seconds, and logs its result to the browser console (prefixed "[Ei Image Crop]") so a future regression is easy to spot.

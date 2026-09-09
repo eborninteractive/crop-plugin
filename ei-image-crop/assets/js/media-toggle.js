@@ -147,8 +147,14 @@
 	 *
 	 * The <select> itself is populated from an async request (it needs to
 	 * know which months have attachments), so it can still not exist yet
-	 * at the exact moment secondaryEl itself does - retry for a bit rather
-	 * than silently giving up on the very first (likely too-early) check.
+	 * at the exact moment secondaryEl itself does. And even once it exists
+	 * in the DOM, the modal it lives in can still be mid fade-in (or
+	 * otherwise not laid out yet) - confirmed live: the very first check
+	 * found the <select> fine but measured an all-zero box for both it and
+	 * our toggle (getBoundingClientRect() reports all zeros for anything
+	 * not actually rendered with real dimensions yet), so "delta" computed
+	 * to a false-positive 0 and nothing ever got applied. Retry until both
+	 * boxes actually have real height, not just until the element exists.
 	 *
 	 * @param {jQuery}  $toggle The already-inserted .ei-image-crop-toggle.
 	 * @param {jQuery}  $scope  Its container - searched for a <select> to align to.
@@ -156,20 +162,21 @@
 	 */
 	function alignToggleWithNeighbor( $toggle, $scope, attempt ) {
 		var $select = $scope.find( 'select' ).first();
+		var selectRect = $select.length ? $select[ 0 ].getBoundingClientRect() : null;
+		var toggleRect = $toggle[ 0 ].getBoundingClientRect();
+		var ready = selectRect && selectRect.height > 0 && toggleRect.height > 0;
 
-		if ( ! $select.length ) {
+		if ( ! ready ) {
 			if ( attempt < ALIGN_MAX_ATTEMPTS ) {
 				setTimeout( function () {
 					alignToggleWithNeighbor( $toggle, $scope, attempt + 1 );
 				}, ALIGN_RETRY_DELAY );
 			} else {
-				console.warn( '[Ei Image Crop] toggle alignment gave up - no <select> found in toolbar-secondary after ' + attempt + ' attempts' );
+				console.warn( '[Ei Image Crop] toggle alignment gave up after ' + attempt + ' attempts - select found: ' + ( !! $select.length ) + ', select height: ' + ( selectRect ? selectRect.height : 'n/a' ) + ', toggle height: ' + toggleRect.height );
 			}
 			return;
 		}
 
-		var selectRect = $select[ 0 ].getBoundingClientRect();
-		var toggleRect = $toggle[ 0 ].getBoundingClientRect();
 		var delta = selectRect.bottom - toggleRect.bottom;
 
 		console.log( '[Ei Image Crop] aligning toggle to select bottom - select.bottom: ' + selectRect.bottom + ', toggle.bottom: ' + toggleRect.bottom + ', delta: ' + delta + ' (attempt ' + attempt + ')' );
