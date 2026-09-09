@@ -40,6 +40,33 @@
 		return ( window.eiImageCrop && eiImageCrop.i18n && eiImageCrop.i18n[ key ] ) || key;
 	}
 
+	/**
+	 * Appends a modal element to the real top-level document's <body>,
+	 * never the local one. Both modals use `position: fixed; inset: 0;` to
+	 * cover the whole viewport, which only works if they actually live in
+	 * the outermost document - inside an ACF block, this script itself
+	 * runs inside the block editor's canvas iframe (a separate, much
+	 * smaller document), so a plain $('body').append() would confine the
+	 * "fixed" overlay to that iframe's own small rectangle instead of the
+	 * real page, making it appear as if the popup never opened at all.
+	 * window.top is just window when not inside any iframe, so this is a
+	 * no-op there - same behavior as before for the classic meta box case.
+	 *
+	 * @param {jQuery} $el
+	 */
+	function appendToTopBody( $el ) {
+		var topDocument = window.top.document;
+
+		if ( topDocument !== document ) {
+			// Same-origin only (true for the block editor's own iframe) -
+			// adopts the node so it belongs to the document it's about to
+			// live in, avoiding "wrong document" DOM quirks on insertion.
+			topDocument.adoptNode( $el[ 0 ] );
+		}
+
+		$( topDocument.body ).append( $el );
+	}
+
 	function buildConfirmDialog() {
 		if ( $confirmModal ) {
 			return $confirmModal;
@@ -58,7 +85,7 @@
 			'</div>'
 		);
 
-		$( 'body' ).append( $confirmModal );
+		appendToTopBody( $confirmModal );
 
 		return $confirmModal;
 	}
@@ -362,7 +389,7 @@
 			'</div>'
 		);
 
-		$( 'body' ).append( $modal );
+		appendToTopBody( $modal );
 
 		$modal.find( '.ei-image-crop-modal-title' ).text( t( 'modalTitle' ) );
 		$modal.find( '.ei-image-crop-preview-title' ).text( t( 'previewTitle' ) );
