@@ -74,6 +74,8 @@ class Ei_Image_Crop_Migration_Aiarc {
 
 		echo '<p>' . esc_html__( 'The report below only reads data. The "Apply migration" button further down writes this plugin\'s own crop metadata onto the attachments listed - review the report first, ideally on a test copy of the site.', 'ei-image-crop' ) . '</p>';
 
+		echo '<div class="notice notice-warning inline"><p><strong>' . esc_html__( 'Run "Apply migration" before switching any field over to this plugin, not after.', 'ei-image-crop' ) . '</strong> ' . esc_html__( 'It reads each old field\'s crop type/size directly from its current settings to work out the right crop for every attachment - once a field is switched to this plugin, those old settings are gone and every one of its crops would fall back to "free" instead. Migrate first, then switch field types one at a time and set "Image size" to match the suggestion below.', 'ei-image-crop' ) . '</p></div>';
+
 		$fields = self::collect_legacy_fields();
 		self::render_fields_table( $fields );
 
@@ -234,6 +236,7 @@ class Ei_Image_Crop_Migration_Aiarc {
 	protected static function render_apply_form() {
 		echo '<h2>' . esc_html__( 'Apply migration', 'ei-image-crop' ) . '</h2>';
 		echo '<p>' . esc_html__( 'Writes this plugin\'s own crop metadata onto every cropped attachment above that doesn\'t already have it, using the resolved original and normalized box shown in the table. Nothing is deleted and no image files are touched - the old plugin\'s own metadata is left in place. Attachments that already have this plugin\'s metadata are left untouched, so this is safe to run more than once.', 'ei-image-crop' ) . '</p>';
+		echo '<p><strong>' . esc_html__( 'Do this before switching any field over to this plugin - not after.', 'ei-image-crop' ) . '</strong></p>';
 		echo '<form method="post">';
 		wp_nonce_field( self::NONCE_ACTION );
 		submit_button( __( 'Apply migration now', 'ei-image-crop' ), 'primary', 'ei_image_crop_migrate_aiarc_apply' );

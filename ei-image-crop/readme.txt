@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.8.1
+Stable tag: 1.8.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.8.2 =
+* Added explicit warnings to the migration page (top of the report, and right above the "Apply migration now" button) that migration must be run BEFORE switching any field over to this plugin, not after - it reads each old field's crop type/size from its current settings to work out the right crop for every attachment, and those settings are gone once the field itself is switched over.
 
 = 1.8.1 =
 * The migration report (1.8.0) can now actually apply the migration: an "Apply migration now" button backfills this plugin's own crop metadata (_ei_crop_parent, _ei_crop_ratio, _ei_crop_box, _ei_crop_hash) onto every legacy cropped attachment that doesn't already have it. This is what makes "Adjust crop" find the true original afterward, instead of re-cropping the already-cropped image - simply switching the field's type over, without this step, leaves that broken. Nothing is deleted, no image files are touched, the old plugin's own metadata is left in place, and attachments that already have this plugin's metadata are left untouched, so it's safe to run more than once.

@@ -71,6 +71,9 @@ msgstr "Radera bild"
 msgid "Delete image?"
 msgstr "Radera bild?"
 
+msgid "Do this before switching any field over to this plugin - not after."
+msgstr "Gör detta innan du byter något fält till det här tillägget - inte efteråt."
+
 msgid "Edit image details (caption, alt text, etc.)"
 msgstr "Redigera bilddetaljer (bildtext, alt-text, m.m.)"
 
@@ -115,6 +118,9 @@ msgstr "Ogiltig källbild."
 
 msgid "Issues"
 msgstr "Problem"
+
+msgid "It reads each old field's crop type/size directly from its current settings to work out the right crop for every attachment - once a field is switched to this plugin, those old settings are gone and every one of its crops would fall back to \"free\" instead. Migrate first, then switch field types one at a time and set \"Image size\" to match the suggestion below."
+msgstr "Den läser varje gammalt fälts beskärningstyp/storlek direkt från dess nuvarande inställningar för att räkna ut rätt beskärning för varje bilaga - så fort ett fält bytts till det här tillägget är de gamla inställningarna borta och alla dess beskärningar skulle istället falla tillbaka till \"fri\". Migrera först, byt sedan fälttyp ett i taget och sätt \"Bildformat\" enligt förslaget nedan."
 
 msgid "Keep in mind that the image is permanently deleted, and if this exact crop is used anywhere else on the site, it will need to be replaced."
 msgstr "Tänk på att bilden försvinner permanent och om du använder just denna beskärning av bilden någon annanstans på hemsidan måste den ersättas."
@@ -169,6 +175,9 @@ msgstr "Ta bort bild"
 
 msgid "Return format"
 msgstr "Returformat"
+
+msgid "Run \"Apply migration\" before switching any field over to this plugin, not after."
+msgstr "Kör \"Genomför migrering\" innan du byter något fält till det här tillägget, inte efteråt."
 
 msgid "Select an image"
 msgstr "Välj en bild"
