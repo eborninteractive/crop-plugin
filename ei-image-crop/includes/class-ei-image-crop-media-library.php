@@ -90,10 +90,22 @@ class Ei_Image_Crop_Media_Library {
 	 * client-side query model, is silently stripped before this filter ever
 	 * runs. A cookie doesn't go through that whitelist, so it's used instead.
 	 *
+	 * Skips the crop hide/show filtering entirely when the query already
+	 * names specific attachment ids via post__in - e.g. the pencil icon's
+	 * "edit attachment details" popup, which scopes the grid to exactly
+	 * the one attachment being edited whether or not it's itself a crop.
+	 * Applying the crop-hiding default on top of that would silently
+	 * exclude the very attachment the caller explicitly asked for,
+	 * leaving the grid empty instead.
+	 *
 	 * @param array $query
 	 * @return array
 	 */
 	public static function filter_grid_query( $query ) {
+		if ( ! empty( $query['post__in'] ) ) {
+			return $query;
+		}
+
 		$showing_only_crops = ! empty( $_COOKIE['ei_show_crops'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		$meta_query   = isset( $query['meta_query'] ) ? (array) $query['meta_query'] : array();
