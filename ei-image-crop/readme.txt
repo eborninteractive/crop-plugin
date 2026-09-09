@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.8.14
+Stable tag: 1.9.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.9.0 =
+* Fixed the crop popup never opening for this field type when used inside an ACF block (works fine in a classic meta box) - the block editor's canvas iframe is a separate document that ACF's own acf/input/admin_enqueue_scripts hook never reaches, so Cropper.js and field.js were simply never loaded there. Now also enqueued via WordPress's enqueue_block_assets whenever the block editor is active, the same mechanism ACF's own core field JS already relies on for fields to work inside blocks at all.
 
 = 1.8.14 =
 * Fixed the media-picker toolbar row (date filter dropdown, and our "Original images"/"Crops" tabs once aligned to it) sitting close enough to the row above it to read as clipped/too far down - .media-toolbar-secondary turned out to be a CSS grid (align-items: end), not flex or floats as earlier changelog entries assumed; nudging it up 10px (confirmed live via browser dev tools) fixes it without affecting the relative alignment between the select and our tabs.

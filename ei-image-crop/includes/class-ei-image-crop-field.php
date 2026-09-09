@@ -26,6 +26,16 @@ class Ei_Image_Crop_Field extends acf_field {
 		);
 
 		parent::__construct();
+
+		// ACF's own acf/input/admin_enqueue_scripts (which the parent
+		// constructor already hooks input_admin_enqueue_scripts() to below)
+		// only reaches the outer admin document. A field placed inside an
+		// ACF block renders in the block editor's canvas iframe instead - a
+		// separate document that hook never touches - so the same field
+		// type works fine in a classic meta box but silently does nothing
+		// (no Cropper.js, no click handler) inside a block. enqueue_block_assets
+		// is WordPress's own mechanism for reaching that iframe.
+		add_action( 'enqueue_block_assets', array( $this, 'enqueue_block_editor_assets' ) );
 	}
 
 	/**
@@ -246,6 +256,24 @@ class Ei_Image_Crop_Field extends acf_field {
 	 */
 	public static function pencil_icon() {
 		return '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>';
+	}
+
+	/**
+	 * enqueue_block_assets also fires on the public-facing frontend (it's
+	 * WordPress's one hook that reaches both the site and the block
+	 * editor's canvas iframe) - only the block editor itself needs this
+	 * plugin's assets, so bail everywhere else rather than shipping
+	 * Cropper.js and jQuery-dependent field.js to every site visitor, or
+	 * loading them unconditionally across all of wp-admin.
+	 */
+	public function enqueue_block_editor_assets() {
+		$screen = is_admin() ? get_current_screen() : null;
+
+		if ( ! $screen || ! $screen->is_block_editor() ) {
+			return;
+		}
+
+		$this->input_admin_enqueue_scripts();
 	}
 
 	/**
