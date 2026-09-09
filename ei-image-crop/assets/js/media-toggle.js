@@ -33,12 +33,13 @@
 	// cookie (sent with every request regardless of that whitelist) is used
 	// instead. props.set() is still called purely to trigger WordPress's own
 	// refetch-on-change listener - its value just isn't what PHP reads.
+	//
+	// Deliberately write-only from here: addToggle() always resets it to
+	// "Original images" on every fresh toolbar build (see below) rather
+	// than reading back whatever was left over from a previous one, so a
+	// tab switch only ever lasts for the currently open grid/picker, never
+	// carries over to the next time the Media Library is opened.
 	var COOKIE_NAME = 'ei_show_crops';
-
-	function getShowCropsCookie() {
-		var match = document.cookie.match( new RegExp( '(?:^|; )' + COOKIE_NAME + '=([^;]*)' ) );
-		return !! match && '1' === match[ 1 ];
-	}
 
 	function setShowCropsCookie( checked ) {
 		document.cookie = COOKIE_NAME + '=' + ( checked ? '1' : '0' ) + '; path=/; max-age=' + ( 60 * 60 * 24 );
@@ -88,11 +89,22 @@
 		var LAYOUT_STYLE = 'display:inline-flex;align-items:center;gap:4px;margin:0 0 0 12px;';
 
 		var library = browserView.collection;
-		var showingCrops = getShowCropsCookie();
+
+		// Every fresh toolbar build - a plain page load of the standalone
+		// Media Library, or each new "Add Media" / field picker frame -
+		// always starts on "Original images", regardless of whatever tab
+		// was left active the last time one of these was open. The cookie
+		// itself needs resetting here too, not just the button's own
+		// look: it's what the very first collection fetch for this grid is
+		// actually scoped by (see filter_grid_query() on the PHP side),
+		// and that fetch can happen before any click ever reaches this
+		// toggle.
+		setShowCropsCookie( false );
+
 		var $toggle = $(
 			'<span class="ei-image-crop-toggle" style="' + LAYOUT_STYLE + '">' +
-				'<button type="button" class="ei-image-crop-tab' + ( showingCrops ? '' : ' is-active' ) + '" data-crops="0">' + originalsLabel() + '</button>' +
-				'<button type="button" class="ei-image-crop-tab' + ( showingCrops ? ' is-active' : '' ) + '" data-crops="1">' + cropsLabel() + '</button>' +
+				'<button type="button" class="ei-image-crop-tab is-active" data-crops="0">' + originalsLabel() + '</button>' +
+				'<button type="button" class="ei-image-crop-tab" data-crops="1">' + cropsLabel() + '</button>' +
 			'</span>'
 		);
 

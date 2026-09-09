@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.7.9
+Stable tag: 1.7.10
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.7.10 =
+* The media grid's "Original images" / "Crops" tabs (standalone Media Library, "Add Media", and the field's own "Select image" picker) now always start on "Original images" when freshly opened, instead of remembering whichever tab was last active. Switching tabs still works as before, it just no longer carries over to the next time the grid is opened.
 
 = 1.7.9 =
 * The crop frame now turns red for a free-crop field capped by a registered size's own width/height (see 1.7.8) when the drawn box falls below that cap in BOTH dimensions - a heads-up that the result won't reach the size the cap allows for, not an upscale warning (a free crop is never upscaled). A single-axis cap (one side left at 0) never triggers this.
