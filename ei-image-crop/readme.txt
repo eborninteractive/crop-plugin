@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.9.3
+Stable tag: 1.9.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.9.4 =
+* A field inside an ACF block still never got initialized even with 1.9.3's fix, confirmed live - ACF's own "append" action apparently doesn't fire (or fires too early) for however this specific markup actually lands in the DOM. Rather than keep guessing which ACF-internal event corresponds to it, field.js now also watches the DOM directly with a MutationObserver and initializes any `.ei-image-crop-field` the moment it actually appears, with no dependency on ACF's own eventing.
 
 = 1.9.3 =
 * Found the actual reason a field inside an ACF block never got its click handlers bound, confirmed live by comparing two matching fields on the same page: `initAll()` only ever searched for `.ei-image-crop-field` *inside* the element ACF's "append" action handed it, but for a field inside an ACF block that element turns out to already BE the field's own wrapper, not a container around it - so the search found nothing and silently skipped it forever, every time. Now also checks whether the handed-in element itself is the field before searching its descendants.

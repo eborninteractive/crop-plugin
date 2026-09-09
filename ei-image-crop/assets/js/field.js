@@ -1200,4 +1200,33 @@
 	}
 
 	registerAcfAppendHandler();
+
+	/**
+	 * Confirmed live: a field inside an ACF block still never gets
+	 * initialized even with the self-vs-descendant fix above, meaning
+	 * ACF's own "append" action either doesn't fire for however this
+	 * specific markup gets inserted, or fires at a point that doesn't
+	 * actually contain it yet (its block's field HTML likely lands in the
+	 * DOM via a separate, later step of ACF PRO's own block rendering).
+	 * Rather than keep guessing at exactly which ACF-internal event
+	 * corresponds to this, watch the DOM directly - this catches a
+	 * .ei-image-crop-field appearing however/whenever it actually does,
+	 * with no dependency on ACF's own eventing at all. initField() itself
+	 * guards against double-initialization, so scanning broadly here is
+	 * cheap and safe.
+	 */
+	if ( window.MutationObserver ) {
+		var mutationObserver = new MutationObserver( function ( mutations ) {
+			for ( var i = 0; i < mutations.length; i++ ) {
+				var addedNodes = mutations[ i ].addedNodes;
+				for ( var j = 0; j < addedNodes.length; j++ ) {
+					if ( addedNodes[ j ].nodeType === 1 ) {
+						initAll( addedNodes[ j ] );
+					}
+				}
+			}
+		} );
+
+		mutationObserver.observe( document.documentElement, { childList: true, subtree: true } );
+	}
 } )( jQuery );
