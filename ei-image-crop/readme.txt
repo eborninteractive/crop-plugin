@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.7.11
+Stable tag: 1.7.12
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.7.12 =
+* Fixed the pencil icon's popup (1.7.11) opening blank - acf.newMediaPopup() didn't actually populate the attachment's own data (no thumbnail, no alt text, no dimensions, just the bare title/excerpt/description/URL fields every attachment has). Rebuilt on plain wp.media() instead - the same core API the field's own "Select image" picker already uses, just scoped to one attachment via library.post__in and explicitly added to the frame's selection so its details sidebar shows.
 
 = 1.7.11 =
 * The pencil icon's "edit image details" popup is no longer a custom iframe loading upload.php - it now opens WP's native attachment-edit popup via ACF's own acf.newMediaPopup() helper (the same one ACF's Image/Gallery/File fields use), matching the look and behavior of any other ACF image field's edit-in-place popup, with none of the double admin-bar/menu or iframe sizing quirks the previous approach had.

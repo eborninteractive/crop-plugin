@@ -104,27 +104,50 @@
 	}
 
 	/**
-	 * Opens WP's native "edit attachment" media popup for the given
-	 * attachment - the very same one ACF's own Image/Gallery/File fields
-	 * use for exactly this (acf.newMediaPopup() with mode: 'edit', a
-	 * stable, public ACF JS helper - safe to rely on since ACF is a hard
-	 * dependency of this entire plugin, and 'acf-input' is already a
-	 * script dependency of this file). Its native WP chrome (no double
-	 * admin bar/menu, no iframe sizing/scroll quirks) replaces the
-	 * previous approach of loading upload.php?item={id} in a custom
-	 * iframe overlay - clicking the pencil never navigated the tab away
-	 * to the Media Library either way, this is just a more robust way to
-	 * achieve that. Left blank of a title/button override on purpose, so
-	 * it shows ACF's own localized defaults, identical to any other ACF
-	 * image field's own edit-in-place popup.
+	 * Opens WP's native attachment-details editor for the given attachment,
+	 * in a standard wp.media() frame - the same core API openMediaFrame()
+	 * already uses for the field's own picker, just scoped down to one
+	 * attachment. Its native WP chrome (no double admin bar/menu, no
+	 * iframe sizing/scroll quirks) replaces the previous approach of
+	 * loading upload.php?item={id} in a custom iframe overlay - clicking
+	 * the pencil never navigated the tab away to the Media Library either
+	 * way, this is just a more robust way to achieve that.
+	 *
+	 * library.post__in scopes the grid to just this one attachment - it's
+	 * one of the few query keys wp_ajax_query_attachments() actually lets
+	 * through its own whitelist (see the comment on COOKIE_NAME in
+	 * media-toggle.js for the same whitelist affecting a different
+	 * feature), so this reliably filters server-side too, not just
+	 * client-side. Explicitly adding the attachment to the frame's own
+	 * selection is what makes its details sidebar auto-show - the same
+	 * thing that happens selecting any single attachment in the ordinary
+	 * Media Library grid - rather than leaving the frame sitting on an
+	 * empty/unselected grid.
 	 *
 	 * @param {number|string} attachmentId
 	 */
 	function openAttachmentModal( attachmentId ) {
-		acf.newMediaPopup( {
-			mode: 'edit',
-			attachment: attachmentId,
+		var frame = wp.media( {
+			title: t( 'editDetails' ),
+			library: { type: 'image', post__in: [ attachmentId ] },
+			multiple: false,
+			button: { text: t( 'close' ) },
 		} );
+
+		// The frame's own docked button is only ever used here to close it -
+		// editing itself autosaves field-by-field via the details sidebar,
+		// same as the standalone Media Library's list view.
+		frame.on( 'select', function () {
+			frame.close();
+		} );
+
+		frame.on( 'open', function () {
+			var attachment = wp.media.attachment( attachmentId );
+			attachment.fetch();
+			frame.state().get( 'selection' ).add( attachment );
+		} );
+
+		frame.open();
 	}
 
 	// Dashicons has no crop glyph, so "Adjust crop" uses this inline SVG
