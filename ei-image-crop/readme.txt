@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.9.0
+Stable tag: 1.9.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.9.1 =
+* Fixed the crop button still doing nothing inside an ACF block even after 1.9.0 got our JS/CSS loading into the block editor's iframe: field.js registers its click handlers for a field's markup either at page load or via ACF's own "append" action (fired whenever ACF injects new field markup later, which is exactly how a block's fields appear), but it only checked once, synchronously, whether window.acf existed yet before registering for that "append" event - and inside the iframe that check could run before ACF's own core script had finished executing, permanently skipping registration. Now retries briefly instead of checking once, and logs the outcome to the console (prefixed "[Ei Image Crop]").
 
 = 1.9.0 =
 * Fixed the crop popup never opening for this field type when used inside an ACF block (works fine in a classic meta box) - the block editor's canvas iframe is a separate document that ACF's own acf/input/admin_enqueue_scripts hook never reaches, so Cropper.js and field.js were simply never loaded there. Now also enqueued via WordPress's enqueue_block_assets whenever the block editor is active, the same mechanism ACF's own core field JS already relies on for fields to work inside blocks at all.

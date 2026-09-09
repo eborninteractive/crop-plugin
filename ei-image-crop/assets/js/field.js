@@ -1130,9 +1130,33 @@
 		initAll( document );
 	} );
 
-	if ( window.acf && acf.addAction ) {
-		acf.addAction( 'append', function ( $el ) {
-			initAll( $el );
-		} );
+	// window.acf is normally already defined by the time this script runs,
+	// since acf-input is listed as a dependency - but inside an ACF block
+	// (rendered in the block editor's canvas iframe, a separate document
+	// enqueue_block_assets pushes our assets into) that ordering isn't
+	// guaranteed the same way, and a one-time check here can lose the race
+	// and permanently skip registering this. Retry briefly instead of
+	// checking once - without this, a field's markup injected later by
+	// ACF's own AJAX block render (which is exactly what the 'append'
+	// action below is for) never gets its click handlers bound at all.
+	var acfAddActionAttempts = 0;
+
+	function registerAcfAppendHandler() {
+		if ( window.acf && acf.addAction ) {
+			acf.addAction( 'append', function ( $el ) {
+				initAll( $el );
+			} );
+			console.log( '[Ei Image Crop] acf "append" handler registered after ' + acfAddActionAttempts + ' attempt(s)' );
+			return;
+		}
+
+		if ( acfAddActionAttempts < 30 ) {
+			acfAddActionAttempts++;
+			setTimeout( registerAcfAppendHandler, 200 );
+		} else {
+			console.warn( '[Ei Image Crop] gave up waiting for window.acf - fields added after page load (e.g. inside an ACF block) will not get a working crop button' );
+		}
 	}
+
+	registerAcfAppendHandler();
 } )( jQuery );
