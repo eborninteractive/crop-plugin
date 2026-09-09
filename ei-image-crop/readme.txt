@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.9.4
+Stable tag: 1.9.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.9.5 =
+* The "Image size" field setting's dropdown now shows a friendlier label for each registered size - e.g. "Kvadrat fri" instead of the raw slug "kvadrat-fri" (hyphens/underscores replaced with spaces, first letter capitalized). Purely cosmetic - the value actually saved is still the untouched slug.
 
 = 1.9.4 =
 * A field inside an ACF block still never got initialized even with 1.9.3's fix, confirmed live - ACF's own "append" action apparently doesn't fire (or fires too early) for however this specific markup actually lands in the DOM. Rather than keep guessing which ACF-internal event corresponds to it, field.js now also watches the DOM directly with a MutationObserver and initializes any `.ei-image-crop-field` the moment it actually appears, with no dependency on ACF's own eventing.
