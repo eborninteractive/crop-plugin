@@ -154,12 +154,14 @@ class Ei_Image_Crop_Ajax {
 		wp_send_json_success(
 			array(
 				'id'  => $result,
-				// 'full' rather than a configurable size on purpose - a crop
-				// never gets WordPress's usual thumbnail/medium/large copies
-				// generated for it at all (see generate()'s use of the
-				// intermediate_image_sizes_advanced filter), so any other
-				// named size would just fall back to this same file anyway.
-				'url' => wp_get_attachment_image_url( $result, 'full' ),
+				// 'medium' rather than a configurable size on purpose - a
+				// crop always gets that size generated for it whenever it's
+				// actually bigger (see generate()'s
+				// keep_only_proportional_sizes()), sharing its own true
+				// aspect ratio since it's a proportional resize. Falls back
+				// to the full file on its own for a crop too small to have
+				// one - never wrong, just occasionally identical to 'full'.
+				'url' => wp_get_attachment_image_url( $result, 'medium' ),
 			)
 		);
 	}
@@ -222,13 +224,15 @@ class Ei_Image_Crop_Ajax {
 		$crops = array();
 
 		foreach ( $ids as $id ) {
-			// 'full' rather than a smaller named size on purpose - a crop
-			// never gets WordPress's usual thumbnail/medium/large copies
-			// generated for it at all (see generate()'s use of the
-			// intermediate_image_sizes_advanced filter), so any other named
-			// size (and 'thumbnail' specifically would also force a square
-			// crop) would just fall back to this exact same file anyway.
-			$thumb = wp_get_attachment_image_url( $id, 'full' );
+			// 'medium' rather than 'thumbnail' (WordPress's own default
+			// hard, forced-square crop, which would misrepresent this
+			// crop's real shape) or 'full' (needlessly large for a small
+			// row icon) - a crop always gets 'medium' generated for it
+			// whenever it's actually bigger (see generate()'s
+			// keep_only_proportional_sizes()), sharing its own true aspect
+			// ratio since it's a proportional resize. Falls back to the
+			// full file on its own for a crop too small to have one.
+			$thumb = wp_get_attachment_image_url( $id, 'medium' );
 			if ( ! $thumb ) {
 				continue;
 			}

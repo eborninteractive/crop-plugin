@@ -147,13 +147,16 @@ class Ei_Image_Crop_Field extends acf_field {
 		$ratio       = self::resolve_ratio( $field );
 		$parent_id   = $value ? Ei_Image_Crop_Generator::resolve_root( $value ) : 0;
 		$preview_id  = $value ? $value : 0;
-		// 'full' rather than a configurable admin size on purpose: a crop
-		// attachment never gets WordPress's usual thumbnail/medium/large
-		// copies generated for it at all (see generate()'s use of the
-		// intermediate_image_sizes_advanced filter) - only its own one
-		// file exists, so any other named size would just fall back to
-		// this same file anyway, just via an extra, pointless lookup.
-		$preview_url = $preview_id ? wp_get_attachment_image_url( $preview_id, 'full' ) : '';
+		// 'medium' rather than a configurable admin setting on purpose - a
+		// crop attachment always gets that size generated for it whenever
+		// it's actually bigger (see generate()'s
+		// keep_only_proportional_sizes()), sharing its own true aspect
+		// ratio since it's a proportional resize rather than a second,
+		// differently-shaped crop. wp_get_attachment_image_url() already
+		// falls back to the full file on its own for a crop too small to
+		// have one, so this is never wrong, just occasionally the same
+		// file as 'full' would have been.
+		$preview_url = $preview_id ? wp_get_attachment_image_url( $preview_id, 'medium' ) : '';
 		$has_image   = (bool) $preview_url;
 
 		// The field only ever submits ONE input to ACF (required for the field

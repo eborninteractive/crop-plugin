@@ -533,13 +533,16 @@
 				// so wasFreshPick is false) remains the explicit way to open
 				// the editor for it afterward.
 				if ( wasFreshPick && existingId ) {
-					// pickedAttachment.url (rather than any of its .sizes)
-					// on purpose - a crop never gets WordPress's usual
-					// thumbnail/medium/large copies generated for it at all
-					// (see generate()'s use of the
-					// intermediate_image_sizes_advanced filter), so its
-					// .sizes object never has anything useful to offer here.
-					var previewUrl = pickedAttachment ? pickedAttachment.url : data.edit.url;
+					// pickedAttachment.sizes.medium when it exists - a crop
+					// always gets that size generated for it whenever it's
+					// actually bigger (see generate()'s
+					// keep_only_proportional_sizes()), sharing its own true
+					// aspect ratio - falling back to the full picked url
+					// otherwise (a crop too small to have a 'medium' of its
+					// own, same as wp_get_attachment_image_url() would do).
+					var previewUrl = ( pickedAttachment && pickedAttachment.sizes && pickedAttachment.sizes.medium )
+						? pickedAttachment.sizes.medium.url
+						: ( pickedAttachment ? pickedAttachment.url : data.edit.url );
 
 					setState( $field, { id: existingId, source: sourceId } );
 					setPreview( $field, previewUrl, existingId );

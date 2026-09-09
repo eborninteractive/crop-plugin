@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.7.18
+Stable tag: 1.7.19
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.7.19 =
+* Admin-side preview images (the field's own thumbnail, the "Existing crops" row icons, and the preview shown right after saving/reusing a crop) now automatically use the smaller 'medium' size instead of the full-resolution crop, now that 1.7.18 guarantees it exists (and shares the crop's true aspect ratio) whenever the crop is actually bigger than it. No setting to configure - it's always correct by construction, so there's nothing to choose.
 
 = 1.7.18 =
 * Restored responsive images (srcset) for crops, without going back to generating every registered size for each one. A crop's own metadata used to skip all registered sizes entirely (since 1.0.13, to avoid needless mass file generation) - but WordPress's responsive-images feature builds srcset directly from that same list, so crops silently lost it too. Now only the sizes that scale proportionally (crop => false) are generated - a hard-cropped custom size never shares the crop's own aspect ratio anyway, so WordPress's own srcset logic would filter it straight back out even if it existed, making it pure waste to generate in the first place.
