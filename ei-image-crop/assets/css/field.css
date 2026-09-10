@@ -631,6 +631,19 @@
 	border-bottom: 1px solid #dcdcde;
 }
 
+/* Same "own row below, not inline" treatment for the classic list table's
+ * version - it renders inside .tablenav's "actions" bar (the date filter
+ * and "Filtrera" button), which floats its children left-to-right rather
+ * than using flex/grid, so a plain block-level, full-width, floats-clearing
+ * element after them naturally wraps onto its own line - no JS needed
+ * here since we control this markup directly (see render_list_toggle()). */
+.tablenav .ei-image-crop-toggle {
+	display: block;
+	clear: both;
+	width: 100%;
+	margin: 8px 0 0;
+}
+
 .ei-image-crop-tab {
 	display: inline-flex;
 	align-items: center;
