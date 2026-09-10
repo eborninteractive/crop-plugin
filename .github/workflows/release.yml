@@ -1,15 +1,29 @@
 name: Release
 
-# Pushing a version tag (e.g. "v1.10.1", matching EI_IMAGE_CROP_VERSION in
-# ei-image-crop.php) builds a plugin zip and publishes it as a GitHub
-# Release asset. The plugin's own update checker (see
-# ei_image_crop_init_update_checker() in ei-image-crop.php) polls exactly
-# that - Releases with an attached zip - on every site running this
-# plugin, so this is the one step that actually ships an update to them.
+# Builds a plugin zip and publishes it as a GitHub Release asset. The
+# plugin's own update checker (see ei_image_crop_init_update_checker() in
+# ei-image-crop.php) polls exactly that - Releases with an attached zip -
+# on every site running this plugin, so this is the one step that actually
+# ships an update to them.
+#
+# Two ways to fire this:
+# - Push a version tag (e.g. "v1.10.2", matching EI_IMAGE_CROP_VERSION in
+#   ei-image-crop.php) - the normal path for a local checkout with push
+#   access.
+# - workflow_dispatch with a "version" input - lets this be triggered via
+#   the GitHub API/CLI (e.g. `gh workflow run` or the Actions API) when
+#   pushing a tag directly isn't possible, without any manual step in the
+#   GitHub UI. softprops/action-gh-release creates the tag itself (pointed
+#   at whatever ref the workflow ran against) if it doesn't already exist.
 on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release, e.g. v1.10.2 (must match EI_IMAGE_CROP_VERSION)'
+        required: true
 
 permissions:
   contents: write
@@ -19,6 +33,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Determine tag
+        id: vars
+        run: echo "tag=${{ github.event.inputs.version || github.ref_name }}" >> "$GITHUB_OUTPUT"
 
       # Zipped from the repo root so the archive's top-level folder is
       # "ei-image-crop" (matching the plugin's own directory/slug) rather
@@ -30,5 +48,6 @@ jobs:
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.vars.outputs.tag }}
           files: ei-image-crop.zip
           generate_release_notes: true
