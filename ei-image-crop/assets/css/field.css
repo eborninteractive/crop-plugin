@@ -630,11 +630,9 @@
  * own inline-flex) rather than stretched full-width - just enough padding
  * and a bottom divider to visually separate it from the grid below. */
 .attachments-browser > .ei-image-crop-toggle {
-	display: flex !important;
-	width: 100% !important;
-	margin-bottom: 10px;
-	padding: 12px 12px 12px 20px;
-	border-bottom: 1px solid #dcdcde;
+	margin-bottom: 10px !important;
+	padding: 12px 12px 12px 20px !important;
+	border-bottom: 1px solid #dcdcde !important;
 }
 
 /* The "Select or Upload Media" popup (and any other field's picker opened
