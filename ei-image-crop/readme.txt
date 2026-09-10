@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.10.24
+Stable tag: 1.10.25
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.10.25 =
+* Dropped the tabs' full-width stretch in both the popup and list views (back to their natural content width), and removed the popup's bottom divider.
 
 = 1.10.24 =
 * Gave the tabs their own full-width styling specifically in the "Select or Upload Media" popup (and similar field pickers), separate from the standalone Media Library grid's compact box.

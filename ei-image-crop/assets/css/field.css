@@ -638,13 +638,11 @@
  * as an overlay, e.g. an ACF block's own image field) wraps everything in
  * WP core's own .media-modal - the standalone Media Library page (Media >
  * Library) never has that ancestor, since it's not a modal at all. That
- * split is what lets this be styled differently (full width, less left
- * padding) from the standalone grid's compact box above, without needing
- * any JS to tell the two apart. */
+ * split is what lets this be styled differently (less left padding, no
+ * bottom divider) from the standalone grid's compact box above, without
+ * needing any JS to tell the two apart. */
 .media-modal .attachments-browser > .ei-image-crop-toggle {
-	width: 100%;
 	padding: 12px 12px 12px 5px;
-	border-bottom: 1px solid #dcdcde;
 }
 
 /* Same "own row below, not inline" treatment for the classic list table's
@@ -661,7 +659,6 @@
  * what a block-level element does by default, no fighting required. */
 .upload-php .wp-filter + .ei-image-crop-toggle {
 	display: flex;
-	width: 100%;
 	margin: 15px 0 20px;
 	padding: 0 0 12px 20px;
 	border-bottom: 1px solid #dddddd;
