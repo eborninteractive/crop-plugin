@@ -631,8 +631,9 @@
  * and a bottom divider to visually separate it from the grid below. */
 .attachments-browser > .ei-image-crop-toggle {
 	margin-bottom: 10px !important;
-	padding: 12px 12px 12px 20px !important;
+	padding: 0 12px 12px 20px !important;
 	border-bottom: 1px solid #dcdcde !important;
+	width: 100%;
 }
 
 /* The "Select or Upload Media" popup (and any other field's picker opened
