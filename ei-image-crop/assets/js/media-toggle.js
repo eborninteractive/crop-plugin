@@ -61,29 +61,32 @@
 	 * @return {boolean} True once the tabs are in the DOM; false if not ready yet.
 	 */
 	function addToggle( browserView ) {
-		if ( ! browserView || ! browserView.toolbar || ! browserView.toolbar.$el || ! browserView.toolbar.$el.length || ! browserView.collection ) {
+		if ( ! browserView || ! browserView.el || ! browserView.collection ) {
 			return false;
 		}
 
-		var $toolbar = browserView.toolbar.$el;
+		var $browser = $( browserView.el );
 
-		// Already inserted after this toolbar - never insert a second one.
-		if ( $toolbar.next( '.ei-image-crop-toggle' ).length ) {
+		// Already inserted into this browser view - never insert a second one.
+		if ( $browser.find( '> .ei-image-crop-toggle' ).length ) {
 			return true;
 		}
 
 		// Confirmed live: in the "Select or Upload Media" picker (as opposed
 		// to the standalone Media Library page), the toolbar view can exist
-		// - createToolbar() has run, this.toolbar.$el is a real element -
-		// without being attached to the document yet; WordPress inserts it
-		// into the visible frame slightly later. .after() on a detached
-		// element is a silent no-op in jQuery, so the toggle was being
-		// built and then dropped on the floor every time. Treat "not
-		// attached yet" the same as "not ready yet" so the retry loops
-		// around this function (see patchExistingFrame and
-		// createToolbar's override below) keep trying instead of silently
-		// losing it.
-		if ( ! $toolbar.parent().length ) {
+		// - createToolbar() has run - without being attached to the
+		// document yet; WordPress inserts it into the visible frame
+		// slightly later. And in the "Edit image details" popup (a single
+		// attachment, opened via the crop field's own pencil icon), the
+		// toolbar apparently never gets a visible row attached at all -
+		// filtering by type/date makes no sense for one fixed attachment.
+		// Rather than depend on the toolbar sub-view specifically (which
+		// may never attach), wait for the browse view's own top-level
+		// element to be attached instead - it has to be, for anything in
+		// it to be visible at all - and place the toggle right after the
+		// toolbar when one actually rendered into this same tree, or at
+		// the top of the browse view otherwise.
+		if ( ! $browser[ 0 ].isConnected ) {
 			return false;
 		}
 
@@ -119,27 +122,32 @@
 			library.props.set( { eiShowCrops: wantsCrops ? 1 : '' } );
 		} );
 
-		$toolbar.after( $toggle );
+		var $toolbar = browserView.toolbar && browserView.toolbar.$el;
+
+		if ( $toolbar && $toolbar.length && $toolbar.parent().is( $browser ) ) {
+			$toolbar.after( $toggle );
+		} else {
+			$browser.prepend( $toggle );
+		}
 
 		return true;
 	}
 
 	// A fixed retry budget (tried first: 30 attempts x 100ms = 3s) turned
-	// out to still be too short - confirmed live, the "Edit image details"
-	// popup (opened via the crop field's pencil icon, scoped to a single
-	// attachment) attaches its toolbar to the document slower than every
-	// other picker this was tested against, so it kept losing the race.
-	// Rather than guess at ever-larger fixed budgets, watch the document
-	// directly for the toolbar actually becoming attached (Node.isConnected)
-	// and act the moment it does, with no arbitrary time limit - the same
-	// approach field.js already relies on for an equivalent problem
-	// (a field's own init not reliably happening in time via ACF's events).
-	var TOOLBAR_ATTACH_SAFETY_TIMEOUT = 30000;
+	// out to still be too short for some pickers. Rather than guess at
+	// ever-larger fixed budgets, watch the document directly for the
+	// browse view's own element actually becoming attached
+	// (Node.isConnected) and act the moment it does, with no arbitrary
+	// time limit - the same approach field.js already relies on for an
+	// equivalent problem (a field's own init not reliably happening in
+	// time via ACF's events).
+	var ATTACH_SAFETY_TIMEOUT = 30000;
 
 	/**
-	 * addToggle() can come back false because the toolbar exists but isn't
-	 * attached to the document yet (see the comment inside addToggle).
-	 * Insert as soon as that stops being true, however long it takes.
+	 * addToggle() can come back false because the browse view's own
+	 * element isn't attached to the document yet (see the comment inside
+	 * addToggle). Insert as soon as that stops being true, however long
+	 * it takes.
 	 *
 	 * @param {Object} browserView
 	 */
@@ -148,18 +156,18 @@
 			return;
 		}
 
-		if ( ! browserView || ! browserView.toolbar || ! browserView.toolbar.$el || ! browserView.toolbar.$el.length ) {
+		if ( ! browserView || ! browserView.el ) {
 			return;
 		}
 
-		var toolbarEl = browserView.toolbar.$el[ 0 ];
+		var browserEl = browserView.el;
 		var gaveUp = setTimeout( function () {
 			observer.disconnect();
-			console.warn( '[Ei Image Crop] gave up inserting the toggle after createToolbar() - toolbar never got attached to the document within ' + ( TOOLBAR_ATTACH_SAFETY_TIMEOUT / 1000 ) + 's' );
-		}, TOOLBAR_ATTACH_SAFETY_TIMEOUT );
+			console.warn( '[Ei Image Crop] gave up inserting the toggle after createToolbar() - browse view never got attached to the document within ' + ( ATTACH_SAFETY_TIMEOUT / 1000 ) + 's' );
+		}, ATTACH_SAFETY_TIMEOUT );
 
 		var observer = new MutationObserver( function () {
-			if ( ! toolbarEl.isConnected ) {
+			if ( ! browserEl.isConnected ) {
 				return;
 			}
 			observer.disconnect();

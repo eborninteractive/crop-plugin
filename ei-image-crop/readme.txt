@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.10.4
+Stable tag: 1.10.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.10.5 =
+* Fixed the "Original images"/"Crops" tabs still never appearing in the "Edit image details" popup even with 1.10.4's unbounded wait - confirmed live via direct DOM inspection, the element was never created at all. Root cause: that popup (scoped to a single attachment, opened via the crop field's pencil icon) apparently never attaches a visible toolbar row at all, since filtering by type/date makes no sense for one fixed image - waiting for the toolbar to attach waited forever for something that was never going to happen. Now waits for the browse view's own container instead (which always attaches, for anything in it to be visible), placing the tabs after the toolbar when one exists in that same tree, or at the top of the view otherwise.
 
 = 1.10.4 =
 * Fixed the "Original images"/"Crops" tabs still not appearing in the "Edit image details" popup (opened via the crop field's pencil icon) after 1.10.2's fix - confirmed live, that popup attaches its toolbar to the document slower than every other picker this was tested against, so the fixed 3-second retry budget added in 1.10.2 was still too short and gave up before it happened. Replaced the fixed retry budget with a MutationObserver that waits as long as it actually takes, the same technique already used in field.js for an equivalent timing problem.
