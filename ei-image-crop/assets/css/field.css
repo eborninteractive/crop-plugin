@@ -630,7 +630,7 @@
  * own inline-flex) rather than stretched full-width - just enough padding
  * and a bottom divider to visually separate it from the grid below. */
 .attachments-browser > .ei-image-crop-toggle {
-	padding: 0 16px 12px;
+	padding: 12px 12px 12px 20px;
 	border-bottom: 1px solid #dcdcde;
 }
 
@@ -650,7 +650,7 @@
 	display: flex;
 	width: 100%;
 	margin: 15px 0 20px;
-	padding-bottom: 12px;
+	padding: 0 0 12px 20px;
 	border-bottom: 1px solid #dddddd;
 }
 
