@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.10.11
+Stable tag: 1.10.12
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.10.12 =
+* Removed the spaces around "×" in new crop attachments' titles - "1400×1400" instead of "1400 × 1400".
 
 = 1.10.11 =
 * New crop attachments' titles now show their ratio as "1400 × 1400" instead of "1400:1400", matching the "×" convention already used elsewhere in the plugin (e.g. the "Image size" setting) - a colon reads as a raw value rather than a width/height pair. Cosmetic only: the underlying ratio value itself is unaffected everywhere else. Crops created before this update keep their existing title as-is.

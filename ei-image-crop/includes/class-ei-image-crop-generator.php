@@ -476,7 +476,7 @@ class Ei_Image_Crop_Generator {
 			// the plugin's existing convention for showing dimensions (see
 			// get_image_size_setting_choices()) - a colon reads as a raw
 			// data value here rather than a width/height pair.
-			$ratio_label = $ratio ? str_replace( ':', ' × ', $ratio ) : __( 'free crop', 'ei-image-crop' );
+			$ratio_label = $ratio ? str_replace( ':', '×', $ratio ) : __( 'free crop', 'ei-image-crop' );
 
 			$attachment_id = wp_insert_attachment(
 				array(
