@@ -137,7 +137,44 @@
 			$browser.prepend( $toggle );
 		}
 
+		reserveSpaceForToggle( $browser, $toggle );
+
 		return true;
+	}
+
+	/**
+	 * Confirmed live: the toggle was inserting correctly all along (and
+	 * staying there) - it just never became visible, because its own
+	 * siblings in .attachments-browser (the attachments grid, the
+	 * sidebar) are positioned absolutely by WordPress's own CSS, each
+	 * with a hardcoded `top` that assumes only the toolbar sits above
+	 * them. A normal-flow sibling like ours doesn't push absolutely
+	 * positioned elements down - nothing makes room for it, so it just
+	 * sits there under/behind whatever's drawn on top. Push each of them
+	 * down by exactly this toggle's own rendered height instead of
+	 * guessing a fixed offset, so it holds regardless of the toolbar's
+	 * actual height in any given WP version/admin color scheme/theme.
+	 *
+	 * @param {jQuery} $browser The .attachments-browser element.
+	 * @param {jQuery} $toggle  The just-inserted .ei-image-crop-toggle.
+	 */
+	function reserveSpaceForToggle( $browser, $toggle ) {
+		var toggleHeight = $toggle.outerHeight( true );
+
+		if ( ! toggleHeight ) {
+			return;
+		}
+
+		$browser.find( '> .attachments-wrapper, > .media-sidebar' ).each( function () {
+			var $sibling = $( this );
+
+			if ( 'absolute' !== $sibling.css( 'position' ) ) {
+				return;
+			}
+
+			var currentTop = parseFloat( $sibling.css( 'top' ) ) || 0;
+			$sibling.css( 'top', ( currentTop + toggleHeight ) + 'px' );
+		} );
 	}
 
 	// A fixed retry budget (tried first: 30 attempts x 100ms = 3s) turned
