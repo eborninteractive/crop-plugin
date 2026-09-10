@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.10.6
+Stable tag: 1.10.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.10.7 =
+* Found the actual reason the crop field's own "Select image" picker never showed the tabs, thanks to a full log trace: insertion genuinely succeeded every time (confirmed by its own "inserting toggle now" log line) - something in WordPress's own rendering then ran a further step afterward that replaced the container's content, silently wiping the toggle back out again every time. Insertion is now self-healing: it keeps re-asserting the toggle's presence on every further change for as long as the browse view stays open, instead of reacting once and stopping.
 
 = 1.10.6 =
 * No functional change - added detailed console logging (prefixed "[Ei Image Crop]") at every decision point in media-toggle.js's toggle-insertion logic, to diagnose in one pass why the tabs still don't appear in the crop field's own "Select image" picker despite 1.10.2-1.10.5's fixes for other pickers.

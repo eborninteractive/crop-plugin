@@ -68,9 +68,11 @@
 
 		var $browser = $( browserView.el );
 
-		// Already inserted into this browser view - never insert a second one.
+		// Already inserted into this browser view - never insert a second
+		// one. Deliberately silent: with the self-healing watch in
+		// insertToggleWhenAttached(), this is the common case on every
+		// mutation once the toggle has settled in, not worth logging.
 		if ( $browser.find( '> .ei-image-crop-toggle' ).length ) {
-			console.log( '[Ei Image Crop] addToggle: already inserted, skipping' );
 			return true;
 		}
 
@@ -157,35 +159,47 @@
 	 * @param {Object} browserView
 	 */
 	function insertToggleWhenAttached( browserView ) {
-		if ( addToggle( browserView ) ) {
-			console.log( '[Ei Image Crop] insertToggleWhenAttached: addToggle succeeded on first try' );
-			return;
-		}
-
 		if ( ! browserView || ! browserView.el ) {
 			console.log( '[Ei Image Crop] insertToggleWhenAttached: bailing, no browserView/el at all' );
 			return;
 		}
 
-		console.log( '[Ei Image Crop] insertToggleWhenAttached: not ready yet, watching for attachment', browserView.el );
-
 		var browserEl = browserView.el;
-		var gaveUp = setTimeout( function () {
+
+		// Confirmed live: a plain "wait for it to connect, insert once"
+		// watch DID see the browse view connect and DID successfully
+		// insert the toggle (logged "addToggle: inserting toggle now") -
+		// yet the toggle was gone again by the time the popup was actually
+		// checked. Something in WordPress's own rendering runs AFTER that
+		// first connection and replaces the container's content, wiping
+		// our insert out along with it. Rather than guess how many
+		// rendering passes to wait through, keep re-asserting the
+		// toggle's presence on every subsequent mutation too, for as long
+		// as the browse view itself stays connected - addToggle() is
+		// already a no-op once the toggle is there and staying there, so
+		// this costs nothing once things settle down.
+		var stopWatching = setTimeout( function () {
 			observer.disconnect();
-			console.warn( '[Ei Image Crop] gave up inserting the toggle after createToolbar() - browse view never got attached to the document within ' + ( ATTACH_SAFETY_TIMEOUT / 1000 ) + 's', browserEl );
+			if ( ! $( browserEl ).find( '> .ei-image-crop-toggle' ).length ) {
+				console.warn( '[Ei Image Crop] gave up - toggle never stuck within ' + ( ATTACH_SAFETY_TIMEOUT / 1000 ) + 's', browserEl );
+			}
 		}, ATTACH_SAFETY_TIMEOUT );
 
 		var observer = new MutationObserver( function () {
 			if ( ! browserEl.isConnected ) {
+				// View closed/torn down - nothing left to maintain.
+				observer.disconnect();
+				clearTimeout( stopWatching );
 				return;
 			}
-			console.log( '[Ei Image Crop] insertToggleWhenAttached: MutationObserver saw it connect' );
-			observer.disconnect();
-			clearTimeout( gaveUp );
 			addToggle( browserView );
 		} );
 
 		observer.observe( document.documentElement, { childList: true, subtree: true } );
+
+		// Try immediately too - covers the (already-connected) case where
+		// no further mutations happen to ever trigger the observer.
+		addToggle( browserView );
 	}
 
 	/**
