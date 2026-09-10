@@ -619,21 +619,18 @@
 }
 
 /* In the grid/picker toolbar (see media-toggle.js), the tabs are placed on
- * their own full-width row directly below the whole toolbar rather than
- * inline among its filters - after repeatedly fighting that toolbar's
- * layout (not a flex container, plus a varying, asynchronously-rendered
- * set of filters: one <select> in an ACF field's own picker, two - media
- * type and date - in the standalone "Open Media Library" picker), trying
- * to align inline with them proved too fragile. .attachments-browser is
- * the toolbar's own parent, so this only matches the sibling
- * media-toggle.js actually inserts - the classic list table's version gets
- * the same padding/border treatment further down, scoped to where
- * relocateListTableToggle() (also media-toggle.js) actually places it. */
+ * their own row directly below the whole toolbar rather than inline among
+ * its filters - after repeatedly fighting that toolbar's layout (not a
+ * flex container, plus a varying, asynchronously-rendered set of filters:
+ * one <select> in an ACF field's own picker, two - media type and date -
+ * in the standalone "Open Media Library" picker), trying to align inline
+ * with them proved too fragile. .attachments-browser is the toolbar's own
+ * parent, so this only matches the sibling media-toggle.js actually
+ * inserts. Left as a compact, shrink-to-fit box (the shared rule above's
+ * own inline-flex) rather than stretched full-width - just enough padding
+ * and a bottom divider to visually separate it from the grid below. */
 .attachments-browser > .ei-image-crop-toggle {
-	display: flex;
-	margin-left: 0;
-	padding: 8px 16px;
-	border-top: 1px solid #dcdcde;
+	padding: 0 16px 12px;
 	border-bottom: 1px solid #dcdcde;
 }
 
@@ -652,11 +649,7 @@
 .upload-php .wp-filter + .ei-image-crop-toggle {
 	display: flex;
 	width: 100%;
-	margin: 8px 0 20px;
-	padding: 8px 16px;
-	border-top: 1px solid #dcdcde;
-	border-bottom: 1px solid #dcdcde;
-	box-sizing: border-box;
+	margin: 0 0 10px;
 }
 
 .ei-image-crop-tab {
