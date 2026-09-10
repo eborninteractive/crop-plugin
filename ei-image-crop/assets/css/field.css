@@ -193,13 +193,11 @@
 
 .ei-image-crop-canvas {
 	position: absolute;
-	/* Top/bottom gap so a crop box covering the full image still leaves its
-	 * top-middle/bottom-middle resize handles clear of the modal's own edge
-	 * instead of getting visually swallowed by it - more at the top since
-	 * that's where the box label (see .ei-image-crop-box-label) also sits.
-	 * Left/right stay flush - handles there aren't at risk since the side
-	 * panel already keeps this pane narrower than the modal's full width. */
-	inset: 32px 0 20px;
+	/* Gap on every side so a crop box covering the full image still leaves
+	 * its resize handles clear of the modal's own edge instead of getting
+	 * visually swallowed by it - more at the top since that's where the box
+	 * label (see .ei-image-crop-box-label) also sits. */
+	inset: 45px 35px 35px;
 }
 
 .ei-image-crop-img {
