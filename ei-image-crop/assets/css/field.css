@@ -638,36 +638,21 @@
 }
 
 /* Same "own row below, not inline" treatment for the classic list table's
- * version. It actually renders inside .wp-filter > .filter-items > .actions
- * (WP_Media_List_Table::extra_tablenav( 'bar' ), not the generic .tablenav
- * used by other list tables), in this DOM order: the "Alla datum" months
- * dropdown, our own toggle, then the "Filtrera" submit button
- * (#post-query-submit). No absolute positioning or hardcoded pixel values
- * here on purpose - both need a guess at some element's exact height
- * (.wp-filter's, in an earlier version of this rule) that breaks the
- * moment that height actually differs, which is exactly what happened.
- * Turning .actions into a flex container instead needs no such guess: its
- * own box just grows to fit two wrapped lines, which pushes the table
- * below it down like any other normal block content would.
- * `inline-flex` (not `flex`) keeps .actions sitting inline next to its
- * "Alla mediaobjekt" sibling in .filter-items, matching its original
- * inline-block behavior. `order` visually moves the Filtrera button ahead
- * of our toggle without touching the DOM, and the toggle's
- * `flex-basis: 100%` is what forces it onto its own wrapped line. */
-.upload-php .wp-filter .actions {
-	display: inline-flex;
-	flex-wrap: wrap;
-	align-items: center;
-}
-
-.upload-php .wp-filter .actions #post-query-submit {
-	order: 1;
-}
-
-.upload-php .wp-filter .ei-image-crop-toggle {
-	order: 2;
-	flex-basis: 100%;
-	margin: 8px 0 0;
+ * version. render_list_toggle() (PHP) has to output it via the
+ * restrict_manage_posts hook, which fires inside WP core's own
+ * .wp-filter > .filter-items > .actions box, sandwiched between the "Alla
+ * datum" dropdown and the "Filtrera" button - every CSS-only attempt to
+ * get a full-width row out of that spot (block/width:100%, then
+ * inline-flex/order/wrap) kept fighting that box's own layout and causing
+ * side effects on ITS other children instead (the "Alla mediaobjekt"
+ * dropdown wrapping onto its own line). relocateListTableToggle() in
+ * media-toggle.js physically moves the toggle to be a plain sibling right
+ * after .wp-filter instead - from there, being a full-width block is just
+ * what a block-level element does by default, no fighting required. */
+.upload-php .wp-filter + .ei-image-crop-toggle {
+	display: flex;
+	width: 100%;
+	margin: 8px 0 20px;
 }
 
 .ei-image-crop-tab {

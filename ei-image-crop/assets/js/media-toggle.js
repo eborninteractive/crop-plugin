@@ -325,9 +325,29 @@
 		}
 	}
 
+	/**
+	 * The classic list table's own toggle (see render_list_toggle() PHP-side)
+	 * has to be echoed from inside the restrict_manage_posts hook, which
+	 * fires inside WP core's own .wp-filter > .filter-items > .actions box -
+	 * sandwiched between the "Alla datum" dropdown and the "Filtrera"
+	 * button, both of which it needs to sit below, not next to. That box is
+	 * server-rendered as part of the page itself (unlike the Backbone
+	 * pickers the rest of this file deals with), so it's already in the DOM
+	 * by the time this runs - no waiting/observing needed, just move it.
+	 */
+	function relocateListTableToggle() {
+		var $toggle = $( '.wp-filter .ei-image-crop-toggle' );
+		var $wpFilter = $toggle.closest( '.wp-filter' );
+
+		if ( $toggle.length && $wpFilter.length ) {
+			$toggle.insertAfter( $wpFilter );
+		}
+	}
+
 	$( function () {
 		try {
 			console.log( '[Ei Image Crop] media-toggle.js running, jQuery available: ' + ( typeof $ === 'function' ) );
+			relocateListTableToggle();
 			patchClassForFutureViews();
 			patchExistingFrame( 0 );
 		} catch ( e ) {
