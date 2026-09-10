@@ -23,6 +23,14 @@ class Ei_Image_Crop_Media_Library {
 		// fire wp_enqueue_media's action for this, so enqueue directly there too;
 		// wp_enqueue_script() no-ops harmlessly if it's already been added.
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_on_library_screen' ) );
+		// Neither of the two hooks above reaches the block editor's canvas
+		// iframe - a media picker opened from a field that lives inside an
+		// ACF block (confirmed live: its own wp.media() call, and the
+		// resulting wp.media.frame, exist only in that iframe's own
+		// separate window, invisible to this script if it only runs in the
+		// outer document) needs this the same way the crop field itself
+		// does (see Ei_Image_Crop_Field::enqueue_block_editor_assets()).
+		add_action( 'enqueue_block_assets', array( __CLASS__, 'enqueue_block_editor_grid_toggle' ) );
 	}
 
 	/**
@@ -165,6 +173,24 @@ class Ei_Image_Crop_Media_Library {
 		// actually present on this screen before enqueuing it.
 		wp_enqueue_media();
 
+		self::enqueue_grid_toggle();
+	}
+
+	/**
+	 * enqueue_block_assets also fires on the public-facing frontend (it's
+	 * WordPress's one hook that reaches both the site and the block
+	 * editor's canvas iframe) - only the block editor itself needs this,
+	 * so bail everywhere else, same guard as
+	 * Ei_Image_Crop_Field::enqueue_block_editor_assets().
+	 */
+	public static function enqueue_block_editor_grid_toggle() {
+		$screen = is_admin() ? get_current_screen() : null;
+
+		if ( ! $screen || ! $screen->is_block_editor() ) {
+			return;
+		}
+
+		wp_enqueue_media();
 		self::enqueue_grid_toggle();
 	}
 

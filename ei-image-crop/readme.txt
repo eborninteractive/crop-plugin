@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.10.2
+Stable tag: 1.10.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.10.3 =
+* Fixed the "Original images"/"Crops" tabs never appearing at all (not even misplaced - completely absent, confirmed live via console log "wp.media.frame present: false" after 30 attempts) in a media picker opened from a field that lives inside an ACF block. media-toggle.js was only ever loaded into the block editor's outer document, never into its canvas iframe - a field inside a block runs its own wp.media() call within that iframe's separate window, so wp.media.frame there was never the one this script was checking. Now also loaded via enqueue_block_assets, the same fix already applied to the crop field's own assets in 1.9.0.
 
 = 1.10.2 =
 * Fixed the "Original images"/"Crops" tabs not appearing at all in the "Select or Upload Media" popup (opened from within a page/block), a regression from 1.10.0's redesign - confirmed live, the toolbar element exists at that point but isn't attached to the document yet in that specific picker, unlike the standalone Media Library page, so appending our row directly after it was a silent no-op. Now retries until the toolbar is actually attached before inserting.
