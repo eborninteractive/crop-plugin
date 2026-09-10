@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.10.26
+Stable tag: 1.10.27
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.10.27 =
+* Reduced the list view's tabs bottom margin (20px to 10px).
 
 = 1.10.26 =
 * Actually removed the popup view's bottom divider - the previous attempt (1.10.25) only removed the declaration from its own rule, but the standalone grid's border-bottom was still cascading through underneath it.

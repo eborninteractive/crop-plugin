@@ -664,7 +664,7 @@
  * what a block-level element does by default, no fighting required. */
 .upload-php .wp-filter + .ei-image-crop-toggle {
 	display: flex;
-	margin: 15px 0 20px;
+	margin: 15px 0 10px;
 	padding: 0 0 12px 20px;
 	border-bottom: 1px solid #dddddd;
 }
