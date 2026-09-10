@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.10.28
+Stable tag: 1.10.29
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.10.29 =
+* Fixed the list view's tab styling incorrectly also applying to the standalone grid view - its toolbar turns out to also carry WordPress's own .wp-filter class, which the list view's CSS rule was (coincidentally) also matching. Now targeted by a marker class added only when the list view actually relocates its tabs, not by that ambiguous structural match.
 
 = 1.10.28 =
 * Fixed the 10px bottom margin from 1.10.27 landing on the list view instead of the grid view - moved it to the correct rule.

@@ -662,8 +662,13 @@
  * dropdown wrapping onto its own line). relocateListTableToggle() in
  * media-toggle.js physically moves the toggle to be a plain sibling right
  * after .wp-filter instead - from there, being a full-width block is just
- * what a block-level element does by default, no fighting required. */
-.upload-php .wp-filter + .ei-image-crop-toggle {
+ * what a block-level element does by default, no fighting required.
+ * Targeted by the .ei-list-table-toggle marker class that same function
+ * adds, not a ".wp-filter + ..." sibling selector - confirmed live that
+ * the standalone grid view's own toolbar ALSO carries the .wp-filter
+ * class, so a sibling selector alone would (and did) also match the grid
+ * view's toggle, which sits right after its own .wp-filter toolbar too. */
+.upload-php .ei-image-crop-toggle.ei-list-table-toggle {
 	display: flex;
 	margin: 15px 0 20px;
 	padding: 0 0 12px 20px;

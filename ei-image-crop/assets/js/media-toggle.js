@@ -340,6 +340,16 @@
 		var $wpFilter = $toggle.closest( '.wp-filter' );
 
 		if ( $toggle.length && $wpFilter.length ) {
+			// Marks this specific toggle as the classic-list-table one, for
+			// field.css to target - the grid view's own toolbar turns out to
+			// also carry the .wp-filter class (confirmed live), so a plain
+			// ".wp-filter + .ei-image-crop-toggle" CSS selector isn't
+			// actually exclusive to this case: the grid view's toggle sits
+			// right after its own .wp-filter toolbar too, coincidentally
+			// matching the exact same selector. This class only ever gets
+			// added here, so CSS keyed on it can't accidentally pick up
+			// the grid view's toggle.
+			$toggle.addClass( 'ei-list-table-toggle' );
 			$toggle.insertAfter( $wpFilter );
 		}
 	}
