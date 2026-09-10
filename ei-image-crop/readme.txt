@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.10.34
+Stable tag: 1.10.35
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.10.35 =
+* Adjusted the crop canvas margin to 45px top / 40px right, bottom, left (was 35px on those three sides).
 
 = 1.10.34 =
 * Adjusted the crop canvas margin to 45px top / 35px right, bottom, left (was 32px top / 20px bottom, flush left/right).

@@ -197,7 +197,7 @@
 	 * its resize handles clear of the modal's own edge instead of getting
 	 * visually swallowed by it - more at the top since that's where the box
 	 * label (see .ei-image-crop-box-label) also sits. */
-	inset: 45px 35px 35px;
+	inset: 45px 40px 40px;
 }
 
 .ei-image-crop-img {
