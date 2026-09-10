@@ -470,11 +470,18 @@ class Ei_Image_Crop_Generator {
 		} else {
 			$parent_post = get_post( $parent_id );
 			$title       = $parent_post ? $parent_post->post_title : $parent_filename;
+			// Display only - $ratio itself (e.g. "1400:1400") is never
+			// parsed back from this title anywhere; the real value used for
+			// matching/filtering is stored separately as post meta. "×" is
+			// the plugin's existing convention for showing dimensions (see
+			// get_image_size_setting_choices()) - a colon reads as a raw
+			// data value here rather than a width/height pair.
+			$ratio_label = $ratio ? str_replace( ':', ' × ', $ratio ) : __( 'free crop', 'ei-image-crop' );
 
 			$attachment_id = wp_insert_attachment(
 				array(
 					'post_mime_type' => $saved['mime-type'],
-					'post_title'     => sprintf( '%s – %s', $title, $ratio ? $ratio : __( 'free crop', 'ei-image-crop' ) ),
+					'post_title'     => sprintf( '%s – %s', $title, $ratio_label ),
 					'post_content'   => '',
 					'post_status'    => 'inherit',
 				),
