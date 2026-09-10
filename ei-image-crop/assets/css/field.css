@@ -199,7 +199,7 @@
 	 * that's where the box label (see .ei-image-crop-box-label) also sits.
 	 * Left/right stay flush - handles there aren't at risk since the side
 	 * panel already keeps this pane narrower than the modal's full width. */
-	inset: 28px 0 15px;
+	inset: 32px 0 20px;
 }
 
 .ei-image-crop-img {
