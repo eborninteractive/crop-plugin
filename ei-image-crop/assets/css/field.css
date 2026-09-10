@@ -626,9 +626,9 @@
  * type and date - in the standalone "Open Media Library" picker), trying
  * to align inline with them proved too fragile. .attachments-browser is
  * the toolbar's own parent, so this only matches the sibling
- * media-toggle.js actually inserts - the classic list table's <span> (see
- * class-ei-image-crop-media-library.php) isn't inside one and keeps the
- * plain inline layout from the shared rule above. */
+ * media-toggle.js actually inserts - the classic list table's version gets
+ * the same padding/border treatment further down, scoped to where
+ * relocateListTableToggle() (also media-toggle.js) actually places it. */
 .attachments-browser > .ei-image-crop-toggle {
 	display: flex;
 	margin-left: 0;
@@ -653,6 +653,10 @@
 	display: flex;
 	width: 100%;
 	margin: 8px 0 20px;
+	padding: 8px 16px;
+	border-top: 1px solid #dcdcde;
+	border-bottom: 1px solid #dcdcde;
+	box-sizing: border-box;
 }
 
 .ei-image-crop-tab {
