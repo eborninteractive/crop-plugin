@@ -62,6 +62,7 @@
 	 */
 	function addToggle( browserView ) {
 		if ( ! browserView || ! browserView.el || ! browserView.collection ) {
+			console.log( '[Ei Image Crop] addToggle: bailing, missing browserView/el/collection', { hasBrowserView: !! browserView, hasEl: !! ( browserView && browserView.el ), hasCollection: !! ( browserView && browserView.collection ) } );
 			return false;
 		}
 
@@ -69,6 +70,7 @@
 
 		// Already inserted into this browser view - never insert a second one.
 		if ( $browser.find( '> .ei-image-crop-toggle' ).length ) {
+			console.log( '[Ei Image Crop] addToggle: already inserted, skipping' );
 			return true;
 		}
 
@@ -87,8 +89,11 @@
 		// toolbar when one actually rendered into this same tree, or at
 		// the top of the browse view otherwise.
 		if ( ! $browser[ 0 ].isConnected ) {
+			console.log( '[Ei Image Crop] addToggle: browserView.el exists but is not connected yet', browserView.el );
 			return false;
 		}
+
+		console.log( '[Ei Image Crop] addToggle: inserting toggle now', browserView.el );
 
 		var library = browserView.collection;
 
@@ -153,23 +158,28 @@
 	 */
 	function insertToggleWhenAttached( browserView ) {
 		if ( addToggle( browserView ) ) {
+			console.log( '[Ei Image Crop] insertToggleWhenAttached: addToggle succeeded on first try' );
 			return;
 		}
 
 		if ( ! browserView || ! browserView.el ) {
+			console.log( '[Ei Image Crop] insertToggleWhenAttached: bailing, no browserView/el at all' );
 			return;
 		}
+
+		console.log( '[Ei Image Crop] insertToggleWhenAttached: not ready yet, watching for attachment', browserView.el );
 
 		var browserEl = browserView.el;
 		var gaveUp = setTimeout( function () {
 			observer.disconnect();
-			console.warn( '[Ei Image Crop] gave up inserting the toggle after createToolbar() - browse view never got attached to the document within ' + ( ATTACH_SAFETY_TIMEOUT / 1000 ) + 's' );
+			console.warn( '[Ei Image Crop] gave up inserting the toggle after createToolbar() - browse view never got attached to the document within ' + ( ATTACH_SAFETY_TIMEOUT / 1000 ) + 's', browserEl );
 		}, ATTACH_SAFETY_TIMEOUT );
 
 		var observer = new MutationObserver( function () {
 			if ( ! browserEl.isConnected ) {
 				return;
 			}
+			console.log( '[Ei Image Crop] insertToggleWhenAttached: MutationObserver saw it connect' );
 			observer.disconnect();
 			clearTimeout( gaveUp );
 			addToggle( browserView );
@@ -198,6 +208,7 @@
 			__eiImageCropPatched: true,
 			createToolbar: function () {
 				BaseBrowser.prototype.createToolbar.apply( this, arguments );
+				console.log( '[Ei Image Crop] patched createToolbar() ran', this.el );
 				insertToggleWhenAttached( this );
 			},
 		} );
@@ -229,7 +240,7 @@
 		var done = frame && addToggle( frame.browserView );
 
 		if ( done ) {
-			console.log( '[Ei Image Crop] toggle inserted on attempt ' + attempt );
+			console.log( '[Ei Image Crop] (page-load check) toggle inserted on attempt ' + attempt );
 			return;
 		}
 
@@ -238,7 +249,13 @@
 				patchExistingFrame( attempt + 1 );
 			}, RETRY_DELAY );
 		} else {
-			console.warn( '[Ei Image Crop] gave up after ' + attempt + ' attempts - wp.media.frame present: ' + !! frame );
+			// Only covers a frame that already exists at page-load time (e.g.
+			// the standalone Media Library's own bootstrap) - irrelevant
+			// noise for a picker opened later via a click, which
+			// patchClassForFutureViews()'s createToolbar() override handles
+			// instead. Labelled to avoid it being mistaken for a real
+			// failure signal when a later click is what's being debugged.
+			console.warn( '[Ei Image Crop] (page-load check, not relevant to a later click) gave up after ' + attempt + ' attempts - wp.media.frame present: ' + !! frame );
 		}
 	}
 
