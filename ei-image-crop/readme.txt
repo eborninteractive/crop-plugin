@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.10.17
+Stable tag: 1.10.18
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.10.18 =
+* Replaced the previous fixed-pixel/absolute-positioning fix for the list view's tabs with a flex-based one that doesn't depend on hardcoded heights - it grows and pushes the table below it down naturally instead.
 
 = 1.10.17 =
 * Actually fixed the classic Media Library list view's tabs staying inline. The previous attempt (1.10.13) targeted `.tablenav`, but this screen doesn't use that wrapper at all - its filter bar is WP core's own `.wp-filter` (an inline-block "actions" box), which was silently ignoring the fix. Now correctly positioned as its own row below that bar.

@@ -640,32 +640,34 @@
 /* Same "own row below, not inline" treatment for the classic list table's
  * version. It actually renders inside .wp-filter > .filter-items > .actions
  * (WP_Media_List_Table::extra_tablenav( 'bar' ), not the generic .tablenav
- * used by other list tables) - .actions there is `display: inline-block`
- * (see WP core's list-tables.css), so a block/width:100% child only fills
- * that inline-block's own shrink-wrapped width, not a real full-width row.
- * .wp-filter itself is WP core's `position: relative` containing block, so
- * this breaks the toggle out of that flow with absolute positioning instead
- * - reserving room for it via padding-bottom on .wp-filter, sized to this
- * toggle's own fixed 30px tab height (see .ei-image-crop-tab) plus an 8px
- * gap, which is safe to hardcode since it's our own markup, not a WP core
- * element of unpredictable height like the grid picker's toolbar was.
- * `bottom: 0` (not `top: 100%`) keeps the toggle inside that reserved
- * padding - .wp-filter also has WP core's own `overflow: hidden`, which
- * would otherwise clip anything positioned past its padding box edge.
- * Scoped to .upload-php (WP's body class for the Media Library screen) -
- * .wp-filter is also used on unrelated admin screens (Plugins, Themes)
- * that shouldn't get this extra padding. */
-.upload-php .wp-filter {
-	padding-bottom: 38px;
+ * used by other list tables), in this DOM order: the "Alla datum" months
+ * dropdown, our own toggle, then the "Filtrera" submit button
+ * (#post-query-submit). No absolute positioning or hardcoded pixel values
+ * here on purpose - both need a guess at some element's exact height
+ * (.wp-filter's, in an earlier version of this rule) that breaks the
+ * moment that height actually differs, which is exactly what happened.
+ * Turning .actions into a flex container instead needs no such guess: its
+ * own box just grows to fit two wrapped lines, which pushes the table
+ * below it down like any other normal block content would.
+ * `inline-flex` (not `flex`) keeps .actions sitting inline next to its
+ * "Alla mediaobjekt" sibling in .filter-items, matching its original
+ * inline-block behavior. `order` visually moves the Filtrera button ahead
+ * of our toggle without touching the DOM, and the toggle's
+ * `flex-basis: 100%` is what forces it onto its own wrapped line. */
+.upload-php .wp-filter .actions {
+	display: inline-flex;
+	flex-wrap: wrap;
+	align-items: center;
+}
+
+.upload-php .wp-filter .actions #post-query-submit {
+	order: 1;
 }
 
 .upload-php .wp-filter .ei-image-crop-toggle {
-	display: flex;
-	position: absolute;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	margin: 0;
+	order: 2;
+	flex-basis: 100%;
+	margin: 8px 0 0;
 }
 
 .ei-image-crop-tab {
