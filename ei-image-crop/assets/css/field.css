@@ -186,19 +186,20 @@
 
 .ei-image-crop-modal-main {
 	flex: 1 1 68%;
-	background: #1d2327;
+	background: #090c0f;
 	position: relative;
 	overflow: hidden;
 }
 
 .ei-image-crop-canvas {
 	position: absolute;
-	/* 15px top/bottom so a crop box covering the full image still leaves
-	 * its top-middle/bottom-middle resize handles clear of the modal's own
-	 * edge instead of getting visually swallowed by it. Left/right stay
-	 * flush - handles there aren't at risk since the side panel already
-	 * keeps this pane narrower than the modal's full width. */
-	inset: 15px 0;
+	/* Top/bottom gap so a crop box covering the full image still leaves its
+	 * top-middle/bottom-middle resize handles clear of the modal's own edge
+	 * instead of getting visually swallowed by it - more at the top since
+	 * that's where the box label (see .ei-image-crop-box-label) also sits.
+	 * Left/right stay flush - handles there aren't at risk since the side
+	 * panel already keeps this pane narrower than the modal's full width. */
+	inset: 28px 0 15px;
 }
 
 .ei-image-crop-img {
