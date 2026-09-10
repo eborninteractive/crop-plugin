@@ -638,18 +638,19 @@
 
 /* The "Select or Upload Media" popup (and any other field's picker opened
  * as an overlay, e.g. an ACF block's own image field) wraps everything in
- * WP core's own .media-modal - the standalone Media Library page (Media >
- * Library) never has that ancestor, since it's not a modal at all. That
- * split is what lets this be styled differently (less left padding, no
- * bottom divider) from the standalone grid's compact box above, without
- * needing any JS to tell the two apart. `border-bottom: none` has to be
- * explicit here - simply not declaring the property (as an earlier version
- * of this rule did) leaves the base rule's own border-bottom cascading
- * through unchanged, since a more specific selector only overrides the
- * properties it actually declares. */
-.media-modal .attachments-browser > .ei-image-crop-toggle {
-	padding: 12px 12px 12px 5px;
-	border-bottom: none;
+ * WP core's own .media-modal-content - the standalone Media Library page
+ * (Media > Library) never has that ancestor, since it's not a modal at
+ * all. That split is what lets this be styled differently (no bottom
+ * divider) from the standalone grid's compact box above, without needing
+ * any JS to tell the two apart. Every declaration here needs !important:
+ * the base .attachments-browser > .ei-image-crop-toggle rule above also
+ * uses !important on these same properties, and an !important declaration
+ * always wins over a plain one regardless of which selector is more
+ * specific - a plain override here would silently lose to that. */
+.media-modal-content .attachments-browser > .ei-image-crop-toggle {
+	margin-bottom: 10px !important;
+	padding: 12px 12px 12px 20px !important;
+	border-bottom: none !important;
 }
 
 /* Same "own row below, not inline" treatment for the classic list table's
