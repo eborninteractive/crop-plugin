@@ -143,37 +143,52 @@
 	}
 
 	/**
-	 * Confirmed live: the toggle was inserting correctly all along (and
-	 * staying there) - it just never became visible, because its own
-	 * siblings in .attachments-browser (the attachments grid, the
-	 * sidebar) are positioned absolutely by WordPress's own CSS, each
-	 * with a hardcoded `top` that assumes only the toolbar sits above
-	 * them. A normal-flow sibling like ours doesn't push absolutely
-	 * positioned elements down - nothing makes room for it, so it just
-	 * sits there under/behind whatever's drawn on top. Push each of them
-	 * down by exactly this toggle's own rendered height instead of
-	 * guessing a fixed offset, so it holds regardless of the toolbar's
-	 * actual height in any given WP version/admin color scheme/theme.
+	 * Confirmed live (with the actual WordPress core CSS rule involved,
+	 * found via dev tools): the toggle was inserting correctly all along
+	 * (and staying there) - it just never became visible. Two things,
+	 * both stemming from the same cause - WordPress positions the
+	 * toolbar, the attachments grid/list AND the uploader dropzone all
+	 * absolutely, each with a hardcoded `top` that assumes only the
+	 * toolbar sits above the grid:
+	 *
+	 * 1. Those siblings' own `top` doesn't leave room for anything else -
+	 *    a normal-flow sibling like ours doesn't push an absolutely
+	 *    positioned element down, so they need to be pushed down manually
+	 *    by exactly this toggle's own rendered height.
+	 * 2. The toolbar itself is ALSO positioned absolutely, so it takes no
+	 *    space in normal flow either - our toggle, being the only real
+	 *    normal-flow content left in .attachments-browser, would
+	 *    otherwise render starting at the very top of it, overlapped by
+	 *    the toolbar drawn on top. It needs a top margin of its own to
+	 *    clear the toolbar, before the grid gets pushed down to clear it.
+	 *
+	 * The grid/uploader's own original `top` (exactly how much room the
+	 * toolbar needs) doubles as that margin, rather than measuring the
+	 * toolbar separately - one less thing that can be a different element
+	 * than expected. Computed at runtime instead of hardcoding pixel
+	 * values, so this holds regardless of the toolbar's actual height in
+	 * any given WP version/admin color scheme/theme.
 	 *
 	 * @param {jQuery} $browser The .attachments-browser element.
 	 * @param {jQuery} $toggle  The just-inserted .ei-image-crop-toggle.
 	 */
 	function reserveSpaceForToggle( $browser, $toggle ) {
-		var toggleHeight = $toggle.outerHeight( true );
+		var $positioned = $browser.find( '.uploader-inline, .attachments-wrapper, .attachments, .media-sidebar' ).filter( function () {
+			return 'absolute' === $( this ).css( 'position' );
+		} );
 
-		if ( ! toggleHeight ) {
+		if ( ! $positioned.length ) {
 			return;
 		}
 
-		$browser.find( '> .attachments-wrapper, > .media-sidebar' ).each( function () {
-			var $sibling = $( this );
+		$toggle.css( 'margin-top', $positioned.first().css( 'top' ) );
 
-			if ( 'absolute' !== $sibling.css( 'position' ) ) {
-				return;
-			}
+		var toggleHeight = $toggle.outerHeight( false );
 
-			var currentTop = parseFloat( $sibling.css( 'top' ) ) || 0;
-			$sibling.css( 'top', ( currentTop + toggleHeight ) + 'px' );
+		$positioned.each( function () {
+			var $el = $( this );
+			var currentTop = parseFloat( $el.css( 'top' ) ) || 0;
+			$el.css( 'top', ( currentTop + toggleHeight ) + 'px' );
 		} );
 	}
 

@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.10.8
+Stable tag: 1.10.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.10.9 =
+* Fixed 1.10.8's fix only targeting `.attachments-wrapper`, missing that WordPress's actual CSS rule (found live via dev tools) also covers `.uploader-inline` and `.attachments`, and that the toolbar itself is *also* positioned absolutely - meaning the tabs row (the only real normal-flow content left) needed its own top margin to clear the toolbar, not just push the grid down below itself. Both are now computed at runtime from the grid's own original position instead of guessed pixel values.
 
 = 1.10.8 =
 * Found the actual root cause of the tabs being invisible despite existing in the DOM (confirmed live via DevTools): the attachments grid and sidebar are positioned absolutely by WordPress's own CSS, each with a hardcoded `top` that assumes only the toolbar sits above them - a normal-flow sibling like our tabs row doesn't push them down, so nothing ever made room for it. Now pushes each of them down by exactly the tabs row's own rendered height right after inserting it, rather than guessing a fixed offset.
