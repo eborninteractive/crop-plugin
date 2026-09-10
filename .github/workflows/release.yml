@@ -1,0 +1,34 @@
+name: Release
+
+# Pushing a version tag (e.g. "v1.10.1", matching EI_IMAGE_CROP_VERSION in
+# ei-image-crop.php) builds a plugin zip and publishes it as a GitHub
+# Release asset. The plugin's own update checker (see
+# ei_image_crop_init_update_checker() in ei-image-crop.php) polls exactly
+# that - Releases with an attached zip - on every site running this
+# plugin, so this is the one step that actually ships an update to them.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Zipped from the repo root so the archive's top-level folder is
+      # "ei-image-crop" (matching the plugin's own directory/slug) rather
+      # than something GitHub-generated - WordPress replaces the existing
+      # plugin folder by name on update, so this has to match exactly.
+      - name: Build plugin zip
+        run: zip -r ei-image-crop.zip ei-image-crop -x '*.DS_Store'
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ei-image-crop.zip
+          generate_release_notes: true

@@ -3,7 +3,7 @@
  * Plugin Name:       Ei Image Crop
  * Plugin URI:        https://github.com/eborninteractive/crop-plugin
  * Description:       ACF field type for cropping images on demand (not at upload), with reusable, editable crops that live as regular Media Library attachments.
- * Version:           1.10.0
+ * Version:           1.10.1
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Eborn Interactive
@@ -19,10 +19,39 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'EI_IMAGE_CROP_VERSION', '1.10.0' );
+define( 'EI_IMAGE_CROP_VERSION', '1.10.1' );
 define( 'EI_IMAGE_CROP_FILE', __FILE__ );
 define( 'EI_IMAGE_CROP_PATH', plugin_dir_path( __FILE__ ) );
 define( 'EI_IMAGE_CROP_URL', plugin_dir_url( __FILE__ ) );
+
+require_once EI_IMAGE_CROP_PATH . 'vendor/plugin-update-checker/plugin-update-checker.php';
+
+use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
+
+/**
+ * Lets every site running this plugin see "Update available" in the
+ * Plugins list straight from GitHub Releases, the same as a plugin
+ * installed from wordpress.org - this isn't on wordpress.org, so without
+ * this, updating it means manually re-uploading it to every single site.
+ * Not gated behind the ACF-active check below: a site with ACF
+ * temporarily deactivated should still be offered the update.
+ */
+function ei_image_crop_init_update_checker() {
+	$update_checker = PucFactory::buildUpdateChecker(
+		'https://github.com/eborninteractive/crop-plugin/',
+		EI_IMAGE_CROP_FILE,
+		'ei-image-crop'
+	);
+
+	// Update source is a GitHub Release's attached zip (built and published
+	// automatically by .github/workflows/release.yml whenever a version
+	// tag is pushed) rather than a raw snapshot of the repo - a plain
+	// branch-archive download would extract as "crop-plugin-<sha>/ei-image-crop/..."
+	// instead of "ei-image-crop/...", which WordPress won't recognize as
+	// the same plugin when installing the update.
+	$update_checker->getVcsApi()->enableReleaseAssets();
+}
+add_action( 'plugins_loaded', 'ei_image_crop_init_update_checker' );
 
 /**
  * Bootstraps the plugin once all other plugins have loaded, so the ACF
