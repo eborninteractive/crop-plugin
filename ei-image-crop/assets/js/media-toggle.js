@@ -124,31 +124,50 @@
 		return true;
 	}
 
-	var TOOLBAR_ATTACH_MAX_ATTEMPTS = 30;
-	var TOOLBAR_ATTACH_RETRY_DELAY = 100;
+	// A fixed retry budget (tried first: 30 attempts x 100ms = 3s) turned
+	// out to still be too short - confirmed live, the "Edit image details"
+	// popup (opened via the crop field's pencil icon, scoped to a single
+	// attachment) attaches its toolbar to the document slower than every
+	// other picker this was tested against, so it kept losing the race.
+	// Rather than guess at ever-larger fixed budgets, watch the document
+	// directly for the toolbar actually becoming attached (Node.isConnected)
+	// and act the moment it does, with no arbitrary time limit - the same
+	// approach field.js already relies on for an equivalent problem
+	// (a field's own init not reliably happening in time via ACF's events).
+	var TOOLBAR_ATTACH_SAFETY_TIMEOUT = 30000;
 
 	/**
 	 * addToggle() can come back false because the toolbar exists but isn't
-	 * attached to the document yet (see the comment inside addToggle) -
-	 * confirmed live, this happens in the "Select or Upload Media" picker
-	 * even though createToolbar() itself has already returned. Retry
-	 * briefly rather than accepting a single attempt as final.
+	 * attached to the document yet (see the comment inside addToggle).
+	 * Insert as soon as that stops being true, however long it takes.
 	 *
 	 * @param {Object} browserView
-	 * @param {number} attempt
 	 */
-	function insertToggleWithRetry( browserView, attempt ) {
+	function insertToggleWhenAttached( browserView ) {
 		if ( addToggle( browserView ) ) {
 			return;
 		}
 
-		if ( attempt < TOOLBAR_ATTACH_MAX_ATTEMPTS ) {
-			setTimeout( function () {
-				insertToggleWithRetry( browserView, attempt + 1 );
-			}, TOOLBAR_ATTACH_RETRY_DELAY );
-		} else {
-			console.warn( '[Ei Image Crop] gave up inserting the toggle after createToolbar() - toolbar never got attached to the document' );
+		if ( ! browserView || ! browserView.toolbar || ! browserView.toolbar.$el || ! browserView.toolbar.$el.length ) {
+			return;
 		}
+
+		var toolbarEl = browserView.toolbar.$el[ 0 ];
+		var gaveUp = setTimeout( function () {
+			observer.disconnect();
+			console.warn( '[Ei Image Crop] gave up inserting the toggle after createToolbar() - toolbar never got attached to the document within ' + ( TOOLBAR_ATTACH_SAFETY_TIMEOUT / 1000 ) + 's' );
+		}, TOOLBAR_ATTACH_SAFETY_TIMEOUT );
+
+		var observer = new MutationObserver( function () {
+			if ( ! toolbarEl.isConnected ) {
+				return;
+			}
+			observer.disconnect();
+			clearTimeout( gaveUp );
+			addToggle( browserView );
+		} );
+
+		observer.observe( document.documentElement, { childList: true, subtree: true } );
 	}
 
 	/**
@@ -171,7 +190,7 @@
 			__eiImageCropPatched: true,
 			createToolbar: function () {
 				BaseBrowser.prototype.createToolbar.apply( this, arguments );
-				insertToggleWithRetry( this, 0 );
+				insertToggleWhenAttached( this );
 			},
 		} );
 	}
