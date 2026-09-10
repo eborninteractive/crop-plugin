@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.9.5
+Stable tag: 1.10.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.10.0 =
+* Redesigned how the "Original images"/"Crops" tabs are placed in the media grid/picker toolbar, after repeatedly fighting that toolbar's layout across several releases (it isn't a flex container, and its own set of filters varies - one date filter in an ACF field's own picker, but a media type filter too in the standalone "Open Media Library" picker, which broke the previous "align to the last select" approach as soon as a wrongly-targeted select produced a bad offset). Instead of trying to align inline among those filters, the tabs now sit on their own full-width row directly below the whole toolbar - no measuring, no alignment, no dependency on however many filters happen to be there.
 
 = 1.9.5 =
 * The "Image size" field setting's dropdown now shows a friendlier label for each registered size - e.g. "Kvadrat fri" instead of the raw slug "kvadrat-fri" (hyphens/underscores replaced with spaces, first letter capitalized). Purely cosmetic - the value actually saved is still the untouched slug.

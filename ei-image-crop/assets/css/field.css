@@ -606,21 +606,29 @@
  * share these same classes so both look the same. */
 
 .ei-image-crop-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
 	margin-left: 12px;
-	/* .media-toolbar-secondary is a 2x2 CSS grid (align-items: end) that we
-	 * apparently don't land in the right cell of as a plain appended
-	 * sibling - media-toggle.js measures the neighboring date filter
-	 * <select> at runtime instead and nudges us to its exact bottom edge
-	 * via an inline `top` offset, which is why there's no CSS vertical
-	 * alignment rule here to speak of. */
 }
 
-/* .media-toolbar-secondary itself was sitting close enough to the row
- * above it that its bottom-aligned content (the date filter <select>, and
- * our toggle once media-toggle.js lines it up with that select) reads as
- * clipped/too far down - confirmed live via the browser's dev tools. */
-.media-modal .media-toolbar-secondary {
-	margin-top: -10px;
+/* In the grid/picker toolbar (see media-toggle.js), the tabs are placed on
+ * their own full-width row directly below the whole toolbar rather than
+ * inline among its filters - after repeatedly fighting that toolbar's
+ * layout (not a flex container, plus a varying, asynchronously-rendered
+ * set of filters: one <select> in an ACF field's own picker, two - media
+ * type and date - in the standalone "Open Media Library" picker), trying
+ * to align inline with them proved too fragile. .attachments-browser is
+ * the toolbar's own parent, so this only matches the sibling
+ * media-toggle.js actually inserts - the classic list table's <span> (see
+ * class-ei-image-crop-media-library.php) isn't inside one and keeps the
+ * plain inline layout from the shared rule above. */
+.attachments-browser > .ei-image-crop-toggle {
+	display: flex;
+	margin-left: 0;
+	padding: 8px 16px;
+	border-top: 1px solid #dcdcde;
+	border-bottom: 1px solid #dcdcde;
 }
 
 .ei-image-crop-tab {

@@ -47,46 +47,30 @@
 
 	/**
 	 * Injects the two tabs into an already-built AttachmentsBrowser view and
-	 * wires them up.
+	 * wires them up. Placed on its own full-width row directly below the
+	 * whole toolbar (not inline inside .media-toolbar-secondary among the
+	 * existing filters) after repeatedly fighting that toolbar's layout:
+	 * it isn't a flex container, its own filter set isn't fixed (one
+	 * <select> in an ACF field's picker, two - media type AND date - in
+	 * the standalone "Open Media Library" picker), and the filters
+	 * themselves render asynchronously. A dedicated row below everything
+	 * else needs none of that - no measuring, no aligning, no dependency
+	 * on however many filters happen to precede it.
 	 *
-	 * @param {Object}  browserView   A wp.media.view.AttachmentsBrowser instance.
-	 * @param {boolean} forceFallback If true, insert onto the toolbar's own
-	 *   $el even when the secondary sub-view isn't ready yet, instead of
-	 *   waiting - used once retries are exhausted so the tabs end up
-	 *   *somewhere* rather than never appearing at all.
-	 * @return {boolean} True once the tabs are in the DOM (in the right
-	 *   spot, or the fallback spot when forced); false if not ready yet.
+	 * @param {Object} browserView A wp.media.view.AttachmentsBrowser instance.
+	 * @return {boolean} True once the tabs are in the DOM; false if not ready yet.
 	 */
-	function addToggle( browserView, forceFallback ) {
-		if ( ! browserView || ! browserView.toolbar || ! browserView.collection ) {
+	function addToggle( browserView ) {
+		if ( ! browserView || ! browserView.toolbar || ! browserView.toolbar.$el || ! browserView.toolbar.$el.length || ! browserView.collection ) {
 			return false;
 		}
 
-		// Already inserted somewhere under the toolbar - never insert a
-		// second one, even if it landed in the fallback spot on an earlier
-		// forced attempt and a proper secondary section is available now.
-		if ( browserView.toolbar.$el.find( '.ei-image-crop-toggle' ).length ) {
+		var $toolbar = browserView.toolbar.$el;
+
+		// Already inserted after this toolbar - never insert a second one.
+		if ( $toolbar.next( '.ei-image-crop-toggle' ).length ) {
 			return true;
 		}
-
-		var secondary = browserView.toolbar.secondary;
-		var $secondaryEl = ( secondary && secondary.$el && secondary.$el.length ) ? secondary.$el : null;
-
-		// The secondary sub-view (date filter, media type dropdown) can still
-		// be mid-render even once `toolbar` itself exists - WordPress builds
-		// it as a nested region, not necessarily in the same tick. Wait for
-		// it rather than silently falling back to the toolbar's outer
-		// element, which is a flex row with no space reserved for an extra
-		// item and effectively hides whatever lands there.
-		if ( ! $secondaryEl && ! forceFallback ) {
-			return false;
-		}
-
-		// Plain inline layout only - unlike the checkbox+<label> this used
-		// to be, WordPress's screen-reader-text hiding of bare <label>
-		// elements in this toolbar section doesn't apply to a <span> of
-		// <button>s, so no !important visibility overrides are needed here.
-		var LAYOUT_STYLE = 'display:inline-flex;align-items:center;gap:4px;margin:0 0 0 12px;';
 
 		var library = browserView.collection;
 
@@ -102,10 +86,10 @@
 		setShowCropsCookie( false );
 
 		var $toggle = $(
-			'<span class="ei-image-crop-toggle" style="' + LAYOUT_STYLE + '">' +
+			'<div class="ei-image-crop-toggle">' +
 				'<button type="button" class="ei-image-crop-tab is-active" data-crops="0">' + originalsLabel() + '</button>' +
 				'<button type="button" class="ei-image-crop-tab" data-crops="1">' + cropsLabel() + '</button>' +
-			'</span>'
+			'</div>'
 		);
 
 		$toggle.find( '.ei-image-crop-tab' ).on( 'click', function () {
@@ -120,79 +104,17 @@
 			library.props.set( { eiShowCrops: wantsCrops ? 1 : '' } );
 		} );
 
-		( $secondaryEl || browserView.toolbar.$el ).append( $toggle );
-
-		if ( $secondaryEl ) {
-			alignToggleWithNeighbor( $toggle, $secondaryEl, 0 );
-		}
+		$toolbar.after( $toggle );
 
 		return true;
-	}
-
-	var ALIGN_MAX_ATTEMPTS = 20;
-	var ALIGN_RETRY_DELAY = 100;
-
-	/**
-	 * .media-toolbar-secondary isn't a flex container - its own .spinner
-	 * child is positioned with plain absolute offsets, not flex alignment,
-	 * so neither align-items nor align-self does anything for a normal
-	 * appended sibling here. The date filter next to us is a label stacked
-	 * above its <select>, taller than our own pill row, so without help we
-	 * land level with the label instead of the select beneath it. Rather
-	 * than guess a fixed pixel offset (which would drift with admin font
-	 * size, WP version, or a different theme's toolbar height), measure
-	 * the actual rendered position of that <select> and nudge ourselves
-	 * down to sit on the same bottom line as it (and the search box next
-	 * to it, which already shares that line with the select natively).
-	 *
-	 * The <select> itself is populated from an async request (it needs to
-	 * know which months have attachments), so it can still not exist yet
-	 * at the exact moment secondaryEl itself does. And even once it exists
-	 * in the DOM, the modal it lives in can still be mid fade-in (or
-	 * otherwise not laid out yet) - confirmed live: the very first check
-	 * found the <select> fine but measured an all-zero box for both it and
-	 * our toggle (getBoundingClientRect() reports all zeros for anything
-	 * not actually rendered with real dimensions yet), so "delta" computed
-	 * to a false-positive 0 and nothing ever got applied. Retry until both
-	 * boxes actually have real height, not just until the element exists.
-	 *
-	 * @param {jQuery}  $toggle The already-inserted .ei-image-crop-toggle.
-	 * @param {jQuery}  $scope  Its container - searched for a <select> to align to.
-	 * @param {number}  attempt
-	 */
-	function alignToggleWithNeighbor( $toggle, $scope, attempt ) {
-		var $select = $scope.find( 'select' ).first();
-		var selectRect = $select.length ? $select[ 0 ].getBoundingClientRect() : null;
-		var toggleRect = $toggle[ 0 ].getBoundingClientRect();
-		var ready = selectRect && selectRect.height > 0 && toggleRect.height > 0;
-
-		if ( ! ready ) {
-			if ( attempt < ALIGN_MAX_ATTEMPTS ) {
-				setTimeout( function () {
-					alignToggleWithNeighbor( $toggle, $scope, attempt + 1 );
-				}, ALIGN_RETRY_DELAY );
-			} else {
-				console.warn( '[Ei Image Crop] toggle alignment gave up after ' + attempt + ' attempts - select found: ' + ( !! $select.length ) + ', select height: ' + ( selectRect ? selectRect.height : 'n/a' ) + ', toggle height: ' + toggleRect.height );
-			}
-			return;
-		}
-
-		var delta = selectRect.bottom - toggleRect.bottom;
-
-		console.log( '[Ei Image Crop] aligning toggle to select bottom - select.bottom: ' + selectRect.bottom + ', toggle.bottom: ' + toggleRect.bottom + ', delta: ' + delta + ' (attempt ' + attempt + ')' );
-
-		if ( delta ) {
-			$toggle.css( { position: 'relative', top: Math.round( delta ) + 'px' } );
-		}
 	}
 
 	/**
 	 * Patches the AttachmentsBrowser class so any browser view built AFTER
 	 * this point (e.g. a media-picker modal opened later by a user click)
 	 * gets the toggle automatically via its own createToolbar(). By the time
-	 * that method returns, the toolbar's sub-views are already built
-	 * synchronously, so a single addToggle() call here (no retry needed)
-	 * reliably lands in the secondary section.
+	 * that method returns, the toolbar itself is already built synchronously,
+	 * so a single addToggle() call here (no retry needed) reliably works.
 	 */
 	function patchClassForFutureViews() {
 		if ( ! window.wp || ! wp.media || ! wp.media.view || ! wp.media.view.AttachmentsBrowser ) {
@@ -209,7 +131,7 @@
 			__eiImageCropPatched: true,
 			createToolbar: function () {
 				BaseBrowser.prototype.createToolbar.apply( this, arguments );
-				addToggle( this, true );
+				addToggle( this );
 			},
 		} );
 	}
@@ -223,8 +145,8 @@
 	 * doesn't retroactively change a view instance already built from the
 	 * original class. wp.media.frame.browserView is WordPress's own direct
 	 * reference to that already-built view, so reach into it directly -
-	 * retrying for a bit since its toolbar.secondary sub-view can still be
-	 * rendering at the exact moment this first runs.
+	 * retrying for a bit since it can still not exist yet at the exact
+	 * moment this first runs.
 	 *
 	 * @param {number} attempt
 	 */
@@ -232,17 +154,15 @@
 		attempt = attempt || 0;
 
 		// wp.media.frame itself not existing yet is just another "not ready
-		// yet" state, same as toolbar.secondary not being there - it must
-		// keep retrying here too, not bail out for good. An early return
-		// with no retry scheduled is exactly how this silently gave up
-		// forever on the very first check if the frame happened to not be
-		// assigned yet at that exact moment.
+		// yet" state - it must keep retrying here too, not bail out for
+		// good. An early return with no retry scheduled is exactly how this
+		// silently gave up forever on the very first check if the frame
+		// happened to not be assigned yet at that exact moment.
 		var frame = window.wp && wp.media && wp.media.frame;
-		var forceFallback = attempt >= MAX_ATTEMPTS;
-		var done = frame && addToggle( frame.browserView, forceFallback );
+		var done = frame && addToggle( frame.browserView );
 
 		if ( done ) {
-			console.log( '[Ei Image Crop] toggle inserted on attempt ' + attempt + ( frame.browserView.toolbar.secondary ? '' : ' (fallback spot)' ) );
+			console.log( '[Ei Image Crop] toggle inserted on attempt ' + attempt );
 			return;
 		}
 
