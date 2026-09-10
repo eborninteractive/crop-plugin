@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.10.9
+Stable tag: 1.10.10
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.10.10 =
+* Reduced the "Original images"/"Crops" tabs' corner radius from 4px to 2px, matching WP admin's own default button shape more closely.
 
 = 1.10.9 =
 * Fixed 1.10.8's fix only targeting `.attachments-wrapper`, missing that WordPress's actual CSS rule (found live via dev tools) also covers `.uploader-inline` and `.attachments`, and that the toolbar itself is *also* positioned absolutely - meaning the tabs row (the only real normal-flow content left) needed its own top margin to clear the toolbar, not just push the grid down below itself. Both are now computed at runtime from the grid's own original position instead of guessed pixel values.
