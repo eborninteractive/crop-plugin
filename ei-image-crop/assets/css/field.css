@@ -634,6 +634,19 @@
 	border-bottom: 1px solid #dcdcde;
 }
 
+/* The "Select or Upload Media" popup (and any other field's picker opened
+ * as an overlay, e.g. an ACF block's own image field) wraps everything in
+ * WP core's own .media-modal - the standalone Media Library page (Media >
+ * Library) never has that ancestor, since it's not a modal at all. That
+ * split is what lets this be styled differently (full width, less left
+ * padding) from the standalone grid's compact box above, without needing
+ * any JS to tell the two apart. */
+.media-modal .attachments-browser > .ei-image-crop-toggle {
+	width: 100%;
+	padding: 12px 12px 12px 5px;
+	border-bottom: 1px solid #dcdcde;
+}
+
 /* Same "own row below, not inline" treatment for the classic list table's
  * version. render_list_toggle() (PHP) has to output it via the
  * restrict_manage_posts hook, which fires inside WP core's own
