@@ -638,16 +638,34 @@
 }
 
 /* Same "own row below, not inline" treatment for the classic list table's
- * version - it renders inside .tablenav's "actions" bar (the date filter
- * and "Filtrera" button), which floats its children left-to-right rather
- * than using flex/grid, so a plain block-level, full-width, floats-clearing
- * element after them naturally wraps onto its own line - no JS needed
- * here since we control this markup directly (see render_list_toggle()). */
-.tablenav .ei-image-crop-toggle {
-	display: block;
-	clear: both;
-	width: 100%;
-	margin: 8px 0 0;
+ * version. It actually renders inside .wp-filter > .filter-items > .actions
+ * (WP_Media_List_Table::extra_tablenav( 'bar' ), not the generic .tablenav
+ * used by other list tables) - .actions there is `display: inline-block`
+ * (see WP core's list-tables.css), so a block/width:100% child only fills
+ * that inline-block's own shrink-wrapped width, not a real full-width row.
+ * .wp-filter itself is WP core's `position: relative` containing block, so
+ * this breaks the toggle out of that flow with absolute positioning instead
+ * - reserving room for it via padding-bottom on .wp-filter, sized to this
+ * toggle's own fixed 30px tab height (see .ei-image-crop-tab) plus an 8px
+ * gap, which is safe to hardcode since it's our own markup, not a WP core
+ * element of unpredictable height like the grid picker's toolbar was.
+ * `bottom: 0` (not `top: 100%`) keeps the toggle inside that reserved
+ * padding - .wp-filter also has WP core's own `overflow: hidden`, which
+ * would otherwise clip anything positioned past its padding box edge.
+ * Scoped to .upload-php (WP's body class for the Media Library screen) -
+ * .wp-filter is also used on unrelated admin screens (Plugins, Themes)
+ * that shouldn't get this extra padding. */
+.upload-php .wp-filter {
+	padding-bottom: 38px;
+}
+
+.upload-php .wp-filter .ei-image-crop-toggle {
+	display: flex;
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	margin: 0;
 }
 
 .ei-image-crop-tab {
