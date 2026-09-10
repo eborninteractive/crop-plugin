@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.10.1
+Stable tag: 1.10.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.10.2 =
+* Fixed the "Original images"/"Crops" tabs not appearing at all in the "Select or Upload Media" popup (opened from within a page/block), a regression from 1.10.0's redesign - confirmed live, the toolbar element exists at that point but isn't attached to the document yet in that specific picker, unlike the standalone Media Library page, so appending our row directly after it was a silent no-op. Now retries until the toolbar is actually attached before inserting.
 
 = 1.10.1 =
 * Added self-hosted update support (via the bundled Plugin Update Checker library, pointed at this plugin's own GitHub Releases) - every site running this plugin now sees a normal "Update available" notice on the Plugins page, the same as any wordpress.org plugin, instead of needing a manual re-upload. Pushing a version tag (e.g. "v1.10.1") triggers a GitHub Actions workflow that builds and publishes the release zip automatically.

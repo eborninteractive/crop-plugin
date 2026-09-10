@@ -72,6 +72,21 @@
 			return true;
 		}
 
+		// Confirmed live: in the "Select or Upload Media" picker (as opposed
+		// to the standalone Media Library page), the toolbar view can exist
+		// - createToolbar() has run, this.toolbar.$el is a real element -
+		// without being attached to the document yet; WordPress inserts it
+		// into the visible frame slightly later. .after() on a detached
+		// element is a silent no-op in jQuery, so the toggle was being
+		// built and then dropped on the floor every time. Treat "not
+		// attached yet" the same as "not ready yet" so the retry loops
+		// around this function (see patchExistingFrame and
+		// createToolbar's override below) keep trying instead of silently
+		// losing it.
+		if ( ! $toolbar.parent().length ) {
+			return false;
+		}
+
 		var library = browserView.collection;
 
 		// Every fresh toolbar build - a plain page load of the standalone
@@ -109,12 +124,37 @@
 		return true;
 	}
 
+	var TOOLBAR_ATTACH_MAX_ATTEMPTS = 30;
+	var TOOLBAR_ATTACH_RETRY_DELAY = 100;
+
+	/**
+	 * addToggle() can come back false because the toolbar exists but isn't
+	 * attached to the document yet (see the comment inside addToggle) -
+	 * confirmed live, this happens in the "Select or Upload Media" picker
+	 * even though createToolbar() itself has already returned. Retry
+	 * briefly rather than accepting a single attempt as final.
+	 *
+	 * @param {Object} browserView
+	 * @param {number} attempt
+	 */
+	function insertToggleWithRetry( browserView, attempt ) {
+		if ( addToggle( browserView ) ) {
+			return;
+		}
+
+		if ( attempt < TOOLBAR_ATTACH_MAX_ATTEMPTS ) {
+			setTimeout( function () {
+				insertToggleWithRetry( browserView, attempt + 1 );
+			}, TOOLBAR_ATTACH_RETRY_DELAY );
+		} else {
+			console.warn( '[Ei Image Crop] gave up inserting the toggle after createToolbar() - toolbar never got attached to the document' );
+		}
+	}
+
 	/**
 	 * Patches the AttachmentsBrowser class so any browser view built AFTER
 	 * this point (e.g. a media-picker modal opened later by a user click)
-	 * gets the toggle automatically via its own createToolbar(). By the time
-	 * that method returns, the toolbar itself is already built synchronously,
-	 * so a single addToggle() call here (no retry needed) reliably works.
+	 * gets the toggle automatically via its own createToolbar().
 	 */
 	function patchClassForFutureViews() {
 		if ( ! window.wp || ! wp.media || ! wp.media.view || ! wp.media.view.AttachmentsBrowser ) {
@@ -131,7 +171,7 @@
 			__eiImageCropPatched: true,
 			createToolbar: function () {
 				BaseBrowser.prototype.createToolbar.apply( this, arguments );
-				addToggle( this );
+				insertToggleWithRetry( this, 0 );
 			},
 		} );
 	}
