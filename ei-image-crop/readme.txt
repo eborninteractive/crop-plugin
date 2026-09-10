@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.10.21
+Stable tag: 1.10.22
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.10.22 =
+* Adjusted the list view's tabs spacing (bigger top/bottom margins) and brought back a bottom divider, styled slightly differently from the grid view's.
 
 = 1.10.21 =
 * Tweaked the tabs' spacing: the grid view's version is now a compact box with just a bottom divider (was full-width with borders on both sides), and the list view's version dropped its borders, keeping just a full-width row with a smaller bottom margin.

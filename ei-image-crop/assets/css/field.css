@@ -649,7 +649,9 @@
 .upload-php .wp-filter + .ei-image-crop-toggle {
 	display: flex;
 	width: 100%;
-	margin: 0 0 10px;
+	margin: 15px 0 20px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid #dddddd;
 }
 
 .ei-image-crop-tab {
