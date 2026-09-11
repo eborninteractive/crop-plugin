@@ -311,6 +311,33 @@
 	}
 
 	/**
+	 * Shown over a container - the whole field for a fresh pick (openCropper()
+	 * doesn't yet know whether it needs the modal at all, see the
+	 * ratioAlreadyMatches() branch), or just the modal's own canvas for
+	 * "Adjust crop" (always ends up needing the modal, so it can open right
+	 * away instead of waiting on this same AJAX round trip first) - from the
+	 * moment openCropper() starts until either the modal has something to
+	 * show or the server-side auto-crop finishes, both of which otherwise
+	 * leave the screen looking like nothing is happening in the meantime.
+	 *
+	 * @param {jQuery} $container
+	 */
+	function showLoading( $container ) {
+		if ( $container.children( '.ei-image-crop-loading' ).length ) {
+			return;
+		}
+
+		$container.append( '<div class="ei-image-crop-loading"><span class="spinner is-active"></span></div>' );
+	}
+
+	/**
+	 * @param {jQuery} $container
+	 */
+	function hideLoading( $container ) {
+		$container.children( '.ei-image-crop-loading' ).remove();
+	}
+
+	/**
 	 * @param {jQuery} $field
 	 * @param {string} url Preview image URL, or '' to clear the preview.
 	 * @param {number|string} [id] Current attachment id, only needed to link
@@ -526,6 +553,25 @@
 		var $img = modal.find( '.ei-image-crop-img' );
 		$img.attr( 'src', '' );
 
+		var $modalMain = modal.find( '.ei-image-crop-modal-main' );
+
+		function hideAllLoading() {
+			hideLoading( $field );
+			hideLoading( $modalMain );
+		}
+
+		// "Adjust crop" (existingId already set here) always ends up needing
+		// the interactive modal - unlike a fresh pick, there's no chance this
+		// turns out to be the no-cropping-needed fast path below, so it can
+		// open right away with its own spinner instead of waiting on this
+		// same AJAX call first, same as clicking it visually already does.
+		if ( existingId ) {
+			modal.prop( 'hidden', false );
+			showLoading( $modalMain );
+		} else {
+			showLoading( $field );
+		}
+
 		$.post( eiImageCrop.ajaxUrl, {
 			action: 'ei_image_crop_get_source',
 			nonce: eiImageCrop.nonce,
@@ -535,6 +581,7 @@
 		} )
 			.done( function ( response ) {
 				if ( ! response || ! response.success ) {
+					hideAllLoading();
 					showError( ( response && response.data && response.data.message ) || t( 'error' ) );
 					modal.prop( 'hidden', false );
 					return;
@@ -562,6 +609,8 @@
 				// so wasFreshPick is false) remains the explicit way to open
 				// the editor for it afterward.
 				if ( wasFreshPick && existingId ) {
+					hideAllLoading();
+
 					// pickedAttachment.sizes.large when it exists - a crop
 					// always gets that size generated for it whenever it's
 					// actually bigger (see generate()'s
@@ -587,6 +636,7 @@
 				}
 
 				function showInteractiveCropper() {
+					hideAllLoading();
 					modal.find( '.ei-image-crop-modal-subtitle' ).text(
 						data.filename + ' · ' + data.full_width + ' × ' + data.full_height + ' px'
 					);
@@ -625,6 +675,7 @@
 				showInteractiveCropper();
 			} )
 			.fail( function () {
+				hideAllLoading();
 				showError( t( 'error' ) );
 				modal.prop( 'hidden', false );
 			} );
@@ -652,6 +703,7 @@
 					return;
 				}
 
+				hideLoading( $field );
 				setState( $field, { id: response.data.id, source: sourceId } );
 				setPreview( $field, response.data.url, response.data.id );
 				currentField = null;

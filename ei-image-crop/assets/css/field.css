@@ -1,5 +1,40 @@
 .ei-image-crop-field {
 	max-width: 640px;
+	position: relative;
+}
+
+/* Shown over the whole field, or just the modal's own canvas for "Adjust
+ * crop" (see showLoading()/hideLoading() in field.js), from the moment an
+ * image is picked or "Adjust crop" is clicked until either the cropper
+ * modal has something to show or, for a pick that needs no cropping, the
+ * server-side auto-crop finishes - both involve at least one AJAX round
+ * trip with nothing else on screen to indicate work is happening
+ * otherwise. */
+.ei-image-crop-loading {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(255, 255, 255, 0.7);
+	z-index: 1;
+}
+
+/* Inside the modal's own (dark-themed) canvas, the light overlay above
+ * would look like a stark, out-of-place flash rather than a loading state. */
+.ei-image-crop-modal-main .ei-image-crop-loading {
+	background: rgba(0, 0, 0, 0.6);
+}
+
+.ei-image-crop-loading .spinner {
+	float: none;
+	visibility: visible;
+}
+
+/* WP core's .spinner is a dark-on-transparent icon, invisible against the
+ * modal canvas's own dark background without inverting it. */
+.ei-image-crop-modal-main .ei-image-crop-loading .spinner {
+	filter: invert(1);
 }
 
 .ei-image-crop-preview {

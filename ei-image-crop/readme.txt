@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.10.38
+Stable tag: 1.10.39
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.10.39 =
+* Added a loading spinner while picking or adjusting an image: over the field itself for the "already the right shape, no cropper needed" fast path (previously showed no feedback while the server auto-cropped it), and inside the cropper modal - which now also opens immediately for "Adjust crop" instead of only after its data finishes loading - for the interactive case.
 
 = 1.10.38 =
 * Changed the crop canvas margin's background color to #000000 (was #020303).
