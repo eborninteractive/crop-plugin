@@ -26,15 +26,8 @@
 	background: rgba(0, 0, 0, 0.6);
 }
 
-.ei-image-crop-loading .spinner {
-	float: none;
-	visibility: visible;
-}
-
-/* WP core's .spinner is a dark-on-transparent icon, invisible against the
- * modal canvas's own dark background without inverting it. */
-.ei-image-crop-modal-main .ei-image-crop-loading .spinner {
-	filter: invert(1);
+.ei-image-crop-loading svg {
+	color: hsl(228, 97%, 42%);
 }
 
 .ei-image-crop-preview {

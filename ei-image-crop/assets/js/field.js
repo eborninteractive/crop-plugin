@@ -196,6 +196,11 @@
 	// Ei_Image_Crop_Field::pencil_icon() (dashicons-edit's baseline read as
 	// a stray underline at this size).
 	var PENCIL_ICON_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>';
+	// Used by showLoading() - a rotating ring rather than WP core's own
+	// .spinner (a dark-on-transparent sprite that needed inverting to read
+	// against the modal's dark canvas); this one is a plain currentColor
+	// path, so it just works in both contexts via CSS `color`.
+	var SPINNER_ICON_SVG = '<svg fill="currentColor" viewBox="0 0 24 24" width="32" height="32" aria-hidden="true" focusable="false"><path d="M10.72,19.9a8,8,0,0,1-6.5-9.79A7.77,7.77,0,0,1,10.4,4.16a8,8,0,0,1,9.49,6.52A1.54,1.54,0,0,0,21.38,12h.13a1.37,1.37,0,0,0,1.38-1.54,11,11,0,1,0-12.7,12.39A1.54,1.54,0,0,0,12,21.34h0A1.47,1.47,0,0,0,10.72,19.9Z"><animateTransform attributeName="transform" type="rotate" dur="0.75s" values="0 12 12;360 12 12" repeatCount="indefinite"/></path></svg>';
 
 	function parseAspectRatio( ratio ) {
 		if ( ! ratio || 'free' === ratio ) {
@@ -327,7 +332,7 @@
 			return;
 		}
 
-		$container.append( '<div class="ei-image-crop-loading"><span class="spinner is-active"></span></div>' );
+		$container.append( '<div class="ei-image-crop-loading">' + SPINNER_ICON_SVG + '</div>' );
 	}
 
 	/**
