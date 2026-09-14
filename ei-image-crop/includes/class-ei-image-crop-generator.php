@@ -430,6 +430,21 @@ class Ei_Image_Crop_Generator {
 			}
 		}
 
+		// A box covering the entire source image, resized (if at all) to
+		// that same image's own exact pixel dimensions, would produce a file
+		// byte-for-byte identical to the original - e.g. a fresh upload
+		// that's already exactly the field's target size, landing here via
+		// the "already the right shape" fast path (see field.js's
+		// ratioAlreadyMatches()) with its default box being the full image.
+		// Skip generating a pointless duplicate attachment and use the
+		// original directly instead.
+		$is_full_box = 0 === $px_x && 0 === $px_y
+			&& $px_w === $source['width'] && $px_h === $source['height'];
+
+		if ( $is_full_box && ( ! $dst_w || ( $dst_w === $source['width'] && $dst_h === $source['height'] ) ) ) {
+			return $parent_id;
+		}
+
 		$cropped = $editor->crop( $px_x, $px_y, $px_w, $px_h, $dst_w, $dst_h, false );
 		if ( is_wp_error( $cropped ) ) {
 			return $cropped;
