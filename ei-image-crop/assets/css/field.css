@@ -34,6 +34,7 @@
 	position: relative;
 	display: inline-block;
 	margin-bottom: 8px;
+	width: 100%;
 }
 
 /* WP admin's own .button{display:inline-block} rule beats the browser's
