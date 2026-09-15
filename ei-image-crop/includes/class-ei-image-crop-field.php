@@ -195,6 +195,10 @@ class Ei_Image_Crop_Field extends acf_field {
 		// have a 'large' of its own.
 		$preview_url = $preview_id ? wp_get_attachment_image_url( $preview_id, 'large' ) : '';
 		$has_image   = (bool) $preview_url;
+		// An SVG has no raster data for the cropper to work with, so its
+		// "Adjust crop" icon is omitted below - it would only offer an
+		// action that leads nowhere.
+		$is_svg      = $has_image && 'image/svg+xml' === get_post_mime_type( $preview_id );
 
 		// The field only ever submits ONE input to ACF (required for the field
 		// to work correctly when nested inside a repeater/flexible content/group,
@@ -237,7 +241,9 @@ class Ei_Image_Crop_Field extends acf_field {
 			echo '<img src="' . esc_url( $preview_url ) . '" alt="" class="ei-image-crop-select" />';
 			echo '<div class="ei-image-crop-overlay">';
 			echo '<a href="' . esc_url( admin_url( 'upload.php?item=' . $value ) ) . '" target="_blank" rel="noopener" data-attachment-id="' . esc_attr( $value ) . '" class="ei-image-crop-icon-btn ei-image-crop-open-attachment" title="' . esc_attr__( 'Edit image details (caption, alt text, etc.)', 'ei-image-crop' ) . '">' . self::pencil_icon() . '</a>';
-			echo '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-edit" title="' . esc_attr__( 'Adjust crop', 'ei-image-crop' ) . '">' . self::crop_icon() . '</button>';
+			if ( ! $is_svg ) {
+				echo '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-edit" title="' . esc_attr__( 'Adjust crop', 'ei-image-crop' ) . '">' . self::crop_icon() . '</button>';
+			}
 			echo '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-remove" title="' . esc_attr__( 'Remove image', 'ei-image-crop' ) . '"></button>';
 			echo '</div>';
 		}

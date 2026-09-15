@@ -347,8 +347,11 @@
 	 * @param {string} url Preview image URL, or '' to clear the preview.
 	 * @param {number|string} [id] Current attachment id, only needed to link
 	 *   the "edit details" icon to its own WP attachment edit screen.
+	 * @param {boolean} [isSvg] An SVG has nothing for the cropper to do -
+	 *   there's no raster data to crop/resize - so it omits the "Adjust
+	 *   crop" icon rather than offering an action that leads nowhere.
 	 */
-	function setPreview( $field, url, id ) {
+	function setPreview( $field, url, id, isSvg ) {
 		var $preview = $field.find( '.ei-image-crop-preview' );
 		var $actions = $field.find( '.ei-image-crop-actions' );
 
@@ -356,20 +359,28 @@
 			// The image itself doubles as the "pick a different image"
 			// control (same convention as ACF's own native Image field) -
 			// the pencil icon is for something else entirely (see below).
+			var $overlay = $( '<div class="ei-image-crop-overlay" />' ).append(
+				$( '<a target="_blank" rel="noopener" class="ei-image-crop-icon-btn ei-image-crop-open-attachment">' + PENCIL_ICON_SVG + '</a>' )
+					.attr( 'href', eiImageCrop.editUrlBase + id )
+					.attr( 'data-attachment-id', id )
+					.attr( 'title', t( 'editDetails' ) )
+			);
+
+			if ( ! isSvg ) {
+				$overlay.append(
+					$( '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-edit">' + CROP_ICON_SVG + '</button>' )
+						.attr( 'title', t( 'adjustCrop' ) )
+				);
+			}
+
+			$overlay.append(
+				$( '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-remove"></button>' )
+					.attr( 'title', t( 'removeImage' ) )
+			);
+
 			$preview.empty()
 				.append( $( '<img class="ei-image-crop-select" />' ).attr( 'src', url ) )
-				.append(
-					$( '<div class="ei-image-crop-overlay" />' ).append(
-						$( '<a target="_blank" rel="noopener" class="ei-image-crop-icon-btn ei-image-crop-open-attachment">' + PENCIL_ICON_SVG + '</a>' )
-							.attr( 'href', eiImageCrop.editUrlBase + id )
-							.attr( 'data-attachment-id', id )
-							.attr( 'title', t( 'editDetails' ) ),
-						$( '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-edit">' + CROP_ICON_SVG + '</button>' )
-							.attr( 'title', t( 'adjustCrop' ) ),
-						$( '<button type="button" class="ei-image-crop-icon-btn ei-image-crop-remove"></button>' )
-							.attr( 'title', t( 'removeImage' ) )
-					)
-				)
+				.append( $overlay )
 				.prop( 'hidden', false );
 			$actions.prop( 'hidden', true );
 		} else {
@@ -1162,6 +1173,16 @@
 
 		frame.on( 'select', function () {
 			var attachment = frame.state().get( 'selection' ).first().toJSON();
+
+			// An SVG has no raster data for the cropper to work with - vector
+			// markup, not pixels, so there's nothing to crop or resize.
+			// Used as-is, same as an already-correctly-shaped raster pick.
+			if ( 'image/svg+xml' === attachment.mime ) {
+				setState( $field, { id: attachment.id, source: attachment.id } );
+				setPreview( $field, attachment.url, attachment.id, true );
+				return;
+			}
+
 			openCropper( $field, attachment.id, '', attachment );
 		} );
 
