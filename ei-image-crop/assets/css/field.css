@@ -382,7 +382,6 @@
 	 * undersized) - without a fixed height here, everything below jumps
 	 * down the moment the text shows up. */
 	min-height: 16px;
-	text-align: center;
 }
 
 /* Only shown at all once the selection can't reach the target size
