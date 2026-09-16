@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.10.45
+Stable tag: 1.10.46
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.10.46 =
+* The undersized-resolution warning now also shows the field's recommended target size in black next to the current (red) resolution, e.g. "⚠ 800 × 600 px (1200 × 800 px)".
 
 = 1.10.45 =
 * Removed the field preview image's max-height cap, now that the preview itself is full-width.

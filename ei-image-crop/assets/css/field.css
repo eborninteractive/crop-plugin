@@ -391,6 +391,14 @@
 	color: #d63638;
 }
 
+/* The recommended size shown alongside the warning (see
+ * updatePreviewCaption() in field.js) stays black rather than inheriting
+ * the warning's own red - it's informational, not part of the warning
+ * itself. */
+.ei-image-crop-recommended-size {
+	color: #000000;
+}
+
 .ei-image-crop-reuse {
 	margin-bottom: 16px;
 }

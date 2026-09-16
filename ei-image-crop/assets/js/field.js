@@ -799,7 +799,12 @@
 		var h = Math.round( data.height * currentTrueScale );
 
 		if ( currentTargetSize ) {
-			$caption.addClass( 'is-undersized' ).text( '⚠ ' + w + ' × ' + h + ' px' );
+			$caption.addClass( 'is-undersized' ).html(
+				'⚠ ' + w + ' × ' + h + ' px ' +
+				'<span class="ei-image-crop-recommended-size">(' +
+					currentTargetSize.width + ' × ' + currentTargetSize.height + ' px)' +
+				'</span>'
+			);
 		} else {
 			if ( currentMaxSize ) {
 				var fit = fitWithinMax( w, h, currentMaxSize );
