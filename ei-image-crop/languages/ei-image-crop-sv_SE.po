@@ -236,3 +236,12 @@ msgstr "refereras inte för närvarande"
 msgid "original image missing"
 msgstr "originalbild saknas"
 
+
+msgid "Allowed formats"
+msgstr "Tillåtna format"
+
+msgid "Untick a format to stop it being picked or uploaded for this field - e.g. PNG photos take up a lot of server space."
+msgstr "Avmarkera ett format för att hindra att det väljs eller laddas upp i det här fältet - t.ex. tar png-foton mycket serverutrymme."
+
+msgid "This field does not accept that image format."
+msgstr "Det här fältet tillåter inte det bildformatet."

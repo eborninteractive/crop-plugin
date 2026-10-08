@@ -1168,7 +1168,27 @@
 		document.cookie = 'ei_crop_ratio=; path=/; max-age=0';
 	}
 
+	/**
+	 * Tells the server which formats this field has switched off while its
+	 * picker is open, so it can hide them from the library and refuse
+	 * uploads of them (see Ei_Image_Crop_Media_Library) - a cookie for the
+	 * same reason as the crop ratio one above. Same short expiry rationale.
+	 */
+	function setBlockedFormatsCookie( blocked ) {
+		if ( blocked.length ) {
+			document.cookie = 'ei_blocked_formats=' + encodeURIComponent( blocked.join( ',' ) ) + '; path=/; max-age=300';
+		} else {
+			clearBlockedFormatsCookie();
+		}
+	}
+
+	function clearBlockedFormatsCookie() {
+		document.cookie = 'ei_blocked_formats=; path=/; max-age=0';
+	}
+
 	function openMediaFrame( $field ) {
+		var blocked = String( $field.data( 'blocked-mimes' ) || '' ).split( ',' ).filter( Boolean );
+
 		var frame = wp.media( {
 			title: t( 'selectImage' ),
 			library: { type: 'image' },
@@ -1178,6 +1198,13 @@
 
 		frame.on( 'select', function () {
 			var attachment = frame.state().get( 'selection' ).first().toJSON();
+
+			// Backstop for anything that slipped past the server-side
+			// filtering of the library/uploads.
+			if ( blocked.indexOf( attachment.mime ) !== -1 ) {
+				window.alert( t( 'formatNotAllowed' ) );
+				return;
+			}
 
 			// An SVG has no raster data for the cropper to work with - vector
 			// markup, not pixels, so there's nothing to crop or resize.
@@ -1191,9 +1218,13 @@
 			openCropper( $field, attachment.id, '', attachment );
 		} );
 
-		frame.on( 'close', clearCropRatioCookie );
+		frame.on( 'close', function () {
+			clearCropRatioCookie();
+			clearBlockedFormatsCookie();
+		} );
 
 		setCropRatioCookie( $field.data( 'ratio' ) );
+		setBlockedFormatsCookie( blocked );
 		frame.open();
 	}
 

@@ -23,6 +23,9 @@ class Ei_Image_Crop_Field extends acf_field {
 			'image_size'    => '',
 			'library'       => 'all',
 			'return_format' => 'array',
+			// Everything allowed by default - existing fields saved before
+			// this setting existed pick it up through ACF's defaults merge.
+			'allowed_formats' => array_keys( self::format_choices() ),
 		);
 
 		parent::__construct();
@@ -36,6 +39,42 @@ class Ei_Image_Crop_Field extends acf_field {
 		// (no Cropper.js, no click handler) inside a block. enqueue_block_assets
 		// is WordPress's own mechanism for reaching that iframe.
 		add_action( 'enqueue_block_assets', array( $this, 'enqueue_block_editor_assets' ) );
+	}
+
+	/**
+	 * Image formats a field can individually block, mime type => label. Only
+	 * these can be turned off - any other image type stays allowed.
+	 *
+	 * @return array<string,string>
+	 */
+	public static function format_choices() {
+		return array(
+			'image/jpeg'    => 'JPEG',
+			'image/png'     => 'PNG',
+			'image/gif'     => 'GIF',
+			'image/webp'    => 'WebP',
+			'image/avif'    => 'AVIF',
+			'image/svg+xml' => 'SVG',
+		);
+	}
+
+	/**
+	 * Mime types this field has switched off in its "Allowed formats"
+	 * setting. Empty when the setting is untouched, or when every box is
+	 * unticked (blocking everything would leave nothing selectable at all).
+	 *
+	 * @param array $field
+	 * @return string[]
+	 */
+	public static function blocked_formats( $field ) {
+		$all     = array_keys( self::format_choices() );
+		$allowed = isset( $field['allowed_formats'] ) ? array_values( (array) $field['allowed_formats'] ) : $all;
+
+		if ( ! $allowed ) {
+			return array();
+		}
+
+		return array_values( array_diff( $all, $allowed ) );
 	}
 
 	/**
@@ -114,6 +153,18 @@ class Ei_Image_Crop_Field extends acf_field {
 					'all'        => __( 'All', 'ei-image-crop' ),
 					'uploadedTo' => __( 'Uploaded to post', 'ei-image-crop' ),
 				),
+			)
+		);
+
+		acf_render_field_setting(
+			$field,
+			array(
+				'label'        => __( 'Allowed formats', 'ei-image-crop' ),
+				'instructions' => __( 'Untick a format to stop it being picked or uploaded for this field - e.g. PNG photos take up a lot of server space.', 'ei-image-crop' ),
+				'type'         => 'checkbox',
+				'name'         => 'allowed_formats',
+				'layout'       => 'horizontal',
+				'choices'      => self::format_choices(),
 			)
 		);
 
@@ -218,6 +269,7 @@ class Ei_Image_Crop_Field extends acf_field {
 			'data-ratio'         => $ratio,
 			'data-library'       => $field['library'],
 			'data-mime-types'    => 'image',
+			'data-blocked-mimes' => implode( ',', self::blocked_formats( $field ) ),
 		);
 
 		echo '<div ' . acf_esc_attrs( $wrapper_atts ) . '>';
@@ -327,6 +379,7 @@ class Ei_Image_Crop_Field extends acf_field {
 				'i18n'    => array(
 					'selectImage'          => __( 'Select an image', 'ei-image-crop' ),
 					'useImage'             => __( 'Use this image', 'ei-image-crop' ),
+					'formatNotAllowed'     => __( 'This field does not accept that image format.', 'ei-image-crop' ),
 					'modalTitle'           => __( 'Crop image', 'ei-image-crop' ),
 					'editDetails'          => __( 'Edit image details (caption, alt text, etc.)', 'ei-image-crop' ),
 					'adjustCrop'           => __( 'Adjust crop', 'ei-image-crop' ),

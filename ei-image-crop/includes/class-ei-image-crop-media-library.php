@@ -31,6 +31,57 @@ class Ei_Image_Crop_Media_Library {
 		// outer document) needs this the same way the crop field itself
 		// does (see Ei_Image_Crop_Field::enqueue_block_editor_assets()).
 		add_action( 'enqueue_block_assets', array( __CLASS__, 'enqueue_block_editor_grid_toggle' ) );
+		add_filter( 'wp_handle_upload_prefilter', array( __CLASS__, 'block_disallowed_upload' ) );
+	}
+
+	/**
+	 * Mime types the currently open picker's field has switched off, via the
+	 * ei_blocked_formats cookie field.js sets while the picker is open - a
+	 * cookie for the same reason as ei_show_crops/ei_crop_ratio: neither a
+	 * media query nor an upload request carries a custom prop through
+	 * WordPress's own whitelisting.
+	 *
+	 * @return string[] Only formats Ei_Image_Crop_Field::format_choices() knows.
+	 */
+	protected static function blocked_formats_from_cookie() {
+		if ( empty( $_COOKIE['ei_blocked_formats'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return array();
+		}
+
+		$raw = explode( ',', sanitize_text_field( wp_unslash( $_COOKIE['ei_blocked_formats'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		// The field class loads late (on ACF's own include hook) and may not
+		// exist yet during an early upload request - fall back to just
+		// validating the shape instead of the known list.
+		if ( ! class_exists( 'Ei_Image_Crop_Field' ) ) {
+			return array_values( preg_grep( '#^image/[a-z0-9.+-]+$#', $raw ) );
+		}
+
+		return array_values( array_intersect( $raw, array_keys( Ei_Image_Crop_Field::format_choices() ) ) );
+	}
+
+	/**
+	 * Refuses an upload in a blocked format while a field's picker that
+	 * blocks it is open - the whole point being to keep such files from ever
+	 * landing on the server, not just from being selectable afterward.
+	 *
+	 * @param array $file
+	 * @return array
+	 */
+	public static function block_disallowed_upload( $file ) {
+		$blocked = self::blocked_formats_from_cookie();
+
+		if ( ! $blocked || empty( $file['name'] ) ) {
+			return $file;
+		}
+
+		$type = wp_check_filetype( $file['name'] );
+
+		if ( $type['type'] && in_array( $type['type'], $blocked, true ) ) {
+			$file['error'] = __( 'This field does not accept that image format.', 'ei-image-crop' );
+		}
+
+		return $file;
 	}
 
 	/**
@@ -115,6 +166,19 @@ class Ei_Image_Crop_Media_Library {
 		}
 
 		$showing_only_crops = ! empty( $_COOKIE['ei_show_crops'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		$blocked = self::blocked_formats_from_cookie();
+
+		if ( $blocked ) {
+			$image_mimes = array_filter(
+				get_allowed_mime_types(),
+				function ( $mime ) {
+					return 0 === strpos( $mime, 'image/' );
+				}
+			);
+
+			$query['post_mime_type'] = array_values( array_diff( array_unique( $image_mimes ), $blocked ) );
+		}
 
 		$meta_query   = isset( $query['meta_query'] ) ? (array) $query['meta_query'] : array();
 		$meta_query[] = $showing_only_crops ? self::inclusion_clause() : self::exclusion_clause();
