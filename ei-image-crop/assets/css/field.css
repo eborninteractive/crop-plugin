@@ -132,7 +132,7 @@
 
 .ei-image-crop-modal-inner {
 	background: #fff;
-	width: min(1100px, 94vw);
+	width: min(1500px, 94vw);
 	height: min(720px, 90vh);
 	display: flex;
 	flex-direction: column;
