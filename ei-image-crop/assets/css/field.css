@@ -132,8 +132,12 @@
 
 .ei-image-crop-modal-inner {
 	background: #fff;
-	width: min(1900px, 94vw);
-	height: min(720px, 90vh);
+	width: min(1500px, 94vw);
+	/* Height follows the width at the same proportions the popup always had
+	 * (1100x720, ~0.65) so a wider popup doesn't just get a shorter, wider
+	 * image area that clips tall images - still capped to the viewport. */
+	aspect-ratio: 1500 / 975;
+	max-height: 90vh;
 	display: flex;
 	flex-direction: column;
 	position: relative;

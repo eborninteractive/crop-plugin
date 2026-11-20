@@ -4,7 +4,7 @@ Tags: acf, image, crop, media, aspect ratio
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.10.49
+Stable tag: 1.10.50
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,9 @@ A size registered without hard cropping (`add_image_size( $name, $width, $height
 Every crop generated from that source is deleted along with it, so the Media Library doesn't accumulate orphaned files.
 
 == Changelog ==
+
+= 1.10.50 =
+* Crop popup back to a 1500px max width, and its height now scales with the width (same proportions as before) so tall images aren't clipped.
 
 = 1.10.49 =
 * Widened the crop popup further (max width 1900px, was 1500px).
